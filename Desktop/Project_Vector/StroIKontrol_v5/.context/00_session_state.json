@@ -1,0 +1,82 @@
+{
+  "project": "ApartmentAuditor",
+  "current_phase": 10,
+  "current_task": "#55 Fix massive data loss in db import",
+  "status": "completed",
+  "last_completed": "#55 Fix massive data loss in db import",
+  "blockers": [],
+  "last_updated": "2025-12-05T18:56:00Z",
+  "statistics": {
+    "json_files_processed": 57,
+    "total_items": 320,
+    "fixed_files": 8,
+    "errors_before": 8,
+    "errors_after": 0,
+    "normalized_records": 320,
+    "uncategorized_records": 0,
+    "integration_tasks": {
+      "database_imported": true,
+      "types_defined": true,
+      "filtering_logic_implemented": true,
+      "ui_updated": true,
+      "protocol_fixed": true,
+      "data_structure_analyzed": true,
+      "floor_category_issue_identified": true,
+      "dual_system_data_conflict_identified": true,
+      "data_categories_normalized": true,
+      "general_category_items_extracted": true,
+      "data_redistributed": true,
+      "floor_material_issue_diagnosed": true,
+      "missing_materials_identified": ["laminate", "wood", "parquet"]
+    }
+  },
+  "debug_findings": {
+    "total_database_records": "320 (полный импорт)",
+    "floor_category_available_records": "91 (16 draft + 75 finish)",
+    "floor_category_in_app": "91 (проверено)",
+    "general_category_items": "55 (15 draft + 40 finish)",
+    "general_category_sources": "СП 54, СП 50, ГОСТ 13996, ГОСТ 59654, СП 1",
+    "data_loss_fix": {
+      "records_before_fix": 312,
+      "records_after_fix": 320,
+      "recovered_records": 8,
+      "missing_filters_records": 8,
+      "conversion_success": "100%"
+    },
+    "redistribution_results": {
+      "total_general_before": 55,
+      "total_general_after": 9,
+      "deleted_records": 7,
+      "moved_to_fire_safety": 14,
+      "moved_to_walls": 10,
+      "moved_to_ceiling": 2,
+      "fire_safety_increase": "from 12 to 26",
+      "ceiling_increase": "from 9 to 11",
+      "walls_increase": "from 48 to 57"
+    },
+    "root_cause": "Структурная ошибка - все данные были в uncategorized, успешно исправлена нормализацией категорий. Дополнительно выявлена проблема двойной системы данных: JSON база (291 запись, 83 floor) vs TypeScript данные (7 floor). Новая проблема: в приложении отсутствуют чекпоинты для материалов floor кроме ceramic_tile, что приводит к пустым результатам при выборе laminate/wood/parquet. ИСПРАВЛЕНО: Устранена потеря 8 записей из-за отсутствия свойства filters - теперь все 320 записей обрабатываются корректно.",
+    "normalization_results": {
+      "total_processed": 320,
+      "categories_fixed": 10,
+      "finish_types": {
+        "floor": {"draft": 16, "finish": 75},
+        "walls": {"draft": 12, "finish": 36},
+        "ceiling": {"draft": 0, "finish": 9},
+        "windows_doors": {"draft": 5, "finish": 16},
+        "plumbing": {"draft": 5, "finish": 16},
+        "electrical": {"draft": 0, "finish": 2},
+        "hvac": {"draft": 28, "finish": 33},
+        "gas": {"draft": 0, "finish": 0},
+        "fire_safety": {"draft": 0, "finish": 12},
+        "general": {"draft": 15, "finish": 40}
+      }
+    },
+    "floor_materials_analysis": {
+      "source_database_materials": ["ceramic_tile", "laminate", "wood", "parquet"],
+      "app_database_materials": ["ceramic_tile"],
+      "missing_in_app": ["laminate", "wood", "parquet"],
+      "filtering_logic_issue": "useProjectStore.ts:299 - возвращает пустой массив для недостающих материалов",
+      "impact": "При выборе материалов пола кроме керамической плитки пользователь получает 0 проверок"
+    }
+  }
+}
