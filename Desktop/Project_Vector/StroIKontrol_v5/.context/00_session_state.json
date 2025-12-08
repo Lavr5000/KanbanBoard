@@ -1,11 +1,11 @@
 {
   "project": "ApartmentAuditor",
   "current_phase": 10,
-  "current_task": "#55 Fix massive data loss in db import",
+  "current_task": "force powershell execution and simplify store",
   "status": "completed",
-  "last_completed": "#55 Fix massive data loss in db import",
+  "last_completed": "#68 force powershell execution and simplify store",
   "blockers": [],
-  "last_updated": "2025-12-05T18:56:00Z",
+  "last_updated": "2025-12-08T17:55:00Z",
   "statistics": {
     "json_files_processed": 57,
     "total_items": 320,
@@ -27,7 +27,14 @@
       "general_category_items_extracted": true,
       "data_redistributed": true,
       "floor_material_issue_diagnosed": true,
-      "missing_materials_identified": ["laminate", "wood", "parquet"]
+      "missing_materials_identified": ["laminate", "wood", "parquet"],
+      "checklist_filter_fixed": true,
+      "pdf_button_fixed": true,
+      "layout_routing_cleaned": true,
+      "powershell_protocol_fixed": true,
+      "store_filtering_simplified": true,
+      "windows_doors_id_verified": true,
+      "database_rebuilt_successfully": true
     }
   },
   "debug_findings": {
