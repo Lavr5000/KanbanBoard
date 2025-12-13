@@ -1,0 +1,882 @@
+{
+  "sourceDocument": {
+    "code": "СП 50.13330.2024",
+    "title": "Свод правил. Тепловая защита зданий",
+    "subtitle": "Актуализированная редакция СНиП 23-02-2003",
+    "dateApproved": "15.05.2024",
+    "dateEffective": "16.06.2024"
+  },
+  "checkpoints": [
+    {
+      "id": "sp50_walls_thermal_resistance",
+      "title": "Сопротивление теплопередаче наружных стен",
+      "category": "walls",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Приведенное сопротивление теплопередаче наружных стен должно быть не менее нормируемого значения в зависимости от категории здания и ГСОП",
+      "tolerance": {
+        "value": "по Таблице 3",
+        "unit": "(м²·°C)/Вт",
+        "condition": "зависит от ГСОП, тип здания и климатической зоны",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Приложение Г СП 50.13330.2024",
+          "СП 345.1325800.2017"
+        ],
+        "procedure": "Расчет по формуле: R_о_норм = R_о_тр × m_р"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "documentTitle": "Свод правил. Тепловая защита зданий",
+        "section": "5.2, 5.4",
+        "table": 3,
+        "exactQuote": "Нормируемое значение приведенного сопротивления теплопередаче ограждающей конструкции R_о_норм, (м²·°C)/Вт, следует определять по формуле: R_о_норм = R_о_тр × m_р"
+      },
+      "violationText": "Нарушено требование п. 5.2 СП 50.13330.2024 - приведенное сопротивление теплопередаче наружной стены ниже нормируемого значения",
+      "hintLayman": "Наружная стена должна достаточно хорошо удерживать тепло",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_walls_surface_temp",
+        "sp50_walls_humidity"
+      ],
+      "tags": [
+        "тепловая защита",
+        "ГСОП",
+        "энергоэффективность"
+      ]
+    },
+    {
+      "id": "sp50_walls_surface_temp",
+      "title": "Температура внутренней поверхности наружных стен",
+      "category": "walls",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Температура должна быть не ниже точки росы при расчетной температуре наружного воздуха",
+      "tolerance": {
+        "value": "≥ точке росы",
+        "unit": "°C",
+        "condition": "при 55% относительной влажности в жилых помещениях",
+        "maxTotal": "Нет минимума"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тепловизор ИК",
+          "Психрометр"
+        ],
+        "procedure": "1. Измерить температуру внутренней поверхности в нескольких точках. 2. Измерить влажность и температуру воздуха. 3. Рассчитать точку росы. 4. Сравнить результаты"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Температура внутренней поверхности ограждающей конструкции должна быть не ниже точки росы внутреннего воздуха при расчетной температуре наружного воздуха"
+      },
+      "violationText": "Нарушено требование п. 5.7 СП 50.13330.2024 - температура ниже точки росы",
+      "hintLayman": "На стене не должно быть конденсата и плесени",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_walls_thermal_resistance",
+        "sp50_walls_humidity"
+      ],
+      "tags": [
+        "санитарно-гигиеническое",
+        "конденсация",
+        "микроклимат"
+      ]
+    },
+    {
+      "id": "sp50_walls_humidity",
+      "title": "Влажностный режим помещения",
+      "category": "walls",
+      "subcategory": "humidity",
+      "stage": "all",
+      "level": "amateur",
+      "description": "Определение условий эксплуатации в зависимости от влажностного режима и зоны влажности района",
+      "tolerance": {
+        "value": "по Таблицам 1 и 2",
+        "unit": "% отн. влажность",
+        "condition": "Сухой: до 60% (≤12°C); Нормальный: 60-75% (≤12°C); Влажный: >75% (≤12°C)",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "visual",
+        "tools": [
+          "Психрометр",
+          "Наблюдение"
+        ],
+        "procedure": "1. Определить тип помещения. 2. Измерить влажность. 3. По таблице 1 определить режим. 4. По таблице 2 определить условия эксплуатации"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "4.3, 4.4",
+        "table": [
+          1,
+          2
+        ],
+        "exactQuote": "Влажностный режим помещений следует устанавливать по таблице 1. Условия эксплуатации - по таблице 2"
+      },
+      "violationText": "Нарушено требование п. 4.3-4.4 - режим влажности не соответствует нормируемому",
+      "hintLayman": "В помещении должна быть определённая влажность воздуха",
+      "photoRequired": false,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_walls_thermal_resistance"
+      ],
+      "tags": [
+        "влажность",
+        "микроклимат"
+      ]
+    },
+    {
+      "id": "sp50_ceiling_thermal_resistance",
+      "title": "Сопротивление теплопередаче потолков и перекрытий",
+      "category": "ceiling",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Приведенное сопротивление потолков/перекрытий должно быть не менее нормируемого",
+      "tolerance": {
+        "value": "по Таблице 3",
+        "unit": "(м²·°C)/Вт",
+        "condition": "зависит от типа перекрытия и ГСОП",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Приложение Г",
+          "Проектная документация"
+        ],
+        "procedure": "Расчет по приложению Г с использованием коэффициентов из таблицы 6"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.2, 5.4",
+        "table": 3,
+        "exactQuote": "Базовые значения требуемого сопротивления для перекрытий определяются по таблице 3"
+      },
+      "violationText": "Нарушено требование п. 5.2 - сопротивление теплопередаче ниже нормируемого",
+      "hintLayman": "Потолок должен хорошо утеплён",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_ceiling_surface_temp"
+      ],
+      "tags": [
+        "тепловая защита",
+        "перекрытия",
+        "чердак"
+      ]
+    },
+    {
+      "id": "sp50_ceiling_surface_temp",
+      "title": "Температура внутренней поверхности потолков",
+      "category": "ceiling",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Температура должна быть не ниже точки росы",
+      "tolerance": {
+        "value": "≥ точке росы",
+        "unit": "°C",
+        "condition": "при стандартной влажности",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тепловизор ИК",
+          "Психрометр"
+        ],
+        "procedure": "1. Измерить температуру потолка. 2. Измерить влажность воздуха. 3. Рассчитать точку росы. 4. Сравнить"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Температура внутренней поверхности должна быть не ниже точки росы"
+      },
+      "violationText": "Нарушено требование п. 5.7 - температура ниже точки росы",
+      "hintLayman": "На потолке не должно быть плесени",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_ceiling_thermal_resistance"
+      ],
+      "tags": [
+        "санитарно-гигиеническое",
+        "конденсация"
+      ]
+    },
+    {
+      "id": "sp50_ceiling_solar_protection",
+      "title": "Солнцезащитные устройства для потолков",
+      "category": "ceiling",
+      "subcategory": "heat_protection",
+      "stage": "finish",
+      "level": "amateur",
+      "description": "В районах с июльской температурой ≥21°C должны быть солнцезащитные устройства",
+      "tolerance": {
+        "value": "0,2",
+        "unit": "коэффициент",
+        "condition": "для жилых зданий; 0,4 для производственных",
+        "maxTotal": "0,2"
+      },
+      "method": {
+        "type": "visual",
+        "tools": [
+          "Визуальный осмотр",
+          "Спецификация устройства"
+        ],
+        "procedure": "1. Проверить температуру июля. 2. Если ≥21°C, проверить наличие устройств"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "6.8",
+        "table": 9,
+        "exactQuote": "Для окон жилых зданий в районах с июльской температурой ≥21°C предусмотреть солнцезащитные устройства"
+      },
+      "violationText": "Нарушено требование п. 6.8 - отсутствуют солнцезащитные устройства",
+      "hintLayman": "Окна должны быть защищены от солнца жалюзи",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [],
+      "tags": [
+        "летний период",
+        "тепловой комфорт"
+      ]
+    },
+    {
+      "id": "sp50_floor_thermal_resistance",
+      "title": "Сопротивление теплопередаче полов",
+      "category": "floor",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Сопротивление теплопередаче полов должно быть не менее нормируемого",
+      "tolerance": {
+        "value": "по Таблице 3",
+        "unit": "(м²·°C)/Вт",
+        "condition": "для перекрытий над подвалом; для пола по грунту - расчет по зонам",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Приложение Г",
+          "Расчеты"
+        ],
+        "procedure": "Для полов по грунту: расчет по зонам (4 полосы 2м от контура)"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.2, 5.4",
+        "table": 3,
+        "exactQuote": "Нормируемое значение для пола над подвалом определяется по таблице 3"
+      },
+      "violationText": "Нарушено требование п. 5.2 - сопротивление ниже нормируемого",
+      "hintLayman": "Пол должен быть хорошо утеплён",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_floor_surface_temp"
+      ],
+      "tags": [
+        "тепловая защита",
+        "полы",
+        "грунт"
+      ]
+    },
+    {
+      "id": "sp50_floor_surface_temp",
+      "title": "Температура внутренней поверхности пола",
+      "category": "floor",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Температура должна быть не ниже точки росы",
+      "tolerance": {
+        "value": "≥ точке росы",
+        "unit": "°C",
+        "condition": "при стандартной влажности",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Инфракрасный термометр",
+          "Психрометр"
+        ],
+        "procedure": "1. Измерить температуру пола в разных местах. 2. Измерить влажность. 3. Рассчитать точку росы"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Температура внутренней поверхности должна быть не ниже точки росы"
+      },
+      "violationText": "Нарушено требование п. 5.7 - температура ниже точки росы",
+      "hintLayman": "Пол не должен быть холодным и влажным",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_floor_thermal_resistance"
+      ],
+      "tags": [
+        "санитарно-гигиеническое",
+        "комфорт"
+      ]
+    },
+    {
+      "id": "sp50_floor_heat_absorption",
+      "title": "Теплоусвоение поверхности пола",
+      "category": "floor",
+      "subcategory": "comfort",
+      "stage": "finish",
+      "level": "amateur",
+      "description": "Поверхность пола должна иметь правильные теплофизические характеристики",
+      "tolerance": {
+        "value": "по Приложению В",
+        "unit": "Вт/(м²·°C)",
+        "condition": "зависит от материала",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "visual",
+        "tools": [
+          "Спецификация материала",
+          "Таблицы характеристик"
+        ],
+        "procedure": "1. Определить материал пола. 2. Проверить паспортные данные"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "9",
+        "table": null,
+        "exactQuote": "Теплоусвоение поверхности пола должно соответствовать требованиям"
+      },
+      "violationText": "Нарушено требование п. 9 - материал имеет неподходящие характеристики",
+      "hintLayman": "Пол не должен быть холодным",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [
+        "sp50_floor_thermal_resistance"
+      ],
+      "tags": [
+        "тепловой комфорт",
+        "материалы"
+      ]
+    },
+    {
+      "id": "sp50_windows_thermal_resistance",
+      "title": "Сопротивление теплопередаче окон",
+      "category": "windows",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Сопротивление теплопередаче светопрозрачных конструкций должно быть не менее нормируемого",
+      "tolerance": {
+        "value": "по Таблице 3",
+        "unit": "(м²·°C)/Вт",
+        "condition": "зависит от ГСОП и категории здания",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Паспорт окна",
+          "СП 345.1325800.2017"
+        ],
+        "procedure": "Проверить паспортные данные и сравнить с требованием"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.2, 5.4",
+        "table": 3,
+        "exactQuote": "Базовые значения требуемого сопротивления для окон определяются по таблице 3"
+      },
+      "violationText": "Нарушено требование п. 5.2 - сопротивление ниже нормируемого",
+      "hintLayman": "Окна должны быть современными с двойным или тройным стеклопакетом",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [
+        "sp50_windows_surface_temp",
+        "sp50_windows_air_permeability"
+      ],
+      "tags": [
+        "тепловая защита",
+        "окна",
+        "остекление"
+      ]
+    },
+    {
+      "id": "sp50_windows_surface_temp",
+      "title": "Температура внутренней поверхности остекления",
+      "category": "windows",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Минимальная температура остекления: 3°C (жилые), 0°C (производственные)",
+      "tolerance": {
+        "value": "≥3°C или ≥0°C",
+        "unit": "°C",
+        "condition": "на всей поверхности остекления",
+        "maxTotal": "Нет максимума"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тепловизор ИК",
+          "Инфракрасный термометр"
+        ],
+        "procedure": "1. Измерить температуру в нескольких точках. 2. Провести в холодные дни. 3. Сравнить с минимумом"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Минимальная температура остекления 3°C для жилых, 0°C для производственных"
+      },
+      "violationText": "Нарушено требование п. 5.7 - температура ниже допустимой",
+      "hintLayman": "На окнах не должно быть конденсата",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_windows_thermal_resistance"
+      ],
+      "tags": [
+        "санитарно-гигиеническое",
+        "конденсация"
+      ]
+    },
+    {
+      "id": "sp50_windows_condensation",
+      "title": "Перепад температуры окна-воздух",
+      "category": "windows",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "amateur",
+      "description": "Для помещений с остеклением >50% перепад не должен быть более 8°C",
+      "tolerance": {
+        "value": "≤8°C",
+        "unit": "°C",
+        "condition": "при остеклённости >50%",
+        "maxTotal": "8°C"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тепловизор",
+          "Термометр"
+        ],
+        "procedure": "1. Определить остеклённость. 2. Если >50%, измерить температуры. 3. Рассчитать перепад"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Перепад температуры при остеклённости >50% не более 8°C"
+      },
+      "violationText": "Нарушено требование п. 5.7 - перепад превышает 8°C",
+      "hintLayman": "Окна не должны быть намного холоднее воздуха",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_windows_surface_temp"
+      ],
+      "tags": [
+        "тепловой комфорт",
+        "микроклимат"
+      ]
+    },
+    {
+      "id": "sp50_windows_air_permeability",
+      "title": "Воздухопроницаемость окон",
+      "category": "windows",
+      "subcategory": "air_tightness",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Сопротивление воздухопроницанию должно быть не менее нормируемого",
+      "tolerance": {
+        "value": "по Таблице 10",
+        "unit": "кг/(м²·ч)",
+        "condition": "деревянные 6,0; пластмассовые/алюминиевые 5,0",
+        "maxTotal": "Нет максимума"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Паспорт окна",
+          "Тесты герметичности"
+        ],
+        "procedure": "Проверить паспортные данные и провести испытания"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "7.3",
+        "table": 10,
+        "exactQuote": "Окна: деревянные 6,0, пластмассовые 5,0 кг/(м²·ч)"
+      },
+      "violationText": "Нарушено требование п. 7.3 - сопротивление ниже нормируемого",
+      "hintLayman": "Окна должны быть герметичными без сквозняков",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_windows_thermal_resistance"
+      ],
+      "tags": [
+        "воздухопроницаемость",
+        "герметичность"
+      ]
+    },
+    {
+      "id": "sp50_doors_input_thermal_resistance",
+      "title": "Сопротивление теплопередаче входных дверей",
+      "category": "doors",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Сопротивление входных дверей ≥0,6 × R_стен",
+      "tolerance": {
+        "value": "≥0,6 × R_стен",
+        "unit": "(м²·°C)/Вт",
+        "condition": "рассчитывается индивидуально",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Паспорт двери",
+          "Расчёт"
+        ],
+        "procedure": "1. Рассчитать R_норм стен. 2. Вычислить 0,6 × R_норм. 3. Проверить паспорт двери"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.2, 5.4",
+        "table": null,
+        "exactQuote": "Сопротивление входных дверей не менее 0,6 R_норм стен"
+      },
+      "violationText": "Нарушено требование п. 5.2 - сопротивление входной двери ниже требуемого",
+      "hintLayman": "Входная дверь должна хорошо изолировать от холода",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [
+        "sp50_doors_surface_temp"
+      ],
+      "tags": [
+        "тепловая защита",
+        "входные двери"
+      ]
+    },
+    {
+      "id": "sp50_doors_surface_temp",
+      "title": "Температура внутренней поверхности входных дверей",
+      "category": "doors",
+      "subcategory": "sanitary",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Температура должна быть не ниже точки росы",
+      "tolerance": {
+        "value": "≥ точке росы",
+        "unit": "°C",
+        "condition": "при стандартной влажности",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тепловизор ИК",
+          "Психрометр"
+        ],
+        "procedure": "1. Измерить температуру двери. 2. Измерить влажность. 3. Рассчитать точку росы"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.7",
+        "table": null,
+        "exactQuote": "Температура должна быть не ниже точки росы"
+      },
+      "violationText": "Нарушено требование п. 5.7 - температура ниже точки росы",
+      "hintLayman": "На двери не должно быть конденсата и плесени",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_doors_input_thermal_resistance"
+      ],
+      "tags": [
+        "санитарно-гигиеническое",
+        "плесень"
+      ]
+    },
+    {
+      "id": "sp50_doors_air_permeability",
+      "title": "Воздухопроницаемость входных дверей",
+      "category": "doors",
+      "subcategory": "air_tightness",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Сопротивление воздухопроницанию должно быть не менее нормируемого",
+      "tolerance": {
+        "value": "по Таблице 10",
+        "unit": "кг/(м²·ч)",
+        "condition": "двери квартир 1,5; входные в здание 7,0",
+        "maxTotal": "Нет максимума"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Паспорт двери",
+          "Тесты герметичности"
+        ],
+        "procedure": "Проверить тип и провести испытания"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "7.3",
+        "table": 10,
+        "exactQuote": "Двери квартир 1,5, входные в здание 7,0 кг/(м²·ч)"
+      },
+      "violationText": "Нарушено требование п. 7.3 - сопротивление ниже нормируемого",
+      "hintLayman": "Двери должны быть герметичными без щелей",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_doors_input_thermal_resistance"
+      ],
+      "tags": [
+        "воздухопроницаемость",
+        "герметичность"
+      ]
+    },
+    {
+      "id": "sp50_doors_gates_thermal_resistance",
+      "title": "Сопротивление теплопередаче ворот",
+      "category": "doors",
+      "subcategory": "thermal",
+      "stage": "all",
+      "level": "pro",
+      "description": "Сопротивление ворот зависит от площади и ГСОП",
+      "tolerance": {
+        "value": "по Таблице 8",
+        "unit": "(м²·°C)/Вт",
+        "condition": "площадь ворот и ГСОП района",
+        "maxTotal": "от 0,64 до 1,05"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Паспорт ворот",
+          "Расчёт"
+        ],
+        "procedure": "1. Определить площадь. 2. Определить ГСОП. 3. По таблице 8 найти требуемое значение"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.8",
+        "table": 8,
+        "exactQuote": "Нормируемые значения для ворот по таблице 8"
+      },
+      "violationText": "Нарушено требование п. 5.8 - сопротивление ниже нормируемого",
+      "hintLayman": "Ворота должны быть утеплены",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [],
+      "tags": [
+        "тепловая защита",
+        "ворота",
+        "гараж"
+      ]
+    },
+    {
+      "id": "sp50_heating_system_protection",
+      "title": "Комплексная теплозащита здания",
+      "category": "heating",
+      "subcategory": "thermal_distribution",
+      "stage": "all",
+      "level": "amateur",
+      "description": "Удельная теплозащитная характеристика здания не должна превышать нормируемое значение",
+      "tolerance": {
+        "value": "по Таблице 7",
+        "unit": "Вт/(м³·°C)",
+        "condition": "от 0,084 до 1,206 в зависимости от объема и ГСОП",
+        "maxTotal": "по таблице"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Приложение Д",
+          "Энергопаспорт"
+        ],
+        "procedure": "1. Определить объем здания. 2. Определить ГСОП. 3. По таблице 7 найти норму. 4. Рассчитать фактическое значение"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "5.5",
+        "table": 7,
+        "exactQuote": "Нормируемое значение удельной теплозащитной характеристики по таблице 7"
+      },
+      "violationText": "Нарушено требование п. 5.5 - характеристика превышает нормируемое значение",
+      "hintLayman": "Здание должно быть хорошо утеплено комплексно",
+      "photoRequired": false,
+      "measurementRequired": false,
+      "relatedChecks": [
+        "sp50_walls_thermal_resistance",
+        "sp50_ceiling_thermal_resistance"
+      ],
+      "tags": [
+        "энергоэффективность",
+        "комплексное требование"
+      ]
+    },
+    {
+      "id": "sp50_ventilation_moisture_control",
+      "title": "Вентиляция и контроль влажности",
+      "category": "ventilation",
+      "subcategory": "moisture_control",
+      "stage": "all",
+      "level": "amateur",
+      "description": "Система вентиляции должна обеспечивать правильный режим влажности",
+      "tolerance": {
+        "value": "по Таблице 1",
+        "unit": "% отн. влажности",
+        "condition": "40-75% в зависимости от типа помещения",
+        "maxTotal": "по таблице"
+      },
+      "method": {
+        "type": "visual",
+        "tools": [
+          "Психрометр",
+          "Осмотр вентиляции"
+        ],
+        "procedure": "1. Определить тип помещения. 2. По таблице 1 установить требуемый режим. 3. Проверить вентиляцию"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "4.3, 7.8",
+        "table": 1,
+        "exactQuote": "Влажностный режим по таблице 1. Приточные устройства при вытяжной вентиляции"
+      },
+      "violationText": "Нарушено требование п. 7.8 - отсутствуют приточные устройства",
+      "hintLayman": "Воздух должен поступать и уходить; кухня и ванная - обязательна вытяжка",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_walls_humidity"
+      ],
+      "tags": [
+        "вентиляция",
+        "влажность",
+        "микроклимат"
+      ]
+    },
+    {
+      "id": "sp50_fire_safety_insulation",
+      "title": "Огнестойкость теплоизоляционных материалов",
+      "category": "fire_safety",
+      "subcategory": "materials",
+      "stage": "draft",
+      "level": "pro",
+      "description": "Материалы должны соответствовать требованиям пожарной безопасности",
+      "tolerance": {
+        "value": "по СП 4.13130.2013",
+        "unit": "класс горючести",
+        "condition": "НГ, Г1 или Г2",
+        "maxTotal": "Нет"
+      },
+      "method": {
+        "type": "visual",
+        "tools": [
+          "Паспорт материала",
+          "Сертификаты"
+        ],
+        "procedure": "1. Определить материал. 2. Проверить паспортные данные. 3. Убедиться в сертификате"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "1",
+        "table": null,
+        "exactQuote": "Материалы должны соответствовать требованиям СП 4.13130.2013"
+      },
+      "violationText": "Нарушено требование к пожарной безопасности - неподходящий материал",
+      "hintLayman": "Утеплитель должен быть негорючим",
+      "photoRequired": true,
+      "measurementRequired": false,
+      "relatedChecks": [
+        "sp50_walls_thermal_resistance"
+      ],
+      "tags": [
+        "пожарная безопасность",
+        "материалы"
+      ]
+    },
+    {
+      "id": "sp50_gaseous_tightness_envelope",
+      "title": "Воздухонепроницаемость конструкции",
+      "category": "air_tightness_general",
+      "subcategory": "envelope_integrity",
+      "stage": "finish",
+      "level": "pro",
+      "description": "Ограждающие конструкции должны быть герметичными",
+      "tolerance": {
+        "value": "по Таблице 10",
+        "unit": "(м²·ч·Па)/кг",
+        "condition": "стены жилых 0,5; стыки 0,5",
+        "maxTotal": "по таблице"
+      },
+      "method": {
+        "type": "instrumental",
+        "tools": [
+          "Тесты герметичности",
+          "Манометр"
+        ],
+        "procedure": "1. Провести испытание воздухопроницаемости. 2. Применить дверной вентилятор. 3. Определить сопротивление"
+      },
+      "normativeRef": {
+        "document": "СП 50.13330.2024",
+        "section": "7.1, 7.2",
+        "table": 10,
+        "exactQuote": "Сопротивление воздухопроницанию должно быть не менее нормируемого по формуле 7.1"
+      },
+      "violationText": "Нарушено требование п. 7.1 - сопротивление ниже нормируемого",
+      "hintLayman": "Стены должны быть герметичными без щелей",
+      "photoRequired": true,
+      "measurementRequired": true,
+      "relatedChecks": [
+        "sp50_windows_air_permeability",
+        "sp50_doors_air_permeability"
+      ],
+      "tags": [
+        "герметичность",
+        "инфильтрация",
+        "энергосбережение"
+      ]
+    }
+  ],
+  "extractionMeta": {
+    "totalExtracted": 21,
+    "extractionDate": "2025-12-12T11:15:00+04:00",
+    "skipped": [
+      {
+        "reason": "Справочная информация",
+        "reference": "Раздел 3 'Термины и определения'"
+      },
+      {
+        "reason": "Справочные данные и географические зоны",
+        "reference": "Приложение А 'Зоны влажности'; Приложение Е 'Таблицы солнечной радиации'"
+      },
+      {
+        "reason": "Справочные материалы (240+ позиций)",
+        "reference": "Приложение В 'Теплотехнические характеристики материалов'"
+      }
+    ]
+  }
+}
