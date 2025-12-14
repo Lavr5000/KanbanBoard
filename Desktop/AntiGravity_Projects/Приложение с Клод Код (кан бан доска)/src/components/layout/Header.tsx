@@ -2,17 +2,19 @@
 
 import React from 'react';
 import { useKanbanStore } from '@/lib/stores/kanbanStore';
+import { useThemeStore, type ThemeMode } from '@/lib/stores/themeStore';
 import { Button } from '@/components/ui/Button';
-import { Trash2, Sun, Moon, KanbanSquareIcon } from 'lucide-react';
+import { Trash2, Sun, Moon, Monitor, KanbanSquareIcon } from 'lucide-react';
 
 export function Header() {
   const { clearBoard } = useKanbanStore();
-  const [isDarkMode, setIsDarkMode] = React.useState(() => {
-    if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
-    }
-    return false;
-  });
+  const { mode, setMode, isDark, setIsDark } = useThemeStore();
+  const [mounted, setMounted] = React.useState(false);
+  const [showThemeMenu, setShowThemeMenu] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClearBoard = () => {
     if (window.confirm('Are you sure you want to clear the board? This action cannot be undone.')) {
@@ -20,28 +22,14 @@ export function Header() {
     }
   };
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
-    }
+  const handleThemeChange = (newMode: ThemeMode) => {
+    setMode(newMode);
+    setShowThemeMenu(false);
   };
 
-  React.useEffect(() => {
-    // Check for saved dark mode preference or system preference
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'true' ||
-        (!savedDarkMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
+  const toggleDarkMode = () => {
+    setIsDark(!isDark);
+  };
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -64,20 +52,61 @@ export function Header() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
-            {/* Dark Mode Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleDarkMode}
-              className="h-9 w-9 p-0 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-              aria-label="Toggle dark mode"
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
+            {/* Theme Selector */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowThemeMenu(!showThemeMenu)}
+                className="h-9 w-9 p-0 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                aria-label="Theme selector"
+                title={`Current: ${mounted ? mode : 'loading'}`}
+              >
+                {mounted && mode === 'light' && <Sun className="h-4 w-4" />}
+                {mounted && mode === 'dark' && <Moon className="h-4 w-4" />}
+                {mounted && mode === 'auto' && <Monitor className="h-4 w-4" />}
+                {!mounted && <Sun className="h-4 w-4" />}
+              </Button>
+
+              {/* Theme Menu */}
+              {showThemeMenu && mounted && (
+                <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 shadow-lg z-50">
+                  <button
+                    onClick={() => handleThemeChange('light')}
+                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
+                      mode === 'light'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    <Sun className="h-4 w-4" />
+                    Light
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('dark')}
+                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
+                      mode === 'dark'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    <Moon className="h-4 w-4" />
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('auto')}
+                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
+                      mode === 'auto'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    <Monitor className="h-4 w-4" />
+                    Auto
+                  </button>
+                </div>
               )}
-            </Button>
+            </div>
 
             {/* Clear Board Button */}
             <Button
