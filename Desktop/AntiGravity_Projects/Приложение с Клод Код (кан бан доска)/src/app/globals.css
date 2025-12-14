@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
+/* Light Theme (default) */
 :root {
+  /* Primary Colors */
   --background: #ffffff;
   --foreground: #171717;
   --card: #ffffff;
   --card-foreground: #171717;
   --popover: #ffffff;
   --popover-foreground: #171717;
+
+  /* UI Colors */
   --primary: #18181b;
   --primary-foreground: #fafafa;
   --secondary: #f4f4f5;
@@ -15,20 +19,41 @@
   --muted-foreground: #71717a;
   --accent: #f4f4f5;
   --accent-foreground: #18181b;
+
+  /* Status Colors */
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  /* Border & Input */
   --border: #e4e4e7;
   --input: #e4e4e7;
   --ring: #18181b;
+
+  /* Chart Colors */
   --chart-1: #12c2e9;
   --chart-2: #c471ed;
   --chart-3: #f64f59;
   --chart-4: #f8b26a;
   --chart-5: #4bc0c8;
+
+  /* Layout */
   --radius: 0.5rem;
+
+  /* Kanban Board */
   --kanban-todo: #94a3b8;
   --kanban-progress: #f59e0b;
   --kanban-done: #10b981;
+
+  /* Additional Light Theme Colors */
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --shadow-sm: rgba(0, 0, 0, 0.05);
+  --shadow-md: rgba(0, 0, 0, 0.1);
 }
 
 @theme inline {
@@ -38,14 +63,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark Theme */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Primary Colors */
     --background: #0a0a0a;
     --foreground: #ededed;
     --card: #0a0a0a;
     --card-foreground: #ededed;
     --popover: #0a0a0a;
     --popover-foreground: #ededed;
+
+    /* UI Colors */
     --primary: #fafafa;
     --primary-foreground: #18181b;
     --secondary: #27272a;
@@ -54,30 +83,99 @@
     --muted-foreground: #a1a1aa;
     --accent: #27272a;
     --accent-foreground: #fafafa;
+
+    /* Status Colors */
     --destructive: #ef4444;
     --destructive-foreground: #fafafa;
+    --success: #059669;
+    --warning: #d97706;
+    --info: #0ea5e9;
+
+    /* Border & Input */
     --border: #27272a;
     --input: #27272a;
     --ring: #d4d4d8;
+
+    /* Chart Colors */
     --chart-1: #12c2e9;
     --chart-2: #c471ed;
     --chart-3: #f64f59;
     --chart-4: #f8b26a;
     --chart-5: #4bc0c8;
+
+    /* Kanban Board */
     --kanban-todo: #64748b;
     --kanban-progress: #d97706;
     --kanban-done: #059669;
+
+    /* Additional Dark Theme Colors */
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #27272a;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --shadow-sm: rgba(0, 0, 0, 0.3);
+    --shadow-md: rgba(0, 0, 0, 0.5);
   }
+}
+
+/* Manual dark mode class (for explicit dark mode toggle) */
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #0a0a0a;
+  --card-foreground: #ededed;
+  --popover: #0a0a0a;
+  --popover-foreground: #ededed;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --success: #059669;
+  --warning: #d97706;
+  --info: #0ea5e9;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #d4d4d8;
+  --chart-1: #12c2e9;
+  --chart-2: #c471ed;
+  --chart-3: #f64f59;
+  --chart-4: #f8b26a;
+  --chart-5: #4bc0c8;
+  --kanban-todo: #64748b;
+  --kanban-progress: #d97706;
+  --kanban-done: #059669;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #27272a;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --shadow-sm: rgba(0, 0, 0, 0.3);
+  --shadow-md: rgba(0, 0, 0, 0.5);
 }
 
 * {
   border-color: var(--border);
 }
 
+html {
+  color-scheme: light;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom scrollbar styles */
