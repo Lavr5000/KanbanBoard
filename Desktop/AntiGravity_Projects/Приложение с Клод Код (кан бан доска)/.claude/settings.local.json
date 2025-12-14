@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\Users\\user\\Desktop\\AntiGravity_Projects\\Приложение с Клод Код (кан бан доска)\")",
+      "Bash(ls:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm install zustand @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities lucide-react clsx @types/uuid uuid)",
+      "Bash(tree:*)",
+      "Bash(npm run build)",
+      "Bash(NO_TURBOPACK=1 npm run build:*)",
+      "Bash(npm run build:*)",
+      "Bash(pkill:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(curl:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
