@@ -46,15 +46,14 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             task.priority === 'medium' ? 'bg-yellow-500' :
             'bg-green-500'
           }`} />
-          <span className="text-[9px] text-gray-400 font-mono tracking-tighter bg-white/5 px-2 py-0.5 rounded">#{task.id.slice(0, 5)}</span>
         </div>
         <div className="flex items-center gap-1">
           <div
             {...attributes}
             {...listeners}
-            className="opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/20 hover:text-white/80 transition-all duration-200 hover:bg-white/10 p-1.5 rounded-lg backdrop-blur-sm"
+            className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-200 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm"
           >
-            <GripVertical size={14} />
+            <GripVertical size={20} />
           </div>
           <button
             onClick={() => deleteTask(task.id)}
@@ -154,18 +153,30 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       ) : (
         <div onClick={() => setIsEditing(true)} className="cursor-text">
           <h4 className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
-          <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
-            {task.description}
-          </p>
+          {task.description && (
+            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
+              {task.description}
+            </p>
+          )}
 
           {/* Construction Fields Display */}
           <div className="space-y-2">
             {/* Dates */}
-            <CompactDateRange
-              startDate={task.startDate}
-              dueDate={task.dueDate}
-              className="mb-2"
-            />
+            {task.startDate || task.dueDate ? (
+              <CompactDateRange
+                startDate={task.startDate}
+                dueDate={task.dueDate}
+                className="mb-2"
+                onClick={() => setIsEditing(true)}
+              />
+            ) : (
+              <div
+                className="text-[9px] text-gray-500 italic mb-2 p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                onClick={() => setIsEditing(true)}
+              >
+                + Add dates
+              </div>
+            )}
 
             {/* Assignees */}
             {task.assignees && task.assignees.length > 0 && (
@@ -179,25 +190,36 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             )}
 
             {/* Progress */}
-            {task.progress !== undefined && task.progress > 0 && (
+            {task.progress !== undefined ? (
               <ProgressBar
                 progress={task.progress}
                 size="sm"
-                showLabel={false}
+                showLabel={task.progress > 0}
                 color={task.progress >= 75 ? 'green' :
                        task.progress >= 50 ? 'yellow' :
                        task.progress >= 25 ? 'blue' : 'red'}
+                editable={true}
+                onProgressChange={(newProgress) => updateTask(task.id, { progress: newProgress })}
               />
+            ) : (
+              <div
+                className="text-[9px] text-gray-500 italic p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                onClick={() => {
+                  updateTask(task.id, { progress: 0 });
+                }}
+              >
+                + Add progress
+              </div>
             )}
           </div>
         </div>
       )}
 
       <div className="mt-3 flex items-center justify-between">
-        <span className={`text-[9px] px-2 py-1 rounded uppercase font-bold ${
-          task.priority === 'high' ? 'bg-red-500/20 text-red-300' :
-          task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
-          'bg-green-500/20 text-green-300'
+        <span className={`text-[8px] px-1.5 py-0.5 rounded-md font-medium ${
+          task.priority === 'high' ? 'bg-red-500/10 text-red-400/70' :
+          task.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400/70' :
+          'bg-green-500/10 text-green-400/70'
         }`}>
           {task.priority}
         </span>

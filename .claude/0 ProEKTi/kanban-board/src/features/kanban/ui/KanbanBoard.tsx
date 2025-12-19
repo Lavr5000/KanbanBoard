@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -21,6 +21,30 @@ import { Task, TaskStatus, Column } from '@/shared/types/task';
 
 export const KanbanBoard = () => {
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Loading state - NO hooks called yet
+  if (!mounted) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-gray-500 text-center">
+          <div className="w-8 h-8 border-2 border-gray-600 rounded-full animate-spin border-t-blue-400 mx-auto mb-3"></div>
+          <div>Initializing Kanban Board...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Return the actual board component
+  return <KanbanBoardContent />;
+};
+
+// Inner component that contains all the hooks
+const KanbanBoardContent = () => {
+  // Now all hooks are called consistently in every render
   const { getTasksByStatus, addTask } = useKanbanStore();
   const { handleDragEnd } = useKanbanDnD();
 
@@ -34,21 +58,6 @@ export const KanbanBoard = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#0f0f17] to-[#1a1a2e]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-blue-400 mb-4"></div>
-          <div className="text-white/60 animate-pulse">Загрузка канбан доски...</div>
-        </div>
-      </div>
-    );
-  }
 
   // Define columns configuration following AppFlowy pattern
   const columnConfig: Column[] = [
@@ -64,7 +73,7 @@ export const KanbanBoard = () => {
     const tasks = getTasksByStatus(column.id);
     return {
       ...column,
-      taskIds: tasks.map(t => t.id),
+      taskIds: tasks.map((t: Task) => t.id),
       tasks
     };
   });

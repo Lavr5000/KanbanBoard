@@ -1,11 +1,26 @@
 "use client";
 import { KanbanSquare, Search, Bell, LayoutGrid, Users, Settings, LogOut } from "lucide-react";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+// Beautiful loading component
+const BoardLoader = () => (
+  <div className="flex h-full items-center justify-center bg-gradient-to-br from-[#0f0f17] to-[#1a1a2e]">
+    <div className="text-center">
+      <div className="relative mb-6">
+        <div className="w-16 h-16 border-4 border-white/10 rounded-full animate-spin border-t-blue-400"></div>
+        <div className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-spin border-b-purple-400" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+      </div>
+      <div className="text-white/80 font-medium mb-2">Загрузка канбан доски</div>
+      <div className="text-white/50 text-sm animate-pulse">Инициализация рабочего пространства...</div>
+    </div>
+  </div>
+);
 
 // Dynamic import to prevent Hydration Error
-const KanbanBoard = dynamic(() => import("@/features/kanban/ui/KanbanBoard").then(m => m.default), {
+const KanbanBoard = dynamic(() => import("@/features/kanban/ui/KanbanBoard"), {
   ssr: false,
-  loading: () => <div className="text-white p-10">Загрузка доски...</div>
+  loading: BoardLoader
 });
 
 export default function Home() {
@@ -55,7 +70,9 @@ export default function Home() {
 
         {/* Board Area */}
         <div className="flex-1 p-6 overflow-hidden bg-[#0D1117] min-h-0">
-           <KanbanBoard />
+           <Suspense fallback={<div className="text-gray-500 p-10">Loading Board...</div>}>
+             <KanbanBoard />
+           </Suspense>
         </div>
       </section>
     </main>

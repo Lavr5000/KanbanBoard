@@ -80,12 +80,14 @@ interface CompactDateRangeProps {
   startDate?: string;
   dueDate?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 export const CompactDateRange = ({
   startDate,
   dueDate,
-  className = ''
+  className = '',
+  onClick
 }: CompactDateRangeProps) => {
   if (!startDate && !dueDate) {
     return null;
@@ -106,7 +108,10 @@ export const CompactDateRange = ({
   const isOverdue = dueDate && new Date(dueDate) < new Date();
 
   return (
-    <div className={`flex items-center gap-1 text-[9px] ${className}`}>
+    <div
+      className={`flex items-center gap-1 text-[9px] cursor-pointer hover:bg-white/5 p-1 rounded transition-colors ${className}`}
+      onClick={onClick}
+    >
       {startDate && <span className="text-gray-500">{formatDate(startDate)}</span>}
       {startDate && dueDate && <span className="text-gray-600">-</span>}
       {dueDate && (
