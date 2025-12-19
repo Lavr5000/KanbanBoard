@@ -23,9 +23,9 @@ export const DueDateIndicator = ({
   }
 
   const sizeClasses = {
-    xs: 'text-[8px]',
-    sm: 'text-[9px]',
-    md: 'text-xs'
+    xs: 'text-xs',
+    sm: 'text-xs',
+    md: 'text-sm'
   };
 
   const iconSize = {
@@ -170,7 +170,7 @@ export const CompactDueDate = ({ dueDate, onClick, className = '' }: CompactDueD
 
   return (
     <div
-      className={`flex items-center gap-1 text-[9px] cursor-pointer hover:bg-white/5 p-1 rounded transition-colors ${colorClass} ${className}`}
+      className={`flex items-center gap-1 text-xs cursor-pointer hover:bg-white/5 p-1 rounded transition-colors ${colorClass} ${className}`}
       onClick={onClick}
     >
       <Calendar size={10} />

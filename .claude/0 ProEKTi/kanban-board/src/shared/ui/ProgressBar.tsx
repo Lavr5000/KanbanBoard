@@ -101,7 +101,7 @@ export const ProgressBar = ({
         </div>
       </div>
       {editable && (
-        <div className="text-[9px] text-gray-500 italic mt-1 text-center">
+        <div className="text-caption text-gray-500 italic mt-1 text-center">
           Click to edit
         </div>
       )}
