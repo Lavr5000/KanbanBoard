@@ -4,6 +4,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { Task } from '@/shared/types/task';
 import { GripVertical, Trash2 } from 'lucide-react';
+import { ProgressBar } from '@/shared/ui/ProgressBar';
+import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
+import { CompactDateRange } from '@/shared/ui/DateRange';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
   const { updateTask, deleteTask } = useKanbanStore();
@@ -98,13 +101,95 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             onPointerDown={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
           />
+
+          {/* Construction Fields Editing */}
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            {/* Dates */}
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="text-[9px] text-gray-400 block mb-1">Start Date</label>
+                <input
+                  type="date"
+                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  value={task.startDate || ''}
+                  onChange={(e) => updateTask(task.id, { startDate: e.target.value || undefined })}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-[9px] text-gray-400 block mb-1">Due Date</label>
+                <input
+                  type="date"
+                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  value={task.dueDate || ''}
+                  onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+
+            {/* Progress */}
+            <div>
+              <label className="text-[9px] text-gray-400 block mb-1">
+                Progress: {task.progress || 0}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                value={task.progress || 0}
+                onChange={(e) => {
+                  const progress = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                  updateTask(task.id, { progress });
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
         </div>
       ) : (
         <div onClick={() => setIsEditing(true)} className="cursor-text">
           <h4 className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
-          <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
+          <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
             {task.description}
           </p>
+
+          {/* Construction Fields Display */}
+          <div className="space-y-2">
+            {/* Dates */}
+            <CompactDateRange
+              startDate={task.startDate}
+              dueDate={task.dueDate}
+              className="mb-2"
+            />
+
+            {/* Assignees */}
+            {task.assignees && task.assignees.length > 0 && (
+              <div className="mb-2">
+                <AssigneeGroup
+                  assignees={task.assignees}
+                  maxVisible={3}
+                  size="xs"
+                />
+              </div>
+            )}
+
+            {/* Progress */}
+            {task.progress !== undefined && task.progress > 0 && (
+              <ProgressBar
+                progress={task.progress}
+                size="sm"
+                showLabel={false}
+                color={task.progress >= 75 ? 'green' :
+                       task.progress >= 50 ? 'yellow' :
+                       task.progress >= 25 ? 'blue' : 'red'}
+              />
+            )}
+          </div>
         </div>
       )}
 

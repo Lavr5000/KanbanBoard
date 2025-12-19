@@ -1,11 +1,28 @@
 export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'testing' | 'done';
 
+export interface Assignee {
+  id: string;
+  name: string;
+  avatar?: string;
+  color?: string;
+}
+
+export interface DateRange {
+  startDate?: string; // ISO date format
+  dueDate?: string;   // ISO date format
+}
+
 export interface Task {
   id: string;
   title: string;
   description: string;
   status: TaskStatus;
   priority: 'low' | 'medium' | 'high';
+  // Construction fields
+  startDate?: string; // ISO date format
+  dueDate?: string;   // ISO date format
+  assignees?: Assignee[]; // Array of assignees
+  progress?: number;   // 0-100
 }
 
 export interface Column {

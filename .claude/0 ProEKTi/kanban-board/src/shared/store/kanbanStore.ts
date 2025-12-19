@@ -38,6 +38,13 @@ export const useKanbanStore = create<KanbanStore>()(
           description: 'Analyze competitor products and features',
           status: 'todo',
           priority: 'medium',
+          startDate: '2025-01-15',
+          dueDate: '2025-01-20',
+          assignees: [
+            { id: 'a1', name: 'Alex Smith', color: '#3B82F6' },
+            { id: 'a2', name: 'Sarah Lee', color: '#EC4899' }
+          ],
+          progress: 25
         },
         {
           id: '2',
@@ -45,6 +52,26 @@ export const useKanbanStore = create<KanbanStore>()(
           description: 'Design and develop component library',
           status: 'todo',
           priority: 'high',
+          startDate: '2025-01-18',
+          dueDate: '2025-01-25',
+          assignees: [
+            { id: 'a3', name: 'Mike Chen', color: '#10B981' }
+          ],
+          progress: 0
+        },
+        {
+          id: '3',
+          title: 'Foundation Works',
+          description: 'Excavation and concrete foundation for the main building',
+          status: 'in-progress',
+          priority: 'high',
+          startDate: '2025-01-10',
+          dueDate: '2025-01-30',
+          assignees: [
+            { id: 'a4', name: 'John Builder', color: '#F59E0B' },
+            { id: 'a5', name: 'Tom Engineer', color: '#8B5CF6' }
+          ],
+          progress: 60
         },
       ],
 
@@ -56,6 +83,11 @@ export const useKanbanStore = create<KanbanStore>()(
           description: taskData?.description || 'Введите описание...',
           status,
           priority: taskData?.priority || 'medium',
+          // Default values for new fields
+          startDate: taskData?.startDate,
+          dueDate: taskData?.dueDate,
+          assignees: taskData?.assignees || [],
+          progress: taskData?.progress ?? 0,
           ...taskData
         };
         return {
@@ -64,9 +96,39 @@ export const useKanbanStore = create<KanbanStore>()(
       }),
 
       updateTask: (id, updates) => set((state) => ({
-        tasks: state.tasks.map(task =>
-          task.id === id ? { ...task, ...updates } : task
-        )
+        tasks: state.tasks.map(task => {
+          if (task.id !== id) return task;
+
+          // Validate and sanitize updates
+          const sanitizedUpdates = { ...updates };
+
+          // Validate progress is within 0-100
+          if ('progress' in sanitizedUpdates) {
+            sanitizedUpdates.progress = Math.max(0, Math.min(100, sanitizedUpdates.progress ?? 0));
+          }
+
+          // Validate dates are in proper format
+          if ('startDate' in sanitizedUpdates && sanitizedUpdates.startDate) {
+            const startDate = new Date(sanitizedUpdates.startDate);
+            if (isNaN(startDate.getTime())) {
+              delete sanitizedUpdates.startDate;
+            }
+          }
+
+          if ('dueDate' in sanitizedUpdates && sanitizedUpdates.dueDate) {
+            const dueDate = new Date(sanitizedUpdates.dueDate);
+            if (isNaN(dueDate.getTime())) {
+              delete sanitizedUpdates.dueDate;
+            }
+          }
+
+          // Validate assignees array
+          if ('assignees' in sanitizedUpdates && !Array.isArray(sanitizedUpdates.assignees)) {
+            delete sanitizedUpdates.assignees;
+          }
+
+          return { ...task, ...sanitizedUpdates };
+        })
       })),
 
       deleteTask: (id) => set((state) => ({
