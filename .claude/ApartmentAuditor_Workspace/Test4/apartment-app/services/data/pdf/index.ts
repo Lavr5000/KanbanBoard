@@ -1,0 +1,1 @@
+export { photoProcessor, PhotoProcessor } from './PhotoProcessor';
