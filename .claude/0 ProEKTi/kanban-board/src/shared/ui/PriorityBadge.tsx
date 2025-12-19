@@ -105,11 +105,14 @@ export const PrioritySelector = ({
   const priorities: Priority[] = ['urgent', 'high', 'medium', 'low'];
 
   return (
-    <div className={`flex gap-1 ${className}`}>
+    <div className={`flex gap-1 ${className}`} onClick={(e) => e.stopPropagation()}>
       {priorities.map((priority) => (
         <button
           key={priority}
-          onClick={() => onChange(priority)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange(priority);
+          }}
           className={`
             ${value === priority
               ? priority === 'urgent' ? 'bg-red-500 text-white' :

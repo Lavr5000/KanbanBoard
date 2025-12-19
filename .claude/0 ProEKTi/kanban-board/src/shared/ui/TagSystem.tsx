@@ -34,9 +34,9 @@ export const TagBadge = ({
   className = ''
 }: TagBadgeProps) => {
   const sizeClasses = {
-    xs: 'text-[8px] px-1.5 py-0.5',
-    sm: 'text-[9px] px-2 py-0.5',
-    md: 'text-xs px-2.5 py-1'
+    xs: 'text-xs px-1.5 py-0.5',
+    sm: 'text-xs px-2 py-0.5',
+    md: 'text-sm px-2.5 py-1'
   };
 
   const iconSize = {
@@ -115,9 +115,9 @@ export const TagGroup = ({
       {remainingCount > 0 && (
         <div
           className={`
-            ${size === 'xs' ? 'text-[8px] px-1.5 py-0.5' :
-              size === 'sm' ? 'text-[9px] px-2 py-0.5' :
-              'text-xs px-2.5 py-1'}
+            ${size === 'xs' ? 'text-xs px-1.5 py-0.5' :
+              size === 'sm' ? 'text-xs px-2 py-0.5' :
+              'text-sm px-2.5 py-1'}
             rounded-full
             bg-white/10
             text-white/70
@@ -179,7 +179,7 @@ export const TagSelector = ({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} onClick={(e) => e.stopPropagation()}>
       {/* Selected Tags */}
       <div className="flex flex-wrap items-center gap-1 mb-2">
         {selectedTags.map((tag) => (
@@ -195,8 +195,11 @@ export const TagSelector = ({
 
       {/* Tag Selector Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 text-[9px] text-white/60 hover:text-white/80 transition-colors bg-white/5 hover:bg-white/10 border border-white/10 rounded px-2 py-1"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80 transition-colors bg-white/5 hover:bg-white/10 border border-white/10 rounded px-2 py-1"
       >
         <Plus size={12} />
         Add tag
@@ -204,20 +207,21 @@ export const TagSelector = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
           {/* Preset Tags */}
           {availableTags.length > 0 && (
             <div className="p-2">
-              <div className="text-[10px] text-gray-400 mb-2 font-medium">Suggested tags</div>
+              <div className="text-label text-gray-400 mb-2 font-medium">Suggested tags</div>
               <div className="flex flex-wrap gap-1">
                 {availableTags.map((preset) => (
                   <button
                     key={preset.name}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handleAddTag(preset);
                       setIsOpen(false);
                     }}
-                    className="text-[9px] px-2 py-1 rounded-full transition-colors hover:opacity-80"
+                    className="text-xs px-2 py-1 rounded-full transition-colors hover:opacity-80"
                     style={{
                       backgroundColor: `${preset.color}20`,
                       color: preset.color,
@@ -233,7 +237,7 @@ export const TagSelector = ({
 
           {/* Custom Tag Input */}
           <div className="border-t border-white/10 p-2">
-            <div className="text-[10px] text-gray-400 mb-1 font-medium">Custom tag</div>
+            <div className="text-label text-gray-400 mb-1 font-medium">Custom tag</div>
             <div className="flex gap-1">
               <input
                 type="text"
@@ -242,16 +246,21 @@ export const TagSelector = ({
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleCreateCustomTag();
                   }
                 }}
+                onClick={(e) => e.stopPropagation()}
                 placeholder="Enter tag name..."
-                className="flex-1 bg-white/5 text-white text-[9px] border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 placeholder-white/30"
+                className="flex-1 bg-white/5 text-white text-xs border border-white/10 rounded-lg px-3 py-1.5 outline-none focus:border-blue-400/50 focus:bg-white/10 transition-all duration-200 placeholder-white/30"
               />
               <button
-                onClick={handleCreateCustomTag}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCreateCustomTag();
+                }}
                 disabled={!newTagName.trim()}
-                className="px-2 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:opacity-50 text-white text-[9px] rounded transition-colors"
+                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:opacity-50 text-white text-xs rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 font-medium"
               >
                 Add
               </button>
@@ -264,7 +273,10 @@ export const TagSelector = ({
       {isOpen && (
         <div
           className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(false);
+          }}
         />
       )}
     </div>

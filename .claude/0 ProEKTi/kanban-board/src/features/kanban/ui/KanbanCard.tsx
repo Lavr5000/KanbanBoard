@@ -60,7 +60,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-200 card-entrance ${
+      className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] ${
         isDragging ? 'drag-preview' : ''
       }`}
     >
@@ -72,13 +72,13 @@ export const KanbanCard = ({ task }: { task: Task }) => {
           <div
             {...attributes}
             {...listeners}
-            className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-200 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm"
+            className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-300 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm hover:scale-105"
           >
             <GripVertical size={20} />
           </div>
           <button
             onClick={() => deleteTask(task.id)}
-            className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 transition-all duration-200 p-1.5 rounded-lg hover:bg-red-500/20 backdrop-blur-sm"
+            className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 transition-all duration-300 p-1.5 rounded-lg hover:bg-red-500/20 backdrop-blur-sm hover:scale-105"
           >
             <Trash2 size={14} />
           </button>
@@ -86,7 +86,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       </div>
 
       {isEditing ? (
-        <div className="space-y-2 relative z-[100]">
+        <div className="space-y-2 relative z-[100]" onClick={(e) => e.stopPropagation()}>
           <input
             autoFocus
             placeholder={task.title ? "" : "Название задачи..."}
@@ -123,10 +123,10 @@ export const KanbanCard = ({ task }: { task: Task }) => {
           />
 
           {/* Priority and Construction Fields Editing */}
-          <div className="space-y-2 pt-2 border-t border-white/10">
+          <div className="space-y-2 pt-2 border-t border-white/10" onClick={(e) => e.stopPropagation()}>
             {/* Priority */}
             <div>
-              <label className="text-[9px] text-gray-400 block mb-1">Priority</label>
+              <label className="text-label text-gray-400 block mb-1">Priority</label>
               <PrioritySelector
                 value={task.priority}
                 onChange={(priority) => updateTask(task.id, { priority })}
@@ -137,32 +137,30 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             {/* Dates */}
             <div className="flex gap-2">
               <div className="flex-1">
-                <label className="text-[9px] text-gray-400 block mb-1">Start Date</label>
+                <label className="text-label text-gray-400 block mb-1">Start Date</label>
                 <input
                   type="date"
                   className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
                   value={task.startDate || ''}
                   onChange={(e) => updateTask(task.id, { startDate: e.target.value || undefined })}
-                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
               <div className="flex-1">
-                <label className="text-[9px] text-gray-400 block mb-1">Due Date</label>
+                <label className="text-label text-gray-400 block mb-1">Due Date</label>
                 <input
                   type="date"
                   className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
                   value={task.dueDate || ''}
                   onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
-                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
             </div>
 
             {/* Tags */}
-            <div onPointerDown={(e) => e.stopPropagation()}>
-              <label className="text-[9px] text-gray-400 block mb-1">Tags</label>
+            <div onClick={(e) => e.stopPropagation()}>
+              <label className="text-label text-gray-400 block mb-1">Tags</label>
               <TagSelector
                 selectedTags={task.tags || []}
                 onTagsChange={(tags) => updateTask(task.id, { tags })}
@@ -171,8 +169,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             </div>
 
             {/* Progress */}
-            <div>
-              <label className="text-[9px] text-gray-400 block mb-1">
+            <div onClick={(e) => e.stopPropagation()}>
+              <label className="text-label text-gray-400 block mb-1">
                 Progress: {task.progress || 0}%
               </label>
               <input
@@ -185,7 +183,6 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                   const progress = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                   updateTask(task.id, { progress });
                 }}
-                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
@@ -216,7 +213,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                   showDaysCount={true}
                 />
               ) : (
-                <div className="text-[9px] text-gray-500 italic">
+                <div className="text-caption text-gray-500 italic">
                   + Add due date
                 </div>
               )}
@@ -246,7 +243,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             )}
             {!task.tags || task.tags.length === 0 ? (
               <div
-                className="text-[9px] text-gray-500 italic mb-2 p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                className="text-caption text-gray-500 italic mb-2 p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
                 onClick={() => setIsEditing(true)}
               >
                 + Add tags
@@ -267,7 +264,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               />
             ) : (
               <div
-                className="text-[9px] text-gray-500 italic p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                className="text-caption text-gray-500 italic p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
                 onClick={() => {
                   updateTask(task.id, { progress: 0 });
                 }}
