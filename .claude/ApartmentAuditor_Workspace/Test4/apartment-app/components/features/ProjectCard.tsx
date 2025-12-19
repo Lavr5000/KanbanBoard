@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, getStatusColor } from '../../constants/colors';
+import { defaultColors, getStatusColor, SIZES, TEXT_STYLES } from '../../constants/colors';
 import { ProgressBar } from '../ui/ProgressBar';
 import type { Project } from '../../types/database';
 
@@ -39,7 +39,7 @@ export function ProjectCard({ project, onPress, showProgress = true }: ProjectCa
             </Text>
             {project.address && (
               <View style={styles.addressRow}>
-                <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+                <Ionicons name="location-outline" size={14} color={defaultColors.textSecondary} />
                 <Text style={styles.addressText}>{project.address}</Text>
               </View>
             )}
@@ -55,7 +55,7 @@ export function ProjectCard({ project, onPress, showProgress = true }: ProjectCa
           </View>
         </View>
 
-        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+        <Ionicons name="chevron-forward" size={20} color={defaultColors.textSecondary} />
       </View>
     </TouchableOpacity>
   );
@@ -63,15 +63,11 @@ export function ProjectCard({ project, onPress, showProgress = true }: ProjectCa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: defaultColors.card,
+    borderRadius: SIZES.borderRadius.lg,
+    padding: SIZES.padding.md,
+    marginBottom: SIZES.margin.sm,
+    ...SIZES.shadow.sm,
   },
   cardContent: {
     flexDirection: 'row',
@@ -86,43 +82,44 @@ const styles = StyleSheet.create({
   statusIndicator: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: SIZES.borderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: SIZES.margin.sm,
+    ...SIZES.shadow.sm,
   },
   textContainer: {
     flex: 1,
   },
   projectTitle: {
-    fontSize: 16,
+    fontSize: TEXT_STYLES.body.fontSize,
     fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
+    color: defaultColors.text,
+    marginBottom: SIZES.margin.xs,
   },
   projectMeta: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    fontSize: TEXT_STYLES.bodySmall.fontSize,
+    color: defaultColors.textSecondary,
     lineHeight: 20,
   },
   addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
-    gap: 4,
+    marginTop: SIZES.margin.xs,
+    gap: SIZES.margin.xs,
   },
   addressText: {
-    fontSize: 13,
-    color: colors.textSecondary,
+    fontSize: TEXT_STYLES.caption.fontSize,
+    color: defaultColors.textSecondary,
     flex: 1,
   },
   progressContainer: {
-    marginTop: 8,
-    gap: 4,
+    marginTop: SIZES.margin.sm,
+    gap: SIZES.margin.xs,
   },
   progressText: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    fontSize: TEXT_STYLES.caption.fontSize,
+    color: defaultColors.textSecondary,
     fontWeight: '500',
   },
 });

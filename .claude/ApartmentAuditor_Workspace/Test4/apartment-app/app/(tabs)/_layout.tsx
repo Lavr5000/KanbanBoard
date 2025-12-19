@@ -45,12 +45,22 @@ export default function TabLayout() {
         }}
       />
 
+      {/* Maps Tab - Map functionality */}
+      <Tabs.Screen
+        name="maps"
+        options={{
+          title: 'Карты',
+          tabBarIcon: ({ color }) => <TabBarIcon name="map-outline" color={color} />,
+          headerShown: false
+        }}
+      />
+
       {/* Services Tab - App services and utilities */}
       <Tabs.Screen
         name="services"
         options={{
           title: 'Сервисы',
-          tabBarIcon: ({ color }) => <TabBarIcon name="build-outline" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="construct-outline" color={color} />,
           headerShown: true
         }}
       />

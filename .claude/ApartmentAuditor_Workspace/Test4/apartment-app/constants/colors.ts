@@ -87,10 +87,89 @@ export const withOpacity = (hex: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-// Default light theme colors for backward compatibility
-export const defaultColors = colors.light;
+// Text styles
+export const TEXT_STYLES = {
+  // Заголовки
+  h1: {
+    fontSize: 32,
+    fontWeight: 'bold' as const,
+  },
+  h2: {
+    fontSize: 24,
+    fontWeight: 'bold' as const,
+  },
+  h3: {
+    fontSize: 20,
+    fontWeight: '600' as const,
+  },
+  // Основной текст
+  body: {
+    fontSize: 16,
+  },
+  bodySmall: {
+    fontSize: 14,
+  },
+  // Подписи
+  caption: {
+    fontSize: 12,
+  },
+  hint: {
+    fontSize: 13,
+  },
+};
 
-// Backward compatibility - export light theme as default colors
+// Sizes and spacing
+export const SIZES = {
+  padding: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+  },
+  margin: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+  },
+  borderRadius: {
+    sm: 4,
+    md: 8,
+    lg: 12,
+    xl: 16,
+    round: 9999,
+  },
+  shadow: {
+    sm: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    md: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    lg: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      elevation: 8,
+    },
+  },
+};
+
+// Default dark theme colors for enforced dark mode
+export const defaultColors = colors.dark;
+
+// Export dark theme as default colors (enforced)
 export const {
   primary,
   secondary,
@@ -105,4 +184,4 @@ export const {
   textTertiary,
   border,
   divider
-} = colors.light;
+} = colors.dark;

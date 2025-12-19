@@ -1,46 +1,29 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-// Import store
-import { useProjectStore } from '../services/store';
-
 // Import colors
 import {
   primary,
-  secondary,
   success,
-  warning,
-  error,
   background,
   card,
-  surface,
   text,
-  textSecondary,
-  textTertiary,
-  border,
-  divider
+  textSecondary
 } from '../constants/colors';
 
 export default function HomeScreen() {
-  const router = useRouter();
-  const { projects, createProject } = useProjectStore();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
-  // Handle navigation to projects list
-  const handleGetStarted = () => {
-    if (projects.length > 0) {
-      router.push('/(tabs)/objects');
-    } else {
-      router.push('/(tabs)/objects');
-    }
+  const handleScreenTap = () => {
+    router.push('/(tabs)/objects');
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.content}>
+      <Pressable style={styles.content} onPress={handleScreenTap}>
         <View style={styles.appIconContainer}>
           <Ionicons name="list-outline" size={80} color={primary} />
         </View>
@@ -65,20 +48,12 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={handleGetStarted}
-        >
-          <Text style={styles.startButtonText}>
-            {projects.length > 0 ? 'Начать работу' : 'Создать первый объект'}
-          </Text>
-        </TouchableOpacity>
-
+  
         <View style={styles.versionContainer}>
           <Text style={styles.versionText}>Версия 1.0.0</Text>
           <Text style={styles.versionMeta}>383 чекпоинта • 9 категорий</Text>
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 }
@@ -140,23 +115,6 @@ const styles = StyleSheet.create({
     color: text,
     fontWeight: '500',
     flex: 1,
-  },
-  startButton: {
-    backgroundColor: primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    marginBottom: 32,
-    shadowColor: primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  startButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'white',
   },
   versionContainer: {
     alignItems: 'center',

@@ -1,18 +1,12 @@
 import { colors } from '../constants/colors';
+import { useUIStore } from '../services/store/uiStore';
 
 // Hook for accessing theme colors and controls
 export function useTheme() {
-  // Temporary implementation - will be connected to UI store later
-  const themeMode: 'light' | 'dark' | 'system' = 'light';
-  const setThemeMode = (mode: 'light' | 'dark' | 'system') => {
-    // Will be connected to UI store later
-    console.log('Setting theme mode to:', mode);
-  };
-  const toggleTheme = () => {
-    const newMode: 'light' | 'dark' = themeMode === 'light' ? 'dark' : 'light';
-    setThemeMode(newMode);
-  };
-  const isDarkMode = themeMode === 'dark';
+  const themeMode = useUIStore((state) => state.themeMode);
+  const setThemeMode = useUIStore((state) => state.setThemeMode);
+  const toggleTheme = useUIStore((state) => state.toggleTheme);
+  const isDarkMode = useUIStore((state) => state.isDarkMode);
 
   const themeColors = isDarkMode ? colors.dark : colors.light;
 

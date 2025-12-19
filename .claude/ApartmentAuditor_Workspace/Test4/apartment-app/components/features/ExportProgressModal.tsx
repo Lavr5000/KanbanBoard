@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 import type { ReportGenerationProgress } from '@/services/domain/report/ReportBuilder';
-import { colors } from '@/constants/colors';
+import { defaultColors } from '@/constants/colors';
 
 interface ExportProgressModalProps {
   visible: boolean;
@@ -17,7 +17,7 @@ export function ExportProgressModal({ visible, progress }: ExportProgressModalPr
     >
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={defaultColors.primary} />
 
           <Text style={styles.message}>
             {progress?.message || 'Подготовка...'}
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
+    color: defaultColors.text,
     marginTop: 16,
     marginBottom: 12,
     textAlign: 'center'
@@ -72,24 +72,24 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '100%',
     height: 8,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: defaultColors.primary,
     borderRadius: 4
   },
   percentage: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
     marginBottom: 8
   },
   detail: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
     marginTop: 4
   }
 });

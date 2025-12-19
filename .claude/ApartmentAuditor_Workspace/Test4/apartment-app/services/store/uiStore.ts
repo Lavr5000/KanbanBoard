@@ -24,7 +24,7 @@ export const useUIStore = create<UIStore>()(
     finishMode: 'draft',
     activeTab: 'objects',
     isLoading: false,
-    themeMode: 'light',
+    themeMode: 'dark',
 
     // Actions
     setFinishMode: (mode: 'draft' | 'finish') => set({ finishMode: mode }),
@@ -47,12 +47,8 @@ export const useUIStore = create<UIStore>()(
     },
 
     get isDarkMode() {
-      const { themeMode } = get();
-      if (themeMode === 'system') {
-        // For now, default to light mode. System detection can be added later
-        return false;
-      }
-      return themeMode === 'dark';
+      // Force dark mode always
+      return true;
     }
   })
 );
@@ -65,7 +61,7 @@ export const useUIStoreWithPersistence = create<UIStore>()(
       finishMode: 'draft',
       activeTab: 'objects',
       isLoading: false,
-      themeMode: 'light',
+      themeMode: 'dark',
 
       // Actions
       setFinishMode: (mode: 'draft' | 'finish') => set({ finishMode: mode }),
@@ -88,12 +84,8 @@ export const useUIStoreWithPersistence = create<UIStore>()(
       },
 
       get isDarkMode() {
-        const { themeMode } = get();
-        if (themeMode === 'system') {
-          // For now, default to light mode. System detection can be added later
-          return false;
-        }
-        return themeMode === 'dark';
+        // Force dark mode always
+        return true;
       }
     }),
     {

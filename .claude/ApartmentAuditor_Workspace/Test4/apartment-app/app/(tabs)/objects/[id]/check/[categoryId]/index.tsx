@@ -7,7 +7,7 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 // Import store hooks and utilities
 import { useProjectStore, useCheckpointStore, useUIStore } from '@/services/store';
 import checkpointsDB from '@/constants/checkpoints_v2.1.json';
-import { colors, getStatusColor } from '@/constants/colors';
+import { defaultColors, getStatusColor } from '@/constants/colors';
 import type { DBCheckpoint, CheckpointStatus } from '@/types/database.types';
 
 // Import components
@@ -43,13 +43,13 @@ function CheckpointItem({
   const getStatusIconColor = () => {
     switch (status) {
       case 'complies':
-        return colors.success;
+        return defaultColors.success;
       case 'defect':
-        return colors.error;
+        return defaultColors.error;
       case 'not_inspected':
-        return colors.warning;
+        return defaultColors.warning;
       default:
-        return colors.textSecondary;
+        return defaultColors.textSecondary;
     }
   };
 
@@ -74,7 +74,7 @@ function CheckpointItem({
           </Text>
           {photos.length > 0 && (
             <View style={styles.photosCount}>
-              <Ionicons name="images" size={14} color={colors.primary} />
+              <Ionicons name="images" size={14} color={defaultColors.primary} />
               <Text style={styles.photosCountText}>{photos.length}</Text>
             </View>
           )}
@@ -86,7 +86,7 @@ function CheckpointItem({
 
         {comment && (
           <View style={styles.commentContainer}>
-            <Ionicons name="chatbubbles-outline" size={14} color={colors.textSecondary} />
+            <Ionicons name="chatbubbles-outline" size={14} color={defaultColors.textSecondary} />
             <Text style={styles.commentText} numberOfLines={2}>
               {comment}
             </Text>
@@ -97,7 +97,7 @@ function CheckpointItem({
           <Text style={styles.metaText}>
             {checkpoint.tolerance}
           </Text>
-          <Ionicons name="document-text-outline" size={14} color={colors.textSecondary} />
+          <Ionicons name="document-text-outline" size={14} color={defaultColors.textSecondary} />
           <Text style={styles.metaText}>
             {checkpoint.standardReference}
           </Text>
@@ -105,7 +105,7 @@ function CheckpointItem({
       </View>
 
       <View style={styles.checkpointRight}>
-        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+        <Ionicons name="chevron-forward" size={20} color={defaultColors.textSecondary} />
       </View>
     </TouchableOpacity>
   );
@@ -205,7 +205,7 @@ export default function CategoryChecklist() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.primary} />
+          <Ionicons name="arrow-back" size={24} color={defaultColors.primary} />
         </TouchableOpacity>
 
         <View style={styles.headerContent}>
@@ -231,8 +231,8 @@ export default function CategoryChecklist() {
               styles.progressFill,
               {
                 width: `${stats.percentage}%`,
-                backgroundColor: stats.percentage >= 80 ? colors.success :
-                               stats.percentage >= 50 ? colors.warning : colors.error
+                backgroundColor: stats.percentage >= 80 ? defaultColors.success :
+                               stats.percentage >= 50 ? defaultColors.warning : defaultColors.error
               }
             ]}
           />
@@ -276,7 +276,7 @@ export default function CategoryChecklist() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
   },
   errorContainer: {
     flex: 1,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: colors.error,
+    color: defaultColors.error,
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
     fontWeight: '500',
   },
   header: {
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: defaultColors.border,
   },
   headerContent: {
     flex: 1,
@@ -317,19 +317,19 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text,
+    color: defaultColors.text,
     marginBottom: 2,
   },
   statusText: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
   },
   progressContainer: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: colors.card,
+    backgroundColor: defaultColors.card,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: defaultColors.border,
   },
   progressInfo: {
     flexDirection: 'row',
@@ -339,16 +339,16 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
     fontWeight: '600',
   },
   checkpointsCount: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   checkpointItem: {
-    backgroundColor: colors.card,
+    backgroundColor: defaultColors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   checkpointTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
+    color: defaultColors.text,
     flex: 1,
     marginRight: 8,
   },
@@ -400,19 +400,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
   },
   photosCountText: {
     fontSize: 12,
-    color: colors.primary,
+    color: defaultColors.primary,
     fontWeight: '600',
   },
   checkpointDescription: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -420,14 +420,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 6,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     padding: 8,
     borderRadius: 8,
     marginBottom: 8,
   },
   commentText: {
     fontSize: 14,
-    color: colors.text,
+    color: defaultColors.text,
     flex: 1,
     lineHeight: 18,
   },
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
     opacity: 0.8,
   },
   checkpointRight: {
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: colors.card,
+    backgroundColor: defaultColors.card,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     width: '100%',
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.text,
+    color: defaultColors.text,
   },
   optionsContainer: {
     gap: 12,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     borderRadius: 12,
   },
   optionIcon: {
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
     fontWeight: '500',
   }
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, getStatusColor } from '../../constants/colors';
+import { getStatusColor, SIZES, TEXT_STYLES, defaultColors } from '../../constants/colors';
 import { ProgressBar } from '../ui/ProgressBar';
 
 interface CategoryCardProps {
@@ -34,9 +34,9 @@ export function CategoryCard({
   currentMode
 }: CategoryCardProps) {
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 80) return colors.success;
-    if (percentage >= 50) return colors.warning;
-    return colors.error;
+    if (percentage >= 80) return defaultColors.success;
+    if (percentage >= 50) return defaultColors.warning;
+    return defaultColors.error;
   };
 
   return (
@@ -50,7 +50,7 @@ export function CategoryCard({
           <Ionicons
             name={categoryIcons[categoryId] || 'folder-outline'}
             size={24}
-            color={colors.primary}
+            color={defaultColors.primary}
             style={styles.categoryIcon}
           />
           <Text style={styles.categoryName}>{categoryName}</Text>
@@ -82,11 +82,11 @@ export function CategoryCard({
       </View>
 
       <View style={styles.statsRow}>
-        <Ionicons name="document-text-outline" size={16} color={colors.textSecondary} />
+        <Ionicons name="document-text-outline" size={16} color={defaultColors.textSecondary} />
         <Text style={styles.statsText}>
           {stats.total} проверок
         </Text>
-        <Ionicons name="checkmark-circle-outline" size={16} color={colors.textSecondary} style={{ marginLeft: 'auto' }} />
+        <Ionicons name="checkmark-circle-outline" size={16} color={defaultColors.textSecondary} style={{ marginLeft: 'auto' }} />
         <Text style={styles.statsText}>
           {stats.inspected} выполнено
         </Text>
@@ -97,70 +97,66 @@ export function CategoryCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: defaultColors.card,
+    borderRadius: SIZES.borderRadius.lg,
+    padding: SIZES.padding.md,
+    marginBottom: SIZES.margin.sm,
+    ...SIZES.shadow.md,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: SIZES.margin.sm,
   },
   categoryTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    gap: 8,
+    gap: SIZES.margin.sm,
   },
   categoryIcon: {
-    marginRight: 4,
+    marginRight: SIZES.margin.xs,
   },
   categoryName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
+    fontSize: TEXT_STYLES.h3.fontSize,
+    fontWeight: TEXT_STYLES.h3.fontWeight,
+    color: defaultColors.text,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: SIZES.padding.sm,
+    paddingVertical: SIZES.padding.xs,
+    borderRadius: SIZES.borderRadius.lg,
   },
   statusBadgeText: {
-    fontSize: 12,
+    fontSize: TEXT_STYLES.caption.fontSize,
     fontWeight: '600',
     color: 'white',
   },
   progressContainer: {
-    marginBottom: 12,
+    marginBottom: SIZES.margin.sm,
   },
   progressInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: SIZES.margin.sm,
   },
   progressText: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: TEXT_STYLES.body.fontSize,
+    color: defaultColors.text,
   },
   percentageText: {
-    fontSize: 16,
+    fontSize: TEXT_STYLES.body.fontSize,
     fontWeight: '600',
   },
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: SIZES.margin.xs,
   },
   statsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    fontSize: TEXT_STYLES.bodySmall.fontSize,
+    color: defaultColors.textSecondary,
   },
 });

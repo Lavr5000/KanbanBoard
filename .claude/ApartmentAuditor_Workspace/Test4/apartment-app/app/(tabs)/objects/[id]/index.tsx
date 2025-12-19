@@ -7,7 +7,7 @@ import { useLocalSearchParams, useNavigation } from 'expo-router';
 // Import store hooks and utilities
 import { useProjectStore, useUIStore, useCheckpointStore } from '@/services/store';
 import checkpointsDB from '@/constants/checkpoints_v2.1.json';
-import { colors, getStatusColor } from '@/constants/colors';
+import { defaultColors, getStatusColor } from '@/constants/colors';
 
 // Import PDF generation components
 import { ParticipantForm } from '@/components/features/ParticipantForm';
@@ -45,9 +45,9 @@ function CategoryCard({
   currentMode: 'draft' | 'finish';
 }) {
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 80) return colors.success;
-    if (percentage >= 50) return colors.warning;
-    return colors.error;
+    if (percentage >= 80) return defaultColors.success;
+    if (percentage >= 50) return defaultColors.warning;
+    return defaultColors.error;
   };
 
   return (
@@ -61,7 +61,7 @@ function CategoryCard({
           <Ionicons
             name={categoryIcons[categoryId] || 'folder-outline'}
             size={24}
-            color={colors.primary}
+            color={defaultColors.primary}
             style={styles.categoryIcon}
           />
           <Text style={styles.categoryName}>{categoryName}</Text>
@@ -100,11 +100,11 @@ function CategoryCard({
       </View>
 
       <View style={styles.statsRow}>
-        <Ionicons name="document-text-outline" size={16} color={colors.textSecondary} />
+        <Ionicons name="document-text-outline" size={16} color={defaultColors.textSecondary} />
         <Text style={styles.statsText}>
           {stats.total} проверок
         </Text>
-        <Ionicons name="checkmark-circle-outline" size={16} color={colors.textSecondary} style={{ marginLeft: 'auto' }} />
+        <Ionicons name="checkmark-circle-outline" size={16} color={defaultColors.textSecondary} style={{ marginLeft: 'auto' }} />
         <Text style={styles.statsText}>
           {stats.inspected} выполнено
         </Text>
@@ -215,7 +215,7 @@ export default function ProjectDashboard() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.primary} />
+          <Ionicons name="arrow-back" size={24} color={defaultColors.primary} />
         </TouchableOpacity>
 
         <View style={styles.headerContent}>
@@ -227,26 +227,26 @@ export default function ProjectDashboard() {
           </Text>
           {project.address && (
             <View style={styles.addressRow}>
-              <Ionicons name="location-outline" size={14} color={colors.textSecondary} />
+              <Ionicons name="location-outline" size={14} color={defaultColors.textSecondary} />
               <Text style={styles.addressText}>{project.address}</Text>
             </View>
           )}
         </View>
 
         <TouchableOpacity
-          style={[styles.modeToggle, { backgroundColor: finishMode === 'finish' ? colors.primary : colors.background }]}
+          style={[styles.modeToggle, { backgroundColor: finishMode === 'finish' ? defaultColors.primary : defaultColors.background }]}
           onPress={handleModeToggle}
         >
           <Text style={[
             styles.modeToggleText,
-            { color: finishMode === 'finish' ? 'white' : colors.text }
+            { color: finishMode === 'finish' ? 'white' : defaultColors.text }
           ]}>
             {finishMode === 'finish' ? 'Чистовая' : 'Черновая'}
           </Text>
           <Ionicons
             name={finishMode === 'finish' ? "checkmark" : "pencil"}
             size={16}
-            color={finishMode === 'finish' ? 'white' : colors.text}
+            color={finishMode === 'finish' ? 'white' : defaultColors.text}
           />
         </TouchableOpacity>
       </View>
@@ -298,7 +298,7 @@ export default function ProjectDashboard() {
               );
             }}
           >
-            <Ionicons name="document-outline" size={20} color={colors.primary} />
+            <Ionicons name="document-outline" size={20} color={defaultColors.primary} />
             <Text style={styles.actionButtonText}>Экспорт отчёта</Text>
           </TouchableOpacity>
 
@@ -306,7 +306,7 @@ export default function ProjectDashboard() {
             style={styles.actionButton}
             onPress={() => {/* Future: Settings */}}
           >
-            <Ionicons name="settings-outline" size={20} color={colors.primary} />
+            <Ionicons name="settings-outline" size={20} color={defaultColors.primary} />
             <Text style={styles.actionButtonText}>Настройки проекта</Text>
           </TouchableOpacity>
         </View>
@@ -331,7 +331,7 @@ export default function ProjectDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
   },
   errorContainer: {
     flex: 1,
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: colors.error,
+    color: defaultColors.error,
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
     fontWeight: '500',
   },
   header: {
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: defaultColors.border,
   },
   headerContent: {
     flex: 1,
@@ -372,12 +372,12 @@ const styles = StyleSheet.create({
   projectTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text,
+    color: defaultColors.text,
     marginBottom: 2,
   },
   projectMeta: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
   },
   addressRow: {
     flexDirection: 'row',
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 13,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
     flex: 1,
   },
   modeToggle: {
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: defaultColors.border,
   },
   modeToggleText: {
     fontSize: 14,
@@ -414,11 +414,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: colors.text,
+    color: defaultColors.text,
     marginBottom: 16,
   },
   card: {
-    backgroundColor: colors.card,
+    backgroundColor: defaultColors.card,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.text,
+    color: defaultColors.text,
   },
   categoryTitleContainer: {
     flexDirection: 'row',
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
   },
   percentageText: {
     fontSize: 16,
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: defaultColors.textSecondary,
   },
   footerSection: {
     paddingHorizontal: 16,
@@ -504,16 +504,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     borderRadius: 8,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: defaultColors.border,
   },
   actionButtonText: {
     fontSize: 16,
-    color: colors.primary,
+    color: defaultColors.primary,
     fontWeight: '600',
   },
 });

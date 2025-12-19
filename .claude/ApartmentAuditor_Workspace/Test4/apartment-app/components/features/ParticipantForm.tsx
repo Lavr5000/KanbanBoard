@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Participant } from '@/types';
-import { colors } from '@/constants/colors';
+import { defaultColors } from '@/constants/colors';
 
 interface ParticipantFormProps {
   initialParticipants?: Participant[];
@@ -48,7 +48,7 @@ export function ParticipantForm({ initialParticipants = [], onSave, onCancel }: 
       <View style={styles.header}>
         <Text style={styles.title}>Участники проверки</Text>
         <TouchableOpacity onPress={onCancel}>
-          <Ionicons name="close" size={24} color={colors.text} />
+          <Ionicons name="close" size={24} color={defaultColors.text} />
         </TouchableOpacity>
       </View>
 
@@ -94,7 +94,7 @@ export function ParticipantForm({ initialParticipants = [], onSave, onCancel }: 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
     padding: 16
   },
   header: {
@@ -106,23 +106,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text
+    color: defaultColors.text
   },
   participantBlock: {
     marginBottom: 16,
     padding: 12,
-    backgroundColor: colors.card,
+    backgroundColor: defaultColors.card,
     borderRadius: 8
   },
   roleLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.primary,
+    color: defaultColors.primary,
     marginBottom: 8
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: defaultColors.border,
     borderRadius: 6,
     padding: 10,
     marginBottom: 8,
@@ -139,19 +139,19 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: defaultColors.border,
     alignItems: 'center'
   },
   cancelButtonText: {
     fontSize: 16,
-    color: colors.text,
+    color: defaultColors.text,
     fontWeight: '600'
   },
   saveButton: {
     flex: 1,
     padding: 14,
     borderRadius: 8,
-    backgroundColor: colors.primary,
+    backgroundColor: defaultColors.primary,
     alignItems: 'center'
   },
   saveButtonText: {

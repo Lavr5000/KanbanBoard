@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { colors } from '../../constants/colors';
+import { defaultColors } from '../../constants/colors';
 
 interface ProgressBarProps {
   percentage: number;
@@ -11,9 +11,9 @@ interface ProgressBarProps {
 
 export function ProgressBar({
   percentage,
-  color = colors.primary,
+  color = defaultColors.primary,
   height = 6,
-  backgroundColor = colors.background
+  backgroundColor = defaultColors.background
 }: ProgressBarProps) {
   return (
     <View style={[styles.container, { height, backgroundColor }]}>

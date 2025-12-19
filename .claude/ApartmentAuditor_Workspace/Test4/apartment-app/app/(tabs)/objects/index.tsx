@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,9 +11,12 @@ import type { Project } from '@/types/database';
 // Import theme and colors
 import { useTheme } from '../../../hooks/useTheme';
 import { getStatusColor, error,
-  background, card, surface, text, textSecondary, border, primary,
-  divider } from '../../../constants/colors';
+  background, card, surface, text, textSecondary, primary } from '../../../constants/colors';
 
+// Import modal components
+import { CreateProjectModal } from "../../../components/features/CreateProjectModal";
+import { ParticipantModal } from "../../../components/features/ParticipantModal";
+import type { Participant } from "../../../types";
 // Calculate project progress
 function getProjectProgress(projectId: string) {
   // Import here to avoid circular dependencies
@@ -103,30 +106,13 @@ export default function ObjectsScreen() {
   const { colors: themeColors } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const [newProjectTitle, setNewProjectTitle] = useState('');
-  const [newProjectAddress, setNewProjectAddress] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
   const [showActive, setShowActive] = useState(true); // Toggle for Актуальные/Архив
-
-  // Handle project creation
-  const handleCreateProject = () => {
-    if (!newProjectTitle.trim()) return;
-
-    const projectId = createProject(newProjectTitle.trim(), newProjectAddress.trim());
-    setActiveProject(projectId);
-
-    // Navigate to project dashboard
-    (navigation.navigate as any)('(tabs)/objects/[id]', { id: projectId });
-
-    setNewProjectTitle('');
-    setNewProjectAddress('');
-    setShowAddForm(false);
-  };
+  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);  const [showParticipantModal, setShowParticipantModal] = useState(false);  const [selectedProjectParticipants, setSelectedProjectParticipants] = useState<Participant[]>([]);
 
   // Handle project selection
   const handleProjectSelect = (project: Project) => {
     setActiveProject(project.id);
-    (navigation.navigate as any)('(tabs)/objects/[id]', { id: project.id });
+    (navigation.navigate as any)("(tabs)/objects/[id]", { id: project.id });
   };
 
   // Render empty state
@@ -137,69 +123,11 @@ export default function ObjectsScreen() {
       </View>
       <Text style={[styles.emptyStateTitle, { color: themeColors.text }]}>Нет объектов</Text>
       <Text style={[styles.emptyStateDescription, { color: themeColors.textSecondary }]}>
-        Создайте новый объект для начала аудита
+        Нажмите на кнопку + чтобы создать новый объект
       </Text>
-      <TouchableOpacity
-        style={[styles.createButton, styles.createButtonLarge, { backgroundColor: themeColors.primary }]}
-        onPress={() => setShowAddForm(true)}
-      >
-        <Ionicons name="add" size={20} color="white" />
-        <Text style={styles.createButtonText}>Создать первый объект</Text>
-      </TouchableOpacity>
     </View>
   );
 
-  // Render add project form
-  const renderAddForm = () => (
-    <View style={[styles.addFormContainer, { backgroundColor: themeColors.card, borderBottomColor: themeColors.border }]}>
-      <Text style={[styles.formTitle, { color: themeColors.text }]}>Новый объект</Text>
-      <View style={[styles.inputContainer, { backgroundColor: themeColors.surface }]}>
-        <Ionicons name="create-outline" size={20} color={themeColors.textSecondary} style={styles.inputIcon} />
-        <TextInput
-          style={[styles.input, { color: themeColors.text }]}
-          onPressIn={() => setShowAddForm(true)}
-          editable={showAddForm}
-          onEndEditing={() => setShowAddForm(false)}
-          maxLength={50}
-          value={showAddForm ? newProjectTitle : ''}
-          placeholder="Введите название объекта..."
-          placeholderTextColor={themeColors.textSecondary}
-        />
-      </View>
-      {showAddForm && (
-        <View style={[styles.inputContainer, { marginTop: 8, backgroundColor: themeColors.surface }]}>
-          <Ionicons name="location-outline" size={20} color={themeColors.textSecondary} style={styles.inputIcon} />
-          <TextInput
-            style={[styles.input, { color: themeColors.text }]}
-            value={newProjectAddress}
-            onChangeText={setNewProjectAddress}
-            placeholder="Введите адрес объекта..."
-            maxLength={100}
-            placeholderTextColor={themeColors.textSecondary}
-          />
-        </View>
-      )}
-      {showAddForm && (
-        <View style={styles.formActions}>
-          <TouchableOpacity
-            style={[styles.formButton, styles.formButtonCancel, { backgroundColor: themeColors.surface, borderColor: themeColors.border }]}
-            onPress={() => {
-              setNewProjectTitle('');
-              setShowAddForm(false);
-            }}
-          >
-            <Text style={[styles.formButtonTextCancel, { color: themeColors.textSecondary }]}>Отмена</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.formButton, styles.formButtonConfirm, { backgroundColor: themeColors.primary }]}
-            onPress={handleCreateProject}
-          >
-            <Text style={styles.formButtonTextConfirm}>Создать</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background, paddingTop: insets.top }]}>
@@ -246,7 +174,6 @@ export default function ObjectsScreen() {
       </View>
 
       {/* Add Form */}
-      {renderAddForm()}
 
       {/* Projects List */}
       {projects.length > 0 ? (
@@ -270,11 +197,26 @@ export default function ObjectsScreen() {
       {/* Floating Action Button */}
       <TouchableOpacity
         style={[styles.fab, { backgroundColor: error }]}
-        onPress={() => setShowAddForm(true)}
+        onPress={() => setShowCreateProjectModal(true)}
         activeOpacity={0.8}
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>
+
+      {/* Modals */}
+      <CreateProjectModal
+        visible={showCreateProjectModal}
+        onClose={() => setShowCreateProjectModal(false)}
+      />
+      <ParticipantModal
+        visible={showParticipantModal}
+        initialParticipants={selectedProjectParticipants}
+        onSave={(participants) => {
+          setSelectedProjectParticipants(participants);
+          setShowParticipantModal(false);
+        }}
+        onClose={() => setShowParticipantModal(false)}
+      />
     </View>
   );
 }
@@ -384,91 +326,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
-  },
-  addFormContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: border,
-  },
-  formTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: text,
-    marginBottom: 12,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: background,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    minHeight: 44,
-  },
-  inputIcon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: text,
-    minHeight: 44,
-    lineHeight: 44,
-  },
-  formActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 12,
-  },
-  formButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    minWidth: 80,
-  },
-  formButtonCancel: {
-    backgroundColor: background,
-    borderWidth: 1,
-    borderColor: border,
-  },
-  formButtonConfirm: {
-    backgroundColor: primary,
-  },
-  formButtonTextCancel: {
-    fontSize: 16,
-    color: textSecondary,
-    fontWeight: '500',
-  },
-  formButtonTextConfirm: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: '600',
-  },
-  createButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: primary,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    gap: 8,
-  },
-  createButtonLarge: {
-    paddingHorizontal: 32,
-    paddingVertical: 20,
-    shadowColor: primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  createButtonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'white',
   },
   progressContainer: {
     marginTop: 8,
