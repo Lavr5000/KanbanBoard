@@ -9,6 +9,7 @@ import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
 import { CompactDateRange } from '@/shared/ui/DateRange';
 import { DueDateIndicator, CompactDueDate } from '@/shared/ui/DueDateIndicator';
 import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
+import { TagGroup, TagSelector } from '@/shared/ui/TagSystem';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
   const { updateTask, deleteTask } = useKanbanStore();
@@ -159,6 +160,16 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               </div>
             </div>
 
+            {/* Tags */}
+            <div onPointerDown={(e) => e.stopPropagation()}>
+              <label className="text-[9px] text-gray-400 block mb-1">Tags</label>
+              <TagSelector
+                selectedTags={task.tags || []}
+                onTagsChange={(tags) => updateTask(task.id, { tags })}
+                size="xs"
+              />
+            </div>
+
             {/* Progress */}
             <div>
               <label className="text-[9px] text-gray-400 block mb-1">
@@ -221,6 +232,26 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                 />
               </div>
             )}
+
+            {/* Tags */}
+            {task.tags && task.tags.length > 0 && (
+              <div className="mb-2">
+                <TagGroup
+                  tags={task.tags}
+                  maxVisible={4}
+                  size="xs"
+                  onTagClick={(tag) => console.log('Tag clicked:', tag)}
+                />
+              </div>
+            )}
+            {!task.tags || task.tags.length === 0 ? (
+              <div
+                className="text-[9px] text-gray-500 italic mb-2 p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                onClick={() => setIsEditing(true)}
+              >
+                + Add tags
+              </div>
+            ) : null}
 
             {/* Progress */}
             {task.progress !== undefined ? (

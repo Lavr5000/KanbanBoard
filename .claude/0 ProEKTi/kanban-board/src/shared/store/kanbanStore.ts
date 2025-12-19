@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Task, TaskStatus, Priority } from '@/shared/types/task';
+import { Task, TaskStatus, Priority, Tag } from '@/shared/types/task';
 
 // Initial mock data to ensure board is never empty
 const initialTasks: Task[] = [
@@ -16,6 +16,11 @@ const initialTasks: Task[] = [
       { id: 'a1', name: 'Alex Smith', color: '#EF4444' },
       { id: 'a2', name: 'Sarah Lee', color: '#F59E0B' }
     ],
+    tags: [
+      { id: 't1', name: 'Bug', color: '#EF4444' },
+      { id: 't2', name: 'Backend', color: '#10B981' },
+      { id: 't3', name: 'Security', color: '#F97316' }
+    ],
     progress: 0
   },
   {
@@ -30,6 +35,10 @@ const initialTasks: Task[] = [
       { id: 'a3', name: 'Mike Chen', color: '#3B82F6' },
       { id: 'a4', name: 'Tom Analyst', color: '#EC4899' }
     ],
+    tags: [
+      { id: 't4', name: 'Research', color: '#06B6D4' },
+      { id: 't5', name: 'Documentation', color: '#6B7280' }
+    ],
     progress: 25
   },
   {
@@ -42,6 +51,11 @@ const initialTasks: Task[] = [
     dueDate: '2024-12-19', // Due today - shows orange indicator
     assignees: [
       { id: 'a5', name: 'Lisa Designer', color: '#10B981' }
+    ],
+    tags: [
+      { id: 't6', name: 'Feature', color: '#3B82F6' },
+      { id: 't7', name: 'Design', color: '#8B5CF6' },
+      { id: 't8', name: 'Frontend', color: '#F59E0B' }
     ],
     progress: 0
   },
@@ -56,6 +70,10 @@ const initialTasks: Task[] = [
     assignees: [
       { id: 'a6', name: 'John Builder', color: '#F59E0B' },
       { id: 'a7', name: 'Tom Engineer', color: '#8B5CF6' }
+    ],
+    tags: [
+      { id: 't9', name: 'Feature', color: '#3B82F6' },
+      { id: 't10', name: 'Backend', color: '#10B981' }
     ],
     progress: 60
   },
