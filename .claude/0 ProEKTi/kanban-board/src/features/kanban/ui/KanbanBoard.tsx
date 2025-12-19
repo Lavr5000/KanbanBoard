@@ -17,7 +17,8 @@ import {
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { useKanbanDnD } from '@/features/kanban/hooks/useKanbanDnD';
 import { KanbanColumn } from './KanbanColumn';
-import { Task, TaskStatus, Column } from '@/shared/types/task';
+import { FilterPanel } from './FilterPanel';
+import { Task, Column } from '@/shared/types/task';
 
 export const KanbanBoard = () => {
   const [mounted, setMounted] = useState(false);
@@ -45,7 +46,7 @@ export const KanbanBoard = () => {
 // Inner component that contains all the hooks
 const KanbanBoardContent = () => {
   // Now all hooks are called consistently in every render
-  const { getTasksByStatus, addTask } = useKanbanStore();
+  const { addTask, filters, setFilters, getFilteredTasks } = useKanbanStore();
   const { handleDragEnd } = useKanbanDnD();
 
   const sensors = useSensors(
@@ -68,9 +69,9 @@ const KanbanBoardContent = () => {
     { id: 'done', title: 'Готово', taskIds: [] }
   ];
 
-  // Create columns with current task data using selectors
+  // Create columns with current task data using filtered tasks
   const columnsWithData: (Column & { tasks: Task[] })[] = columnConfig.map(column => {
-    const tasks = getTasksByStatus(column.id);
+    const tasks = getFilteredTasks().filter(task => task.status === column.id);
     return {
       ...column,
       taskIds: tasks.map((t: Task) => t.id),
@@ -79,36 +80,45 @@ const KanbanBoardContent = () => {
   });
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex h-full gap-8 overflow-x-auto pb-6 w-full kanban-scrollbar p-4">
-        <div className="flex gap-8 min-w-max">
-          {columnsWithData.map((column, index) => (
-            <SortableContext
-              key={column.id}
-              id={column.id}
-              items={column.taskIds}
-              strategy={verticalListSortingStrategy}
-            >
-              <div
-                className="card-entrance"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <KanbanColumn
-                  column={column}
-                  tasks={column.tasks}
-                  count={column.tasks.length}
-                  onAddTask={() => addTask(column.id)}
-                />
-              </div>
-            </SortableContext>
-          ))}
-        </div>
+    <div className="flex flex-col h-full">
+      <FilterPanel
+        filters={filters}
+        onFiltersChange={setFilters}
+        taskCount={getFilteredTasks().length}
+      />
+      <div className="flex-1">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="flex h-full gap-8 overflow-x-auto pb-6 w-full kanban-scrollbar p-4">
+            <div className="flex gap-8 min-w-max">
+              {columnsWithData.map((column, index) => (
+                <SortableContext
+                  key={column.id}
+                  id={column.id}
+                  items={column.taskIds}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div
+                    className="card-entrance"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <KanbanColumn
+                      column={column}
+                      tasks={column.tasks}
+                      count={column.tasks.length}
+                      onAddTask={() => addTask(column.id)}
+                    />
+                  </div>
+                </SortableContext>
+              ))}
+            </div>
+          </div>
+        </DndContext>
       </div>
-    </DndContext>
+    </div>
   );
 };
 

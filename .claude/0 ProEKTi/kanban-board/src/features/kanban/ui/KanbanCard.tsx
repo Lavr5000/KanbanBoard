@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { Task, Priority } from '@/shared/types/task';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, Trash2, Check, X } from 'lucide-react';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
 import { CompactDateRange } from '@/shared/ui/DateRange';
@@ -14,6 +14,17 @@ import { TagGroup, TagSelector } from '@/shared/ui/TagSystem';
 export const KanbanCard = ({ task }: { task: Task }) => {
   const { updateTask, deleteTask } = useKanbanStore();
   const [isEditing, setIsEditing] = useState(false);
+
+  // Store temporary values during editing
+  const [editValues, setEditValues] = useState({
+    title: task.title,
+    description: task.description,
+    priority: task.priority,
+    startDate: task.startDate,
+    dueDate: task.dueDate,
+    tags: task.tags,
+    progress: task.progress
+  });
 
   const {
     attributes,
@@ -28,6 +39,52 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+  };
+
+  // Handle editing actions
+  const handleStartEdit = () => {
+    setEditValues({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      startDate: task.startDate,
+      dueDate: task.dueDate,
+      tags: task.tags,
+      progress: task.progress
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    // Save all changes at once
+    updateTask(task.id, editValues);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    // Discard changes and reset to original values
+    setEditValues({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      startDate: task.startDate,
+      dueDate: task.dueDate,
+      tags: task.tags,
+      progress: task.progress
+    });
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      handleSave();
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancel();
+    }
   };
 
   // Calculate due date status
@@ -60,6 +117,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     <div
       ref={setNodeRef}
       style={style}
+      data-testid={`kanban-card-${task.id}`}
       className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] ${
         isDragging ? 'drag-preview' : ''
       }`}
@@ -72,12 +130,15 @@ export const KanbanCard = ({ task }: { task: Task }) => {
           <div
             {...attributes}
             {...listeners}
+            data-testid="drag-handle"
             className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-300 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm hover:scale-105"
           >
             <GripVertical size={20} />
           </div>
           <button
             onClick={() => deleteTask(task.id)}
+            data-testid="delete-button"
+            aria-label="Delete task"
             className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 transition-all duration-300 p-1.5 rounded-lg hover:bg-red-500/20 backdrop-blur-sm hover:scale-105"
           >
             <Trash2 size={14} />
@@ -91,33 +152,18 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             autoFocus
             placeholder={task.title ? "" : "Название задачи..."}
             className="w-full bg-white/5 text-white border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400/50 transition-all placeholder-blue-400/50"
-            value={task.title}
-            onChange={(e) => updateTask(task.id, { title: e.target.value })}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                setIsEditing(false);
-              }
-              if (e.key === 'Escape') setIsEditing(false);
-            }}
+            value={editValues.title}
+            onChange={(e) => setEditValues({ ...editValues, title: e.target.value })}
+            onKeyDown={handleKeyDown}
             onPointerDown={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
           />
           <textarea
             placeholder={task.description ? "" : "Описание..."}
             className="w-full bg-white/5 text-white/90 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none min-h-[60px] focus:border-blue-400/30 transition-all resize-none placeholder-blue-400/50"
-            value={task.description}
-            onChange={(e) => updateTask(task.id, { description: e.target.value })}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-              if (e.key === 'Escape' && !e.shiftKey) {
-                e.preventDefault();
-                setIsEditing(false);
-              }
-            }}
+            value={editValues.description}
+            onChange={(e) => setEditValues({ ...editValues, description: e.target.value })}
+            onKeyDown={handleKeyDown}
             onPointerDown={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
           />
@@ -128,8 +174,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             <div>
               <label className="text-label text-gray-400 block mb-1">Priority</label>
               <PrioritySelector
-                value={task.priority}
-                onChange={(priority) => updateTask(task.id, { priority })}
+                value={editValues.priority}
+                onChange={(priority) => setEditValues({ ...editValues, priority })}
                 size="xs"
               />
             </div>
@@ -141,8 +187,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                 <input
                   type="date"
                   className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
-                  value={task.startDate || ''}
-                  onChange={(e) => updateTask(task.id, { startDate: e.target.value || undefined })}
+                  value={editValues.startDate || ''}
+                  onChange={(e) => setEditValues({ ...editValues, startDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -151,8 +197,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                 <input
                   type="date"
                   className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
-                  value={task.dueDate || ''}
-                  onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
+                  value={editValues.dueDate || ''}
+                  onChange={(e) => setEditValues({ ...editValues, dueDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -162,8 +208,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             <div onClick={(e) => e.stopPropagation()}>
               <label className="text-label text-gray-400 block mb-1">Tags</label>
               <TagSelector
-                selectedTags={task.tags || []}
-                onTagsChange={(tags) => updateTask(task.id, { tags })}
+                selectedTags={editValues.tags || []}
+                onTagsChange={(tags) => setEditValues({ ...editValues, tags })}
                 size="xs"
               />
             </div>
@@ -171,26 +217,47 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             {/* Progress */}
             <div onClick={(e) => e.stopPropagation()}>
               <label className="text-label text-gray-400 block mb-1">
-                Progress: {task.progress || 0}%
+                Progress: {editValues.progress || 0}%
               </label>
               <input
                 type="range"
                 min="0"
                 max="100"
                 className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                value={task.progress || 0}
+                value={editValues.progress || 0}
                 onChange={(e) => {
                   const progress = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                  updateTask(task.id, { progress });
+                  setEditValues({ ...editValues, progress });
                 }}
                 onClick={(e) => e.stopPropagation()}
+                data-testid="progress-slider"
               />
+            </div>
+
+            {/* Save/Cancel Buttons */}
+            <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+              <button
+                onClick={handleCancel}
+                className="flex items-center gap-1 px-3 py-1.5 bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 hover:text-white rounded-lg transition-all duration-200 text-xs font-medium"
+                title="Отменить (Escape)"
+              >
+                <X size={14} />
+                Отмена
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-white rounded-lg transition-all duration-200 text-xs font-medium"
+                title="Сохранить (Ctrl+Enter)"
+              >
+                <Check size={14} />
+                Сохранить
+              </button>
             </div>
           </div>
         </div>
       ) : (
-        <div onClick={() => setIsEditing(true)} className="cursor-text">
-          <h4 className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
+        <div onClick={handleStartEdit} className="cursor-text">
+          <h4 data-testid="card-title" className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
           {task.description && (
             <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
               {task.description}
@@ -202,7 +269,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             {/* Due Date */}
             <div
               className="mb-2 cursor-pointer hover:bg-white/5 p-1 rounded transition-colors"
-              onClick={() => setIsEditing(true)}
+              onClick={handleStartEdit}
             >
               {task.dueDate ? (
                 <DueDateIndicator
@@ -244,7 +311,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             {!task.tags || task.tags.length === 0 ? (
               <div
                 className="text-caption text-gray-500 italic mb-2 p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
-                onClick={() => setIsEditing(true)}
+                onClick={handleStartEdit}
               >
                 + Add tags
               </div>

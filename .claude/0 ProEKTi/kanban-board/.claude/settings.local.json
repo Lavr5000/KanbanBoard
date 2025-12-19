@@ -46,7 +46,17 @@
       "Bash(git checkout:*)",
       "Bash(git remote set-url:*)",
       "Bash(git remote add:*)",
-      "Bash(git remote remove:*)"
+      "Bash(git remote remove:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(ls:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npm run test:ci:*)",
+      "Bash(npm test:*)",
+      "Bash(node __tests__/test-runner.js)",
+      "Bash(npm install:*)",
+      "Bash(npx jest:*)",
+      "Bash(npm run test:coverage:*)"
     ]
   }
 }
