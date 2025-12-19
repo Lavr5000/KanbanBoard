@@ -19,7 +19,7 @@ export const KanbanColumn = ({ column, tasks, count, onAddTask }: KanbanColumnPr
   });
 
   return (
-    <div className="w-[300px] flex-shrink-0 flex flex-col glass-column-enhanced rounded-2xl border h-[calc(100vh-140px)] shadow-2xl overflow-hidden">
+    <div className="w-[300px] flex-shrink-0 flex flex-col glass-column rounded-2xl border h-[calc(100vh-140px)] shadow-xl overflow-hidden">
       {/* Header */}
       <div className="p-4 flex items-center justify-between bg-white/[0.03] border-b border-white/8 backdrop-blur-sm">
         <h3 className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{column.title}</h3>
@@ -53,12 +53,12 @@ export const KanbanColumn = ({ column, tasks, count, onAddTask }: KanbanColumnPr
         {/* Empty state indicator */}
         {tasks.length === 0 && (
           <div className="h-full min-h-[150px] flex items-center justify-center">
-            <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-500 flex flex-col items-center gap-4 ${
+            <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 flex flex-col items-center gap-4 ${
               isOver
-                ? 'border-blue-400/80 bg-gradient-to-br from-blue-500/10 to-purple-500/5 scale-[1.05] shadow-lg shadow-blue-500/30 pulse-glow-effect'
-                : 'border-white/15 opacity-50 float-animation'
+                ? 'border-blue-400/80 bg-blue-500/10'
+                : 'border-white/15 opacity-50'
             }`}>
-              <ArrowDown size={24} className="text-blue-400/70 float-animation" style={{ animationDelay: '0.5s' }} />
+              <ArrowDown size={24} className="text-blue-400/70" />
               <span className="text-[10px] uppercase tracking-widest text-blue-300/80 font-semibold">Перетащите сюда</span>
               <span className="text-[8px] text-blue-400/50">для добавления задачи</span>
             </div>

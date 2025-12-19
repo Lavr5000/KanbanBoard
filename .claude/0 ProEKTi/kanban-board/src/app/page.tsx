@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 // Dynamic import to prevent Hydration Error
 const KanbanBoard = dynamic(() => import("@/features/kanban/ui/KanbanBoard").then(m => m.default), {
   ssr: false,
-  loading: () => <div className="text-white p-10 animate-pulse">Загрузка доски...</div>
+  loading: () => <div className="text-white p-10">Загрузка доски...</div>
 });
 
 export default function Home() {
@@ -49,7 +49,7 @@ export default function Home() {
                 <Search size={16} /> <span>Поиск...</span>
             </div>
             <Bell className="text-gray-400 hover:text-white cursor-pointer" size={20} />
-            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 border border-[#30363D]" />
+            <div className="w-9 h-9 rounded-full bg-blue-500 border border-[#30363D]" />
           </div>
         </header>
 

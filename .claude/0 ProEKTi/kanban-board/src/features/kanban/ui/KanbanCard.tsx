@@ -32,16 +32,16 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group glass-card-enhanced bg-gradient-to-br ${gradientClass} p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95 card-entrance hover-lift-enhanced ${
+      className={`group glass-card bg-gradient-to-br ${gradientClass} p-4 rounded-xl shadow-lg transition-all duration-200 card-entrance ${
         isDragging ? 'drag-preview' : ''
-      } ${task.priority === 'high' ? 'priority-glow-high' : task.priority === 'medium' ? 'priority-glow-medium' : 'priority-glow-low'}`}
+      }`}
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full transition-all duration-300 shimmer-effect ${
-            task.priority === 'high' ? 'bg-gradient-to-r from-red-500 to-pink-500 shadow-[0_0_16px_rgba(239,68,68,0.8)] group-hover:shadow-[0_0_24px_rgba(239,68,68,1)]' :
-            task.priority === 'medium' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 shadow-[0_0_14px_rgba(245,158,11,0.7)] group-hover:shadow-[0_0_20px_rgba(245,158,11,0.9)]' :
-            'bg-gradient-to-r from-green-500 to-emerald-500 shadow-[0_0_14px_rgba(34,197,94,0.7)] group-hover:shadow-[0_0_20px_rgba(34,197,94,0.9)]'
+          <div className={`w-2 h-2 rounded-full transition-colors ${
+            task.priority === 'high' ? 'bg-red-500' :
+            task.priority === 'medium' ? 'bg-yellow-500' :
+            'bg-green-500'
           }`} />
           <span className="text-[9px] text-gray-400 font-mono tracking-tighter bg-white/5 px-2 py-0.5 rounded">#{task.id.slice(0, 5)}</span>
         </div>
@@ -67,7 +67,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
           <input
             autoFocus
             placeholder={task.title ? "" : "Название задачи..."}
-            className="w-full bg-white/5 backdrop-blur-sm text-white border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400/50 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-lg placeholder-blue-400/50"
+            className="w-full bg-white/5 text-white border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400/50 transition-all placeholder-blue-400/50"
             value={task.title}
             onChange={(e) => updateTask(task.id, { title: e.target.value })}
             onBlur={() => setIsEditing(false)}
@@ -84,7 +84,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
           />
           <textarea
             placeholder={task.description ? "" : "Описание..."}
-            className="w-full bg-white/5 backdrop-blur-sm text-white/90 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none min-h-[60px] focus:border-blue-400/30 focus:ring-2 focus:ring-blue-500/20 transition-all resize-none shadow-lg placeholder-blue-400/50"
+            className="w-full bg-white/5 text-white/90 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none min-h-[60px] focus:border-blue-400/30 transition-all resize-none placeholder-blue-400/50"
             value={task.description}
             onChange={(e) => updateTask(task.id, { description: e.target.value })}
             onBlur={() => setIsEditing(false)}
@@ -109,10 +109,10 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       )}
 
       <div className="mt-3 flex items-center justify-between">
-        <span className={`text-[9px] px-2.5 py-1 rounded-lg uppercase font-bold tracking-wide backdrop-blur-sm transition-all duration-300 ${
-          task.priority === 'high' ? 'bg-gradient-to-r from-red-500/30 to-pink-500/20 text-red-300 shadow-[0_0_12px_rgba(239,68,68,0.4)]' :
-          task.priority === 'medium' ? 'bg-gradient-to-r from-yellow-500/30 to-orange-500/20 text-yellow-300 shadow-[0_0_10px_rgba(245,158,11,0.4)]' :
-          'bg-gradient-to-r from-green-500/30 to-emerald-500/20 text-green-300 shadow-[0_0_10px_rgba(34,197,94,0.4)]'
+        <span className={`text-[9px] px-2 py-1 rounded uppercase font-bold ${
+          task.priority === 'high' ? 'bg-red-500/20 text-red-300' :
+          task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+          'bg-green-500/20 text-green-300'
         }`}>
           {task.priority}
         </span>
