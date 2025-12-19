@@ -1,9 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Task, TaskStatus, Priority, Tag } from '@/shared/types/task';
+import { Task, TaskStatus, Priority, Tag, TaskFilters } from '@/shared/types/task';
 
 // Initial mock data to ensure board is never empty
 const initialTasks: Task[] = [
+  {
+    id: 'bug-1',
+    title: 'Bug Fix: Login validation issue',
+    description: 'Fix critical login form validation bug affecting user authentication',
+    status: 'todo',
+    priority: 'urgent',
+    startDate: '2025-01-19',
+    dueDate: '2025-01-20',
+    assignees: [
+      { id: 'dev1', name: 'QA Team', color: '#EF4444' }
+    ],
+    tags: [
+      { id: 't11', name: 'Bug', color: '#EF4444' },
+      { id: 't12', name: 'Authentication', color: '#F59E0B' }
+    ],
+    progress: 0
+  },
   {
     id: '1',
     title: 'Critical Bug Fix - Payment System',
@@ -147,6 +164,7 @@ const initialTasks: Task[] = [
 // Data layer - pure data structure
 interface KanbanData {
   tasks: Task[];
+  filters: TaskFilters;
 }
 
 // Actions layer - operations on data
@@ -164,7 +182,15 @@ interface KanbanActions {
   getTaskById: (id: string) => Task | undefined;
 }
 
-type KanbanStore = KanbanData & KanbanActions;
+// Filter operations
+interface KanbanFilters {
+  filters: TaskFilters;
+  setFilters: (filters: TaskFilters) => void;
+  clearFilters: () => void;
+  getFilteredTasks: () => Task[];
+}
+
+type KanbanStore = KanbanData & KanbanActions & KanbanFilters;
 
 // Helper function to generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -174,6 +200,18 @@ export const useKanbanStore = create<KanbanStore>()(
     (set, get) => ({
       // Initial data - use the predefined initialTasks
       tasks: initialTasks,
+
+      // Initial filters - all empty
+      filters: {
+        search: '',
+        priorities: [],
+        statuses: [],
+        dateRange: {
+          start: undefined,
+          end: undefined,
+          hasDueDate: undefined
+        }
+      },
 
       // Actions
       addTask: (status, taskData) => set((state) => {
@@ -259,24 +297,104 @@ export const useKanbanStore = create<KanbanStore>()(
 
       // Utility selectors
       getTasksByStatus: (status) => {
-        return get().tasks.filter(task => task.status === status);
+        return get().getFilteredTasks().filter(task => task.status === status);
       },
 
       getTaskById: (id) => {
         return get().tasks.find(task => task.id === id);
+      },
+
+      // Filter methods
+      setFilters: (newFilters) => set({ filters: newFilters }),
+
+      clearFilters: () => set({
+        filters: {
+          search: '',
+          priorities: [],
+          statuses: [],
+          dateRange: {
+            start: undefined,
+            end: undefined,
+            hasDueDate: undefined
+          }
+        }
+      }),
+
+      getFilteredTasks: () => {
+        const { tasks, filters } = get();
+
+        return tasks.filter(task => {
+          // Search filter - case-insensitive search in title and description
+          if (filters.search) {
+            const searchTerm = filters.search.toLowerCase();
+            const titleMatch = task.title.toLowerCase().includes(searchTerm);
+            const descriptionMatch = task.description.toLowerCase().includes(searchTerm);
+            if (!titleMatch && !descriptionMatch) return false;
+          }
+
+          // Priority filter
+          if (filters.priorities.length > 0) {
+            if (!filters.priorities.includes(task.priority)) return false;
+          }
+
+          // Status filter
+          if (filters.statuses.length > 0) {
+            if (!filters.statuses.includes(task.status)) return false;
+          }
+
+          // Date range filters
+          const { dateRange } = filters;
+
+          // Has due date filter
+          if (dateRange.hasDueDate && !task.dueDate) {
+            return false;
+          }
+
+          // Start date filter
+          if (dateRange.start && task.dueDate) {
+            const taskDueDate = new Date(task.dueDate);
+            const filterStartDate = new Date(dateRange.start);
+            if (taskDueDate < filterStartDate) return false;
+          }
+
+          // End date filter
+          if (dateRange.end && task.dueDate) {
+            const taskDueDate = new Date(task.dueDate);
+            const filterEndDate = new Date(dateRange.end);
+            if (taskDueDate > filterEndDate) return false;
+          }
+
+          return true;
+        });
       }
     }),
     {
       name: 'kanban-storage',
       // Only persist the data, not the actions
       partialize: (state) => ({
-        tasks: state.tasks
+        tasks: state.tasks,
+        filters: state.filters
       }),
       // Ensure we always have data on hydration
       onRehydrateStorage: () => (state) => {
-        if (state && (!state.tasks || state.tasks.length === 0)) {
-          console.log('No tasks found in storage, initializing with mock data');
-          state.tasks = initialTasks;
+        if (state) {
+          if (!state.tasks || state.tasks.length === 0) {
+            console.log('No tasks found in storage, initializing with mock data');
+            state.tasks = initialTasks;
+          }
+          // Ensure filters exist
+          if (!state.filters) {
+            state.filters = {
+              search: '',
+              priorities: [],
+              statuses: [],
+              dateRange: {
+                start: undefined,
+                end: undefined,
+                hasDueDate: undefined
+              }
+            };
+          }
         }
       }
     }

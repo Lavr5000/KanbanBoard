@@ -39,3 +39,14 @@ export interface Column {
   title: string;
   taskIds: string[];
 }
+
+export interface TaskFilters {
+  search: string;
+  priorities: Priority[];
+  statuses: TaskStatus[];
+  dateRange: {
+    start?: string;
+    end?: string;
+    hasDueDate?: boolean;
+  };
+}

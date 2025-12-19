@@ -19,7 +19,10 @@ export const KanbanColumn = ({ column, tasks, count, onAddTask }: KanbanColumnPr
   });
 
   return (
-    <div className="w-[300px] flex-shrink-0 flex flex-col glass-column rounded-2xl border h-[calc(100vh-140px)] shadow-xl overflow-hidden">
+    <div
+      data-testid={`column-${column.id}`}
+      className="w-[300px] flex-shrink-0 flex flex-col glass-column rounded-2xl border h-[calc(100vh-140px)] shadow-xl overflow-hidden"
+    >
       {/* Header */}
       <div className="p-4 flex items-center justify-between bg-white/[0.03] border-b border-white/8 backdrop-blur-sm">
         <h3 className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{column.title}</h3>
@@ -31,6 +34,7 @@ export const KanbanColumn = ({ column, tasks, count, onAddTask }: KanbanColumnPr
       {/* Add Button at the top */}
       <div className="px-3 pt-3">
         <button
+          data-testid={`add-task-${column.id}`}
           onClick={onAddTask}
           className="w-full py-2.5 flex items-center justify-center gap-2 text-[11px] font-bold text-gray-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-all border border-dashed border-white/15 group backdrop-blur-sm"
         >
