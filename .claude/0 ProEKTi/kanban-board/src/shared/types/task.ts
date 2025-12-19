@@ -12,12 +12,14 @@ export interface DateRange {
   dueDate?: string;   // ISO date format
 }
 
+export type Priority = 'urgent' | 'high' | 'medium' | 'low';
+
 export interface Task {
   id: string;
   title: string;
   description: string;
   status: TaskStatus;
-  priority: 'low' | 'medium' | 'high';
+  priority: Priority;
   // Construction fields
   startDate?: string; // ISO date format
   dueDate?: string;   // ISO date format

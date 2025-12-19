@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
-import { Task } from '@/shared/types/task';
+import { Task, Priority } from '@/shared/types/task';
 import { GripVertical, Trash2 } from 'lucide-react';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
 import { CompactDateRange } from '@/shared/ui/DateRange';
+import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
   const { updateTask, deleteTask } = useKanbanStore();
@@ -27,7 +28,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const gradientClass = task.priority === 'high' ? 'from-red-500/10 to-pink-500/5' :
+  const gradientClass = task.priority === 'urgent' ? 'from-red-600/20 to-red-400/5' :
+                        task.priority === 'high' ? 'from-red-500/10 to-pink-500/5' :
                         task.priority === 'medium' ? 'from-yellow-500/10 to-orange-500/5' :
                         'from-green-500/10 to-emerald-500/5';
 
@@ -41,11 +43,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full transition-colors ${
-            task.priority === 'high' ? 'bg-red-500' :
-            task.priority === 'medium' ? 'bg-yellow-500' :
-            'bg-green-500'
-          }`} />
+          <PriorityBadge priority={task.priority} size="xs" />
         </div>
         <div className="flex items-center gap-1">
           <div
@@ -101,8 +99,18 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             onFocus={(e) => e.stopPropagation()}
           />
 
-          {/* Construction Fields Editing */}
+          {/* Priority and Construction Fields Editing */}
           <div className="space-y-2 pt-2 border-t border-white/10">
+            {/* Priority */}
+            <div>
+              <label className="text-[9px] text-gray-400 block mb-1">Priority</label>
+              <PrioritySelector
+                value={task.priority}
+                onChange={(priority) => updateTask(task.id, { priority })}
+                size="xs"
+              />
+            </div>
+
             {/* Dates */}
             <div className="flex gap-2">
               <div className="flex-1">
@@ -216,13 +224,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       )}
 
       <div className="mt-3 flex items-center justify-between">
-        <span className={`text-[8px] px-1.5 py-0.5 rounded-md font-medium ${
-          task.priority === 'high' ? 'bg-red-500/10 text-red-400/70' :
-          task.priority === 'medium' ? 'bg-yellow-500/10 text-yellow-400/70' :
-          'bg-green-500/10 text-green-400/70'
-        }`}>
-          {task.priority}
-        </span>
+        <PriorityBadge priority={task.priority} size="xs" showLabel={true} />
       </div>
     </div>
   );

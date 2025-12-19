@@ -1,11 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Task, TaskStatus } from '@/shared/types/task';
+import { Task, TaskStatus, Priority } from '@/shared/types/task';
 
 // Initial mock data to ensure board is never empty
 const initialTasks: Task[] = [
   {
     id: '1',
+    title: 'Critical Bug Fix - Payment System',
+    description: 'Fix critical payment processing bug affecting production users',
+    status: 'todo',
+    priority: 'urgent',
+    startDate: '2025-01-15',
+    dueDate: '2025-01-16',
+    assignees: [
+      { id: 'a1', name: 'Alex Smith', color: '#EF4444' },
+      { id: 'a2', name: 'Sarah Lee', color: '#F59E0B' }
+    ],
+    progress: 0
+  },
+  {
+    id: '2',
     title: 'Analysis of competitors',
     description: 'Analyze competitor products and features',
     status: 'todo',
@@ -13,13 +27,13 @@ const initialTasks: Task[] = [
     startDate: '2025-01-15',
     dueDate: '2025-01-20',
     assignees: [
-      { id: 'a1', name: 'Alex Smith', color: '#3B82F6' },
-      { id: 'a2', name: 'Sarah Lee', color: '#EC4899' }
+      { id: 'a3', name: 'Mike Chen', color: '#3B82F6' },
+      { id: 'a4', name: 'Tom Analyst', color: '#EC4899' }
     ],
     progress: 25
   },
   {
-    id: '2',
+    id: '3',
     title: 'Create UI Kit',
     description: 'Design and develop component library',
     status: 'todo',
@@ -27,26 +41,39 @@ const initialTasks: Task[] = [
     startDate: '2025-01-18',
     dueDate: '2025-01-25',
     assignees: [
-      { id: 'a3', name: 'Mike Chen', color: '#10B981' }
+      { id: 'a5', name: 'Lisa Designer', color: '#10B981' }
     ],
     progress: 0
   },
   {
-    id: '3',
+    id: '4',
     title: 'Foundation Works',
     description: 'Excavation and concrete foundation for the main building',
     status: 'in-progress',
-    priority: 'high',
+    priority: 'urgent',
     startDate: '2025-01-10',
-    dueDate: '2025-01-30',
+    dueDate: '2025-01-15',
     assignees: [
-      { id: 'a4', name: 'John Builder', color: '#F59E0B' },
-      { id: 'a5', name: 'Tom Engineer', color: '#8B5CF6' }
+      { id: 'a6', name: 'John Builder', color: '#F59E0B' },
+      { id: 'a7', name: 'Tom Engineer', color: '#8B5CF6' }
     ],
     progress: 60
   },
   {
-    id: '4',
+    id: '5',
+    title: 'User Authentication',
+    description: 'Implement user login and registration system',
+    status: 'in-progress',
+    priority: 'high',
+    startDate: '2025-01-12',
+    dueDate: '2025-01-20',
+    assignees: [
+      { id: 'a8', name: 'Backend Team', color: '#6366F1' }
+    ],
+    progress: 40
+  },
+  {
+    id: '6',
     title: 'Code Review',
     description: 'Review pull requests and provide feedback',
     status: 'review',
@@ -54,12 +81,12 @@ const initialTasks: Task[] = [
     startDate: '2025-01-22',
     dueDate: '2025-01-23',
     assignees: [
-      { id: 'a6', name: 'Lisa Reviewer', color: '#EF4444' }
+      { id: 'a9', name: 'Senior Devs', color: '#8B5CF6' }
     ],
     progress: 80
   },
   {
-    id: '5',
+    id: '7',
     title: 'Integration Testing',
     description: 'Test API integrations and data flow',
     status: 'testing',
@@ -67,12 +94,25 @@ const initialTasks: Task[] = [
     startDate: '2025-01-24',
     dueDate: '2025-01-26',
     assignees: [
-      { id: 'a7', name: 'QA Team', color: '#6366F1' }
+      { id: 'a10', name: 'QA Team', color: '#EC4899' }
     ],
     progress: 45
   },
   {
-    id: '6',
+    id: '8',
+    title: 'Documentation Update',
+    description: 'Update API documentation and user guides',
+    status: 'testing',
+    priority: 'low',
+    startDate: '2025-01-25',
+    dueDate: '2025-01-30',
+    assignees: [
+      { id: 'a11', name: 'Tech Writer', color: '#10B981' }
+    ],
+    progress: 20
+  },
+  {
+    id: '9',
     title: 'Deploy to Production',
     description: 'Deploy application to production environment',
     status: 'done',
@@ -80,7 +120,7 @@ const initialTasks: Task[] = [
     startDate: '2025-01-20',
     dueDate: '2025-01-21',
     assignees: [
-      { id: 'a8', name: 'DevOps', color: '#10B981' }
+      { id: 'a12', name: 'DevOps', color: '#F59E0B' }
     ],
     progress: 100
   }
