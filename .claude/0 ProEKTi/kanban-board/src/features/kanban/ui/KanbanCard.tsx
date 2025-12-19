@@ -7,6 +7,7 @@ import { GripVertical, Trash2 } from 'lucide-react';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
 import { CompactDateRange } from '@/shared/ui/DateRange';
+import { DueDateIndicator, CompactDueDate } from '@/shared/ui/DueDateIndicator';
 import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
@@ -28,16 +29,37 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  // Calculate due date status
+  const getDueDateStatus = () => {
+    if (!task.dueDate) return null;
+
+    const now = new Date();
+    const due = new Date(task.dueDate);
+    const daysDiff = Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff < 0) return 'overdue';
+    if (daysDiff === 0) return 'due-today';
+    if (daysDiff <= 3) return 'due-soon';
+    return 'normal';
+  };
+
+  const dueDateStatus = getDueDateStatus();
+
   const gradientClass = task.priority === 'urgent' ? 'from-red-600/20 to-red-400/5' :
                         task.priority === 'high' ? 'from-red-500/10 to-pink-500/5' :
                         task.priority === 'medium' ? 'from-yellow-500/10 to-orange-500/5' :
                         'from-green-500/10 to-emerald-500/5';
 
+  const dueDateBorderClass = dueDateStatus === 'overdue' ? 'border-l-4 border-l-red-500' :
+                              dueDateStatus === 'due-today' ? 'border-l-4 border-l-orange-500' :
+                              dueDateStatus === 'due-soon' ? 'border-l-2 border-l-yellow-500' :
+                              'border-l-2 border-l-transparent';
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group glass-card bg-gradient-to-br ${gradientClass} p-4 rounded-xl shadow-lg transition-all duration-200 card-entrance ${
+      className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-200 card-entrance ${
         isDragging ? 'drag-preview' : ''
       }`}
     >
@@ -169,22 +191,25 @@ export const KanbanCard = ({ task }: { task: Task }) => {
 
           {/* Construction Fields Display */}
           <div className="space-y-2">
-            {/* Dates */}
-            {task.startDate || task.dueDate ? (
-              <CompactDateRange
-                startDate={task.startDate}
-                dueDate={task.dueDate}
-                className="mb-2"
-                onClick={() => setIsEditing(true)}
-              />
-            ) : (
-              <div
-                className="text-[9px] text-gray-500 italic mb-2 p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
-                onClick={() => setIsEditing(true)}
-              >
-                + Add dates
-              </div>
-            )}
+            {/* Due Date */}
+            <div
+              className="mb-2 cursor-pointer hover:bg-white/5 p-1 rounded transition-colors"
+              onClick={() => setIsEditing(true)}
+            >
+              {task.dueDate ? (
+                <DueDateIndicator
+                  dueDate={task.dueDate}
+                  startDate={task.startDate}
+                  size="xs"
+                  showStatus={true}
+                  showDaysCount={true}
+                />
+              ) : (
+                <div className="text-[9px] text-gray-500 italic">
+                  + Add due date
+                </div>
+              )}
+            </div>
 
             {/* Assignees */}
             {task.assignees && task.assignees.length > 0 && (

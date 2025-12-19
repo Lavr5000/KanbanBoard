@@ -11,7 +11,7 @@ const initialTasks: Task[] = [
     status: 'todo',
     priority: 'urgent',
     startDate: '2025-01-15',
-    dueDate: '2025-01-16',
+    dueDate: '2024-12-17', // Overdue - shows red indicator
     assignees: [
       { id: 'a1', name: 'Alex Smith', color: '#EF4444' },
       { id: 'a2', name: 'Sarah Lee', color: '#F59E0B' }
@@ -38,8 +38,8 @@ const initialTasks: Task[] = [
     description: 'Design and develop component library',
     status: 'todo',
     priority: 'high',
-    startDate: '2025-01-18',
-    dueDate: '2025-01-25',
+    startDate: '2025-01-15',
+    dueDate: '2024-12-19', // Due today - shows orange indicator
     assignees: [
       { id: 'a5', name: 'Lisa Designer', color: '#10B981' }
     ],
@@ -52,7 +52,7 @@ const initialTasks: Task[] = [
     status: 'in-progress',
     priority: 'urgent',
     startDate: '2025-01-10',
-    dueDate: '2025-01-15',
+    dueDate: '2024-12-22', // Due in 3 days - shows yellow indicator
     assignees: [
       { id: 'a6', name: 'John Builder', color: '#F59E0B' },
       { id: 'a7', name: 'Tom Engineer', color: '#8B5CF6' }
