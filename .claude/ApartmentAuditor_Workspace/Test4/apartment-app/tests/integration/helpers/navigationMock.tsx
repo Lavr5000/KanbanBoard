@@ -8,7 +8,7 @@
  * - Mock route parameters
  */
 
-import { useRouter, useRoute, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 // Track navigation calls globally
 export interface NavigationCall {
@@ -166,12 +166,6 @@ export const createMockRouter = () => ({
   }),
 });
 
-// Mock route function that uses the tracker
-export const createMockRoute = (initialPathname: string = '/', initialParams: any = {}) => ({
-  params: initialParams,
-  pathname: initialPathname,
-});
-
 // Mock search params function
 export const createMockSearchParams = (params: any = {}) => () => params;
 
@@ -190,18 +184,15 @@ export const setupNavigationMocks = (
   const mockRouter = createMockRouter();
   (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
-  // Mock useRoute
-  const mockRoute = createMockRoute(initialPathname, initialParams);
-  (useRoute as jest.Mock).mockReturnValue(mockRoute);
-
   // Mock useLocalSearchParams
   const mockSearchParams = createMockSearchParams(initialParams);
   (useLocalSearchParams as jest.Mock).mockImplementation(mockSearchParams);
 
   return {
     mockRouter,
-    mockRoute,
     tracker: navigationTracker,
+    currentPath: initialPathname,
+    params: initialParams,
   };
 };
 
