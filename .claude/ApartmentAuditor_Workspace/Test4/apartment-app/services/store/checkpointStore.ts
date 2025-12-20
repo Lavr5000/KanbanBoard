@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage } from 'zustand/middleware/persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {
   CheckpointChanges,

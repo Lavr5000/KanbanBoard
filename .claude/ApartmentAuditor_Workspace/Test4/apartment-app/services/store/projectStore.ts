@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage } from 'zustand/middleware/persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Project } from '../types/index';
 
@@ -13,9 +13,13 @@ interface ProjectStore {
   createProject: (title: string, address?: string) => string;
   updateProject: (id: string, updates: Partial<Project>) => void;
   deleteProject: (id: string) => void;
+  archiveProject: (id: string) => void;
+  unarchiveProject: (id: string) => void;
   setActiveProject: (id: string | null) => void;
   getActiveProject: () => Project | null;
   getAllProjects: () => Project[];
+  getActiveProjects: () => Project[];
+  getArchivedProjects: () => Project[];
   getActiveProjectIndex: () => number;
 }
 
@@ -38,6 +42,7 @@ const validateProject = (project: unknown): project is Project => {
     typeof p.createdAt === 'number' &&
     typeof p.updatedAt === 'number' &&
     typeof p.isActive === 'boolean' &&
+    typeof p.isArchived === 'boolean' &&
     (p.finishMode === 'draft' || p.finishMode === 'finish')
   );
 };
@@ -61,6 +66,7 @@ export const useProjectStore = create<ProjectStore>()(
           createdAt: now,
           updatedAt: now,
           isActive: true,
+          isArchived: false,
           finishMode: 'draft'
         };
 
@@ -107,6 +113,34 @@ export const useProjectStore = create<ProjectStore>()(
 
       getAllProjects: () => {
         return get().projects;
+      },
+
+      getActiveProjects: () => {
+        return get().projects.filter(project => !project.isArchived);
+      },
+
+      getArchivedProjects: () => {
+        return get().projects.filter(project => project.isArchived);
+      },
+
+      archiveProject: (id: string) => {
+        set(state => ({
+          projects: state.projects.map(project =>
+            project.id === id
+              ? { ...project, isArchived: true, updatedAt: Date.now() }
+              : project
+          )
+        }));
+      },
+
+      unarchiveProject: (id: string) => {
+        set(state => ({
+          projects: state.projects.map(project =>
+            project.id === id
+              ? { ...project, isArchived: false, updatedAt: Date.now() }
+              : project
+          )
+        }));
       },
 
       getActiveProjectIndex: () => {

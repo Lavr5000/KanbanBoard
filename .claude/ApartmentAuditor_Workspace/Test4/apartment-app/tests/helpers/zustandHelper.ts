@@ -13,25 +13,22 @@ import { useCheckpointStore } from '../../services/store/checkpointStore';
  * This should be called in beforeEach to ensure test isolation
  */
 export const resetAllStores = (): void => {
-  // Reset project store using setState
-  const projectStore = useProjectStore.getState();
-  projectStore.setState({
+  // Reset project store
+  useProjectStore.setState({
     projects: [],
     activeProjectId: null,
   });
 
-  // Reset UI store using setState
-  const uiStore = useUIStore.getState();
-  uiStore.setState({
+  // Reset UI store
+  useUIStore.setState({
     finishMode: 'draft',
     activeTab: 'objects',
     isLoading: false,
     themeMode: 'dark',
   });
 
-  // Reset checkpoint store using setState
-  const checkpointStore = useCheckpointStore.getState();
-  checkpointStore.setState({
+  // Reset checkpoint store
+  useCheckpointStore.setState({
     changes: {},
     projectId: null,
   });
