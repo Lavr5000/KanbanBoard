@@ -98,7 +98,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
           {/* Color */}
           <ColorPicker
-            selectedColor={formData.color}
+            selectedColor={formData.color as any}
             onColorSelect={(color) => setFormData({ ...formData, color })}
           />
 
