@@ -129,7 +129,7 @@ body {
 
 /* Simplified scrollbar */
 .kanban-scrollbar::-webkit-scrollbar {
-  height: 8px;
+  height: 16px;
 }
 
 .kanban-scrollbar::-webkit-scrollbar-track {
@@ -140,4 +140,52 @@ body {
 .kanban-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(59, 130, 246, 0.6);
   border-radius: 4px;
+}
+
+/* Date input styling for dark theme */
+input[type="date"] {
+  color: #ffffff !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+/* Date input placeholder text */
+input[type="date"]::-webkit-date-and-time-value {
+  color: #ffffff !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #ffffff !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field {
+  color: #ffffff !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-day-field {
+  color: #ffffff !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #ffffff !important;
+}
+
+/* Date input calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Firefox date input styling */
+@supports (-moz-appearance: none) {
+  input[type="date"] {
+    color: #ffffff !important;
+    background: transparent !important;
+  }
 }

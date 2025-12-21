@@ -372,7 +372,7 @@ describe('KanbanBoard Integration', () => {
         createMockTask({
           id: `task-${i}`,
           title: `Task ${i}`,
-          status: ['todo', 'in-progress', 'review', 'testing', 'done'][i % 5] as TaskStatus
+          status: ['todo', 'in-progress', 'review', 'done'][i % 4] as TaskStatus
         })
       )
 

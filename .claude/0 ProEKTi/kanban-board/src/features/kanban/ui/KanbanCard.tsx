@@ -122,7 +122,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       ref={setNodeRef}
       style={{...style, ...cardStyle}}
       data-testid={`kanban-card-${task.id}`}
-      className={`group bg-zinc-900/50 ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] ${
+      className={`group bg-zinc-900/50 ${dueDateBorderClass} p-4 rounded-xl shadow-lg border border-white/8 transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] hover:border-white/15 ${
         isDragging ? 'drag-preview' : ''
       }`}
     >
@@ -183,28 +183,50 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             <div className="flex gap-2">
               <div
                 className="flex-1 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition-colors border border-white/10"
-                onClick={(e) => e.currentTarget.querySelector('input')?.focus()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const input = e.currentTarget.querySelector('input') as HTMLInputElement;
+                  if (input) {
+                    if (typeof input.showPicker === 'function') {
+                      input.showPicker();
+                    } else {
+                      input.focus();
+                    }
+                  }
+                }}
               >
                 <label className="text-xs text-gray-400 block mb-2">Дата начала</label>
                 <input
                   type="date"
-                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer"
+                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer pointer-events-none"
                   value={editValues.startDate || ''}
                   onChange={(e) => setEditValues({ ...editValues, startDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
                 />
               </div>
               <div
                 className="flex-1 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition-colors border border-white/10"
-                onClick={(e) => e.currentTarget.querySelector('input')?.focus()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const input = e.currentTarget.querySelector('input') as HTMLInputElement;
+                  if (input) {
+                    if (typeof input.showPicker === 'function') {
+                      input.showPicker();
+                    } else {
+                      input.focus();
+                    }
+                  }
+                }}
               >
                 <label className="text-xs text-gray-400 block mb-2">Дата окончания</label>
                 <input
                   type="date"
-                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer"
+                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer pointer-events-none"
                   value={editValues.dueDate || ''}
                   onChange={(e) => setEditValues({ ...editValues, dueDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
                 />
               </div>
             </div>

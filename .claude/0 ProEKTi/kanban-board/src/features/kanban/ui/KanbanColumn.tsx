@@ -46,7 +46,7 @@ export const KanbanColumn = ({ column, tasks, count, onAddTask }: KanbanColumnPr
 
       {/* Task List */}
       <div
-        className={`flex-1 p-3 overflow-y-auto space-y-3 min-h-[200px] transition-all duration-300 rounded-xl mx-3 ${
+        className={`flex-1 p-3 overflow-y-auto space-y-4 min-h-[200px] transition-all duration-300 rounded-xl mx-3 ${
           tasks.length === 0 ? 'border-2 border-white/[0.08] bg-white/[0.01]' : 'border-transparent bg-transparent'
         }`}
       >

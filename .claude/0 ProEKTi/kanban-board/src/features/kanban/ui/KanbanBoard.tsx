@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -21,30 +21,6 @@ import { FilterPanel } from './FilterPanel';
 import { Task, Column } from '@/shared/types/task';
 
 export const KanbanBoard = () => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Loading state - NO hooks called yet
-  if (!mounted) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-gray-500 text-center">
-          <div className="w-8 h-8 border-2 border-gray-600 rounded-full animate-spin border-t-blue-400 mx-auto mb-3"></div>
-          <div>Initializing Kanban Board...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Return the actual board component
-  return <KanbanBoardContent />;
-};
-
-// Inner component that contains all the hooks
-const KanbanBoardContent = () => {
   // Now all hooks are called consistently in every render
   const { addTask, filters, setFilters, getCurrentProjectTasks } = useKanbanStore();
   const { handleDragEnd } = useKanbanDnD();
@@ -65,7 +41,6 @@ const KanbanBoardContent = () => {
     { id: 'todo', title: 'Новая задача', taskIds: [] },
     { id: 'in-progress', title: 'Выполняется', taskIds: [] },
     { id: 'review', title: 'Ожидает проверки', taskIds: [] },
-    { id: 'testing', title: 'Тестирование', taskIds: [] },
     { id: 'done', title: 'Готово', taskIds: [] }
   ];
 

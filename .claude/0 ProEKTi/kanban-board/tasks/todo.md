@@ -1,194 +1,322 @@
-# Отчет: Исправление "Stuck Loading Screen" и добавление моковых данных
+# 🚀 План Создания Комплексных E2E Тестов для Kanban Board
 
-## Выполненные задачи ✅
+**Дата:** 2025-12-19
+**Проект:** 0 ProEKTi/kanban-board
+**Цель:** Создание 25 comprehensive E2E тестов с использованием Jest/React Testing Library
 
-### ✅ 1. Анализ проблемы
-- **Найдена основная причина**: Отсутствие начальных данных в Zustand store при первом запуске
-- **Обнаруженные файлы**:
-  - `src/app/page.tsx` - нужен Suspense для дополнительной защиты
-  - `src/features/kanban/ui/KanbanBoard.tsx` - нужна mounted state проверка
-  - `src/shared/store/kanbanStore.ts` - улучшена инициализация данных
+## 📊 Анализ Текущей Ситуации
 
-### ✅ 2. Улучшена инициализация данных в Zustand store
-- **Добавлены**: 6 моковых задач для всех колонок
-- **Обеспечено**: Наличие данных при первом запуске
-- **Добавлена**: Проверка `onRehydrateStorage` для восстановления данных
-- **Результат**: Доска всегда показывает контент, даже при чистом localStorage
+### ✅ Существующие Ресурсы:
+- **Тестовый фреймворк:** Jest + React Testing Library + User Event
+- **Конфигурация:** Полностью настроенная jest.config.js с_coverage 50%
+- **Моки:** Comprehensive моки в jest.setup.js (DnD, localStorage, ResizeObserver)
+- **Существующие тесты:** user-journeys.test.tsx (с мокированным store)
+- **Компоненты:** KanbanBoard, KanbanColumn, KanbanCard, FilterPanel
+- **Store:** Zustand с persist middleware и полным CRUD функционалом
+- **Типы:** Полная TypeScript типизация всех сущностей
 
-```typescript
-const initialTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Analysis of competitors',
-    description: 'Analyze competitor products and features',
-    status: 'todo',
-    priority: 'medium',
-    startDate: '2025-01-15',
-    dueDate: '2025-01-20',
-    assignees: [
-      { id: 'a1', name: 'Alex Smith', color: '#3B82F6' },
-      { id: 'a2', name: 'Sarah Lee', color: '#EC4899' }
-    ],
-    progress: 25
-  },
-  // ... еще 5 задач для всех колонок
-];
+### ❌ Проблемы для Решения:
+1. **Мокированный Store:** user-journeys.test.tsx использует моки вместо реального Zustand store
+2. **Ограниченное покрытие:** Только базовые пользовательские сценарии
+3. **Нереалистичные данные:** Простые тестовые задачи без реальной вариативности
+4. **Отсутствие Performance тестов:** Нет тестов производительности
+5. **Пропущенные Edge Cases:** Нет тестов ошибок и граничных случаев
+
+## 🏗️ Архитектурная Стратегия
+
+### 1. Реальный Store Вместо Моков
+- Использовать настоящий Zustand store с `persist` middleware
+- Создать `TestWrapper` для инициализации и очистки store между тестами
+- Реалистичные данные через генераторы и fixtures
+
+### 2. Комплексная Структура Тестов
+```
+src/__tests__/e2e/
+├── fixtures/           # Генераторы данных и хелперы
+├── core/              # Основные рабочие процессы (8 тестов)
+├── filtering/         # Фильтрация и поиск (6 тестов)
+├── edge-cases/        # Edge cases и ошибки (5 тестов)
+├── performance/       # Производительность (4 теста)
+└── accessibility/     # Доступность (2 теста)
 ```
 
-### ✅ 3. Добавлен React Suspense для защиты от гидратации
-- **Импортирован**: `Suspense` из React
-- **Добавлен**: Обертка вокруг KanbanBoard с fallback
-- **Результат**: Дополнительная защита от hydration bailout
+## 📋 Детальный План Тестовых Сценариев (25 тестов)
 
+### 🔄 Phase 1: Основные Рабочие Процессы (8 тестов)
+
+#### 1. Полный жизненный цикл задачи
+**Файл:** `src/__tests__/e2e/core/task-lifecycle.test.tsx`
 ```typescript
-<Suspense fallback={<div className="text-gray-500 p-10">Loading Board...</div>}>
-  <KanbanBoard />
-</Suspense>
+describe('Complete Task Lifecycle', () => {
+  it('should create → edit → move → complete task with all fields')
+  it('should handle task creation with multiple assignees and tags')
+  it('should manage task progress from 0% to 100% with visual feedback')
+  it('should handle priority changes and due date management')
+})
 ```
 
-### ✅ 4. Восстановлена mounted state проверка в KanbanBoard
-- **Добавлен**: `useState` и `useEffect` для mounted state
-- **Создан**: Простой loader для initial render
-- **Результат**: Полная защита от mismatched UI при гидратации
-
+#### 2. Массовые операции
+**Файл:** `src/__tests__/e2e/core/bulk-operations.test.tsx`
 ```typescript
-const [mounted, setMounted] = useState(false);
-useEffect(() => { setMounted(true); }, []);
+describe('Bulk Operations', () => {
+  it('should create multiple tasks rapidly without performance degradation')
+  it('should handle drag & drop of multiple tasks between columns')
+  it('should maintain performance with 50+ tasks on board')
+})
+```
 
-if (!mounted) {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="text-gray-500 text-center">
-        <div className="w-8 h-8 border-2 border-gray-600 rounded-full animate-spin border-t-blue-400 mx-auto mb-3"></div>
-        <div>Initializing Kanban Board...</div>
-      </div>
-    </div>
-  );
+#### 3. Complex Drag & Drop
+**Файл:** `src/__tests__/e2e/core/drag-drop-advanced.test.tsx`
+```typescript
+describe('Advanced Drag & Drop', () => {
+  it('should drag between columns correctly with visual feedback')
+  it('should reorder tasks within column maintaining order')
+  it('should handle cancelled drag operations (ESC key)')
+  it('should maintain visual feedback during entire drag operation')
+})
+```
+
+#### 4. Inline Editing
+**Файл:** `src/__tests__/e2e/core/inline-editing.test.tsx`
+```typescript
+describe('Inline Task Editing', () => {
+  it('should edit title with double-click activation')
+  it('should save with Ctrl+Enter and cancel with Escape')
+  it('should handle concurrent editing of multiple fields')
+  it('should validate input on the fly with proper error messages')
+})
+```
+
+### 🔍 Phase 2: Фильтрация и Поиск (6 тестов)
+
+#### 5. Комплексная фильтрация
+**Файл:** `src/__tests__/e2e/filtering/comprehensive-filters.test.tsx`
+```typescript
+describe('Comprehensive Filtering', () => {
+  it('should combine text search + priority + status + date filters')
+  it('should filter by date ranges effectively with edge cases')
+  it('should clear all filters correctly and reset state')
+  it('should preserve filter state between page refreshes')
+})
+```
+
+#### 6. Advanced Search
+**Файл:** `src/__tests__/e2e/filtering/advanced-search.test.tsx`
+```typescript
+describe('Advanced Search Functionality', () => {
+  it('should search across title, description, tags, assignees')
+  it('should handle case-insensitive search with special characters')
+  it('should support real-time search with debouncing')
+  it('should highlight search matches in UI')
+})
+```
+
+### ⚠️ Phase 3: Edge Cases и Ошибки (5 тестов)
+
+#### 7. Валидация данных
+**Файл:** `src/__tests__/e2e/edge-cases/data-validation.test.tsx`
+```typescript
+describe('Data Validation', () => {
+  it('should reject invalid dates and provide clear error messages')
+  it('should validate progress range (0-100) with bounds checking')
+  it('should handle empty required fields with proper validation')
+  it('should sanitize HTML in text fields to prevent XSS')
+})
+```
+
+#### 8. Обработка ошибок
+**Файл:** `src/__tests__/e2e/edge-cases/error-handling.test.tsx`
+```typescript
+describe('Error Handling', () => {
+  it('should handle localStorage corruption gracefully')
+  it('should recover from network errors during operations')
+  it('should maintain UI stability during store errors')
+  it('should provide meaningful error messages to users')
+})
+```
+
+### ⚡ Phase 4: Производительность (4 теста)
+
+#### 9. Масштабирование
+**Файл:** `src/__tests__/e2e/performance/scalability.test.tsx`
+```typescript
+describe('Performance & Scalability', () => {
+  it('should handle 100+ tasks smoothly with <100ms operations')
+  it('should maintain responsiveness during complex filtering')
+  it('should optimize drag & drop with many tasks')
+  it('should prevent memory leaks during extended sessions')
+})
+```
+
+### ♿ Phase 5: Доступность (2 теста)
+
+#### 10. Keyboard Navigation
+**Файл:** `src/__tests__/e2e/accessibility/keyboard-navigation.test.tsx`
+```typescript
+describe('Accessibility', () => {
+  it('should be fully operable via keyboard only')
+  it('should support screen readers with proper ARIA labels')
+})
+```
+
+## 🛠️ Ключевые Технические Решения
+
+### 1. TestWrapper для Реального Store
+```typescript
+// src/__tests__/e2e/fixtures/store-helpers.ts
+export const TestWrapper = ({ children, initialTasks }: TestWrapperProps) => {
+  const { setTasks, clearTasks } = useKanbanStore();
+
+  useEffect(() => {
+    clearTasks();
+    if (initialTasks) {
+      setTasks(initialTasks);
+    }
+  }, [initialTasks]);
+
+  return <>{children}</>;
+};
+```
+
+### 2. Генераторы Реалистичных Данных
+```typescript
+// src/__tests__/e2e/fixtures/tasks-data.ts
+export const createRealisticTask = (overrides?: Partial<Task>): Task => ({
+  id: `task-${faker.datatype.uuid()}`,
+  title: faker.lorem.words(3),
+  description: faker.lorem.sentences(2),
+  status: faker.helpers.arrayElement(taskStatuses),
+  priority: faker.helpers.arrayElement(priorities),
+  startDate: faker.date.recent().toISOString().split('T')[0],
+  dueDate: faker.date.soon(30).toISOString().split('T')[0],
+  assignees: createRandomAssignees(1, 3),
+  tags: createRandomTags(0, 5),
+  progress: faker.datatype.number({ min: 0, max: 100 }),
+  ...overrides
+});
+```
+
+### 3. Drag & Drop Симуляция
+```typescript
+// src/__tests__/e2e/fixtures/dnd-simulators.ts
+export const simulateDragDrop = async (
+  draggable: HTMLElement,
+  droppable: HTMLElement
+): Promise<void> => {
+  fireEvent.dragStart(draggable);
+  fireEvent.dragEnter(droppable);
+  fireEvent.drop(droppable);
+  fireEvent.dragEnd(draggable);
+
+  await waitFor(() => {
+    // Verify drag operation result
+  });
+};
+```
+
+### 4. Performance Метрики
+```typescript
+// src/__tests__/e2e/fixtures/performance-utils.ts
+export const measurePerformance = async (
+  operation: () => Promise<void>,
+  maxDuration: number = 1000
+): Promise<void> => {
+  const start = performance.now();
+  await operation();
+  const duration = performance.now() - start;
+
+  expect(duration).toBeLessThan(maxDuration);
+};
+```
+
+## 🚀 План Реализации по Фазам
+
+### Phase 1: Critical Foundation (День 1-2)
+**Цель:** 8 основных тестов жизненного цикла задач
+
+**Файлы для создания:**
+- `src/__tests__/e2e/fixtures/tasks-data.ts`
+- `src/__tests__/e2e/fixtures/store-helpers.ts`
+- `src/__tests__/e2e/core/task-lifecycle.test.tsx`
+- `src/__tests__/e2e/core/drag-drop-advanced.test.tsx`
+
+**Ключевые изменения:**
+- Модернизация существующего user-journeys.test.tsx для реального store
+- Создание TestWrapper компонента
+- Добавление генераторов реалистичных данных
+
+### Phase 2: Advanced Features (День 3-4)
+**Цель:** 6 тестов фильтрации и поиска
+
+**Файлы для создания:**
+- `src/__tests__/e2e/filtering/comprehensive-filters.test.tsx`
+- `src/__tests__/e2e/filtering/advanced-search.test.tsx`
+- `src/__tests__/e2e/fixtures/dnd-simulators.ts`
+
+**Результаты:** Покрытие всех фильтрационных сценариев с реальными данными
+
+### Phase 3: Quality Assurance (День 5-6)
+**Цель:** 5 тестов edge cases и обработки ошибок
+
+**Файлы для создания:**
+- `src/__tests__/e2e/edge-cases/data-validation.test.tsx`
+- `src/__tests__/e2e/edge-cases/error-handling.test.tsx`
+- `src/__tests__/e2e/fixtures/performance-utils.ts`
+
+**Результаты:** Стабильность приложения при некорректных данных и ошибках
+
+### Phase 4: Performance & Accessibility (День 7)
+**Цель:** 6 тестов производительности и доступности
+
+**Файлы для создания:**
+- `src/__tests__/e2e/performance/scalability.test.tsx`
+- `src/__tests__/e2e/accessibility/keyboard-navigation.test.tsx`
+
+**Результаты:** Оптимизация производительности и полная accessibility поддержка
+
+## 📈 Ожидаемые Результаты
+
+### Количественные Метрики:
+- **Тесты:** 25 comprehensive E2E тестов
+- **Покрытие:** >85% пользовательских сценариев
+- **Performance:** <100ms для большинства операций
+- **Accessibility:** WCAG 2.1 AA соответствие
+
+### Качественные Улучшения:
+- **Реалистичное тестирование:** Настоящий DOM и Zustand store
+- **Надежность:** Проверка edge cases и обработки ошибок
+- **Производительность:** Мониторинг с реальными данными
+- **UX:** Полная accessibility поддержка
+
+## 🔧 Необходимые Зависимости
+
+**Добавить в package.json:**
+```json
+{
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "axe-core": "^4.8.2",
+    "jest-axe": "^8.0.0"
+  }
 }
 ```
 
-### ✅ 5. Проверка работы приложения
-- **Сборка**: ✅ Успешно, без ошибок
-- **Сервер**: ✅ Запущен на http://localhost:3000
-- **Типизация**: ✅ Без ошибок
-- **Результат**: Приложение готово к тестированию
+## 🎯 Финальный Результат
 
-## Технические изменения
+После реализации этого плана Kanban проект будет иметь:
+- Комплексное E2E покрытие всех основных пользовательских сценариев
+- Стабильную тестовую инфраструктуру на основе Jest/React Testing Library
+- Реалистичное тестирование без изоляции от реального store и DOM
+- Performance и Accessibility тестирование для production-ready приложения
+- Масштабируемую архитектуру готовую для дальнейшего расширения
 
-### Файл: `src/shared/store/kanbanStore.ts`
-```typescript
-// Добавлено:
-- initialTasks константа с 6 моковыми задачами
-- onRehydrateStorage для проверки пустых данных
-- Улучшена инициализация store с гарантированными данными
+**Общее время реализации:** 7 дней
+**Требуемые ресурсы:** 1 разработчик
+**Риск:** Минимальный (основан на существующей технологии)
 
-// Результат: Всегда есть контент для отображения
-```
+## ✅ СТАТУС: ПЛАН СОЗДАН И ГОТОВ К РЕАЛИЗАЦИИ
 
-### Файл: `src/app/page.tsx`
-```typescript
-// Добавлено:
-import { Suspense } from 'react';
-
-// Обернуто:
-<Suspense fallback={<div className="text-gray-500 p-10">Loading Board...</div>}>
-  <KanbanBoard />
-</Suspense>
-```
-
-### Файл: `src/features/kanban/ui/KanbanBoard.tsx`
-```typescript
-// Добавлено:
-- useState для mounted
-- useEffect для установки mounted
-- Простой loader для initial render
-
-// Результат: Компонент с полной защитой от гидратации
-```
-
-## Ожидаемый результат
-
-1. **✅ Данные всегда есть**: 6 моковых задач распределены по всем колонкам
-2. **✅ Нет белого экрана**: Доска показывает контент с первого запуска
-3. **✅ Защита от гидратации**: Три уровня защиты (mounted state, dynamic import, Suspense)
-4. **✅ Темная тема**: Применена через CSS переменные и классы
-5. **✅ Functional DnD**: Полностью работает drag-and-drop функциональность
-
-## Распределение моковых данных
-
-### Колонка "Новая задача" (TODO):
-- Analysis of competitors (25% прогресс)
-- Create UI Kit (0% прогресс)
-
-### Колонка "Выполняется" (IN PROGRESS):
-- Foundation Works (60% прогресс)
-
-### Колонка "Ожидает проверки" (REVIEW):
-- Code Review (80% прогресс)
-
-### Колонка "Тестирование" (TESTING):
-- Integration Testing (45% прогресс)
-
-### Колонка "Готово" (DONE):
-- Deploy to Production (100% прогресс)
-
-## Принципы соблюдены
-- **Простота**: Изменения только там, где необходимо
-- **Надежность**: Многоуровневая защита от ошибок
-- **Производительность**: Оптимизированная инициализация
-- **UX**: Отсутствие белых экранов и зависаний
-
-## Тестирование
-- **Сборка**: ✅ Пройдена успешно
-- **Сервер**: ✅ Запущен на localhost:3000
-- **Типизация**: ✅ Без ошибок
-- **Функциональность**: ✅ DnD работает корректно
-
----
-
-## 🔧 Дополнительное исправление
-
-### ✅ 6. Исправление нарушения порядка React Hooks (КРИТИЧНО)
-- **Проблема**: React detected a change in the order of Hooks called by KanbanBoard
-- **Причина**: Хуки вызывались до проверки `mounted`, но компонент возвращался раньше, нарушая Rules of Hooks
-- **Решение**: Создан компонент-обертка для разделения loading логики от основной логики с хуками
-
-```typescript
-// Было (неправильно):
-export const KanbanBoard = () => {
-  const [mounted, setMounted] = useState(false);
-  const { getTasksByStatus } = useKanbanStore(); // ❌ Хук до проверки mounted
-
-  if (!mounted) return <Loader />; // ❌ Ранний return после хуков
-
-  // Rest component...
-};
-
-// Стало (правильно):
-export const KanbanBoard = () => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
-
-  if (!mounted) {
-    return <Loader />; // ✅ Early return без хуков
-  }
-
-  return <KanbanBoardContent />; // ✅ Отдельный компонент с хуками
-};
-
-const KanbanBoardContent = () => {
-  const { getTasksByStatus } = useKanbanStore(); // ✅ Все хуки в одном месте
-  // Rest component with all hooks...
-};
-```
-
-- **Результат**: ✅ Ошибок в консоли больше нет
-- **Проверка**: ✅ Сборка проходит успешно
-- **Функциональность**: ✅ Все работает корректно
-
----
-
-**Дата выполнения:** 2025-12-19
-**Статус:** ✅ Завершено успешно
-**Задача:** Seed Mock Data, Fix Hydration Bailout, and Apply Dark Theme + Fix React Hooks Order Violation
+**Дата создания:** 2025-12-19
+**Автор:** Claude AI Assistant
+**Проект:** 0 ProEKTi/kanban-board
+**Приоритет:** HIGH

@@ -41,7 +41,7 @@ export const useKanbanDnD = () => {
       targetId = overId;
     } else {
       // Fallback: overId might be a valid status (column ID)
-      const validStatuses: TaskStatus[] = ['todo', 'in-progress', 'review', 'testing', 'done'];
+      const validStatuses: TaskStatus[] = ['todo', 'in-progress', 'review', 'done'];
       if (validStatuses.includes(overId as TaskStatus)) {
         newStatus = overId as TaskStatus;
         targetId = undefined;
