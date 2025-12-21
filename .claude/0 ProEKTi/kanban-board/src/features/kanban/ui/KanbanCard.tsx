@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
-import { Task, Priority } from '@/shared/types/task';
-import { GripVertical, Trash2, Check, X } from 'lucide-react';
+import { Task } from '@/shared/types/task';
+import { GripVertical, Trash2 } from 'lucide-react';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
-import { CompactDateRange } from '@/shared/ui/DateRange';
-import { DueDateIndicator, CompactDueDate } from '@/shared/ui/DueDateIndicator';
+import { DueDateIndicator } from '@/shared/ui/DueDateIndicator';
 import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
-import { TagGroup, TagSelector } from '@/shared/ui/TagSystem';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
-  const { updateTask, deleteTask } = useKanbanStore();
+  const { updateTask, deleteTask, projects } = useKanbanStore();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const editFormRef = useRef<HTMLDivElement>(null);
+
+  // Get project color for this task
+  const projectColor = projects.find(p => p.id === task.projectId)?.color || '#3B82F6';
 
   // Store temporary values during editing
   const [editValues, setEditValues] = useState({
@@ -22,7 +25,6 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     priority: task.priority,
     startDate: task.startDate,
     dueDate: task.dueDate,
-    tags: task.tags,
     progress: task.progress
   });
 
@@ -49,27 +51,37 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       priority: task.priority,
       startDate: task.startDate,
       dueDate: task.dueDate,
-      tags: task.tags,
       progress: task.progress
     });
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    // Save all changes at once
-    updateTask(task.id, editValues);
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await updateTask(task.id, editValues);
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBlur = async (e: React.FocusEvent) => {
+    // Don't save if clicking within the edit form
+    if (editFormRef.current && editFormRef.current.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    await handleSave();
   };
 
   const handleCancel = () => {
-    // Discard changes and reset to original values
     setEditValues({
       title: task.title,
       description: task.description,
       priority: task.priority,
       startDate: task.startDate,
       dueDate: task.dueDate,
-      tags: task.tags,
       progress: task.progress
     });
     setIsEditing(false);
@@ -77,7 +89,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation();
-    if (e.key === 'Enter' && e.ctrlKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSave();
     }
@@ -103,40 +115,44 @@ export const KanbanCard = ({ task }: { task: Task }) => {
 
   const dueDateStatus = getDueDateStatus();
 
-  const gradientClass = task.priority === 'urgent' ? 'from-red-600/20 to-red-400/5' :
-                        task.priority === 'high' ? 'from-red-500/10 to-pink-500/5' :
-                        task.priority === 'medium' ? 'from-yellow-500/10 to-orange-500/5' :
-                        'from-green-500/10 to-emerald-500/5';
+  // Use project color instead of priority gradients
+  const cardStyle = {
+    backgroundColor: projectColor + '20', // Add transparency to project color
+    borderLeft: `4px solid ${projectColor}`,
+  };
 
-  const dueDateBorderClass = dueDateStatus === 'overdue' ? 'border-l-4 border-l-red-500' :
-                              dueDateStatus === 'due-today' ? 'border-l-4 border-l-orange-500' :
-                              dueDateStatus === 'due-soon' ? 'border-l-2 border-l-yellow-500' :
-                              'border-l-2 border-l-transparent';
+  const dueDateBorderClass = dueDateStatus === 'overdue' ? 'border-r-4 border-r-red-500' :
+                              dueDateStatus === 'due-today' ? 'border-r-4 border-r-orange-500' :
+                              dueDateStatus === 'due-soon' ? 'border-r-2 border-r-yellow-500' :
+                              'border-r-2 border-r-transparent';
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{...style, ...cardStyle}}
       data-testid={`kanban-card-${task.id}`}
-      className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] ${
+      className={`group bg-zinc-900/50 ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-300 card-entrance hover:shadow-xl hover:scale-[1.02] ${
         isDragging ? 'drag-preview' : ''
       }`}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing"
+      >
         <div className="flex items-center gap-2">
           <PriorityBadge priority={task.priority} size="xs" />
         </div>
         <div className="flex items-center gap-1">
-          <div
-            {...attributes}
-            {...listeners}
-            data-testid="drag-handle"
-            className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-300 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm hover:scale-105"
-          >
+          <div className="opacity-40 group-hover:opacity-100 text-white/30 hover:text-white/80 transition-all duration-300 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm hover:scale-105">
             <GripVertical size={20} />
           </div>
           <button
-            onClick={() => deleteTask(task.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteTask(task.id);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
             data-testid="delete-button"
             aria-label="Delete task"
             className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 transition-all duration-300 p-1.5 rounded-lg hover:bg-red-500/20 backdrop-blur-sm hover:scale-105"
@@ -147,7 +163,12 @@ export const KanbanCard = ({ task }: { task: Task }) => {
       </div>
 
       {isEditing ? (
-        <div className="space-y-2 relative z-[100]" onClick={(e) => e.stopPropagation()}>
+        <div
+          ref={editFormRef}
+          className={`space-y-2 relative z-[100] ${isSaving ? 'opacity-70' : ''}`}
+          onClick={(e) => e.stopPropagation()}
+          onBlur={handleBlur}
+        >
           <input
             autoFocus
             placeholder={task.title ? "" : "Название задачи..."}
@@ -204,16 +225,6 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               </div>
             </div>
 
-            {/* Tags */}
-            <div onClick={(e) => e.stopPropagation()}>
-              <label className="text-label text-gray-400 block mb-1">Tags</label>
-              <TagSelector
-                selectedTags={editValues.tags || []}
-                onTagsChange={(tags) => setEditValues({ ...editValues, tags })}
-                size="xs"
-              />
-            </div>
-
             {/* Progress */}
             <div onClick={(e) => e.stopPropagation()}>
               <label className="text-label text-gray-400 block mb-1">
@@ -234,32 +245,13 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               />
             </div>
 
-            {/* Save/Cancel Buttons */}
-            <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
-              <button
-                onClick={handleCancel}
-                className="flex items-center gap-1 px-3 py-1.5 bg-gray-600/20 hover:bg-gray-600/30 text-gray-300 hover:text-white rounded-lg transition-all duration-200 text-xs font-medium"
-                title="Отменить (Escape)"
-              >
-                <X size={14} />
-                Отмена
-              </button>
-              <button
-                onClick={handleSave}
-                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 hover:text-white rounded-lg transition-all duration-200 text-xs font-medium"
-                title="Сохранить (Ctrl+Enter)"
-              >
-                <Check size={14} />
-                Сохранить
-              </button>
-            </div>
-          </div>
+                      </div>
         </div>
       ) : (
         <div onClick={handleStartEdit} className="cursor-text">
-          <h4 data-testid="card-title" className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
+          <h4 data-testid="card-title" className="text-zinc-200 font-medium text-sm mb-1.5 leading-tight">{task.title}</h4>
           {task.description && (
-            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
+            <p className="text-zinc-500 text-xs line-clamp-2 leading-relaxed mb-3">
               {task.description}
             </p>
           )}
@@ -280,7 +272,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
                   showDaysCount={true}
                 />
               ) : (
-                <div className="text-caption text-gray-500 italic">
+                <div className="text-caption text-zinc-500 italic">
                   + Add due date
                 </div>
               )}
@@ -297,26 +289,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               </div>
             )}
 
-            {/* Tags */}
-            {task.tags && task.tags.length > 0 && (
-              <div className="mb-2">
-                <TagGroup
-                  tags={task.tags}
-                  maxVisible={4}
-                  size="xs"
-                  onTagClick={(tag) => console.log('Tag clicked:', tag)}
-                />
-              </div>
-            )}
-            {!task.tags || task.tags.length === 0 ? (
-              <div
-                className="text-caption text-gray-500 italic mb-2 p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
-                onClick={handleStartEdit}
-              >
-                + Add tags
-              </div>
-            ) : null}
-
+            
             {/* Progress */}
             {task.progress !== undefined ? (
               <ProgressBar
@@ -331,7 +304,7 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               />
             ) : (
               <div
-                className="text-caption text-gray-500 italic p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
+                className="text-caption text-zinc-500 italic p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
                 onClick={() => {
                   updateTask(task.id, { progress: 0 });
                 }}

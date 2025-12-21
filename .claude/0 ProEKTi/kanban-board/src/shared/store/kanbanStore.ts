@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Task, TaskStatus, Priority, Tag, TaskFilters } from '@/shared/types/task';
+import { Task, TaskStatus, Priority, TaskFilters } from '@/shared/types/task';
+import { Project, CreateProjectInput, UpdateProjectInput, PROJECT_COLORS } from '@/shared/types/project';
 
 // Initial mock data to ensure board is never empty
 const initialTasks: Task[] = [
@@ -10,14 +11,11 @@ const initialTasks: Task[] = [
     description: 'Fix critical login form validation bug affecting user authentication',
     status: 'todo',
     priority: 'urgent',
+    projectId: 'default-project',
     startDate: '2025-01-19',
     dueDate: '2025-01-20',
     assignees: [
       { id: 'dev1', name: 'QA Team', color: '#EF4444' }
-    ],
-    tags: [
-      { id: 't11', name: 'Bug', color: '#EF4444' },
-      { id: 't12', name: 'Authentication', color: '#F59E0B' }
     ],
     progress: 0
   },
@@ -27,16 +25,12 @@ const initialTasks: Task[] = [
     description: 'Fix critical payment processing bug affecting production users',
     status: 'todo',
     priority: 'urgent',
+    projectId: 'default-project',
     startDate: '2025-01-15',
     dueDate: '2024-12-17', // Overdue - shows red indicator
     assignees: [
       { id: 'a1', name: 'Alex Smith', color: '#EF4444' },
       { id: 'a2', name: 'Sarah Lee', color: '#F59E0B' }
-    ],
-    tags: [
-      { id: 't1', name: 'Bug', color: '#EF4444' },
-      { id: 't2', name: 'Backend', color: '#10B981' },
-      { id: 't3', name: 'Security', color: '#F97316' }
     ],
     progress: 0
   },
@@ -46,15 +40,12 @@ const initialTasks: Task[] = [
     description: 'Analyze competitor products and features',
     status: 'todo',
     priority: 'medium',
+    projectId: 'default-project',
     startDate: '2025-01-15',
     dueDate: '2025-01-20',
     assignees: [
       { id: 'a3', name: 'Mike Chen', color: '#3B82F6' },
       { id: 'a4', name: 'Tom Analyst', color: '#EC4899' }
-    ],
-    tags: [
-      { id: 't4', name: 'Research', color: '#06B6D4' },
-      { id: 't5', name: 'Documentation', color: '#6B7280' }
     ],
     progress: 25
   },
@@ -64,15 +55,11 @@ const initialTasks: Task[] = [
     description: 'Design and develop component library',
     status: 'todo',
     priority: 'high',
+    projectId: 'default-project',
     startDate: '2025-01-15',
     dueDate: '2024-12-19', // Due today - shows orange indicator
     assignees: [
       { id: 'a5', name: 'Lisa Designer', color: '#10B981' }
-    ],
-    tags: [
-      { id: 't6', name: 'Feature', color: '#3B82F6' },
-      { id: 't7', name: 'Design', color: '#8B5CF6' },
-      { id: 't8', name: 'Frontend', color: '#F59E0B' }
     ],
     progress: 0
   },
@@ -82,15 +69,12 @@ const initialTasks: Task[] = [
     description: 'Excavation and concrete foundation for the main building',
     status: 'in-progress',
     priority: 'urgent',
+    projectId: 'default-project',
     startDate: '2025-01-10',
     dueDate: '2024-12-22', // Due in 3 days - shows yellow indicator
     assignees: [
       { id: 'a6', name: 'John Builder', color: '#F59E0B' },
       { id: 'a7', name: 'Tom Engineer', color: '#8B5CF6' }
-    ],
-    tags: [
-      { id: 't9', name: 'Feature', color: '#3B82F6' },
-      { id: 't10', name: 'Backend', color: '#10B981' }
     ],
     progress: 60
   },
@@ -100,6 +84,7 @@ const initialTasks: Task[] = [
     description: 'Implement user login and registration system',
     status: 'in-progress',
     priority: 'high',
+    projectId: 'default-project',
     startDate: '2025-01-12',
     dueDate: '2025-01-20',
     assignees: [
@@ -113,6 +98,7 @@ const initialTasks: Task[] = [
     description: 'Review pull requests and provide feedback',
     status: 'review',
     priority: 'medium',
+    projectId: 'default-project',
     startDate: '2025-01-22',
     dueDate: '2025-01-23',
     assignees: [
@@ -126,6 +112,7 @@ const initialTasks: Task[] = [
     description: 'Test API integrations and data flow',
     status: 'testing',
     priority: 'high',
+    projectId: 'default-project',
     startDate: '2025-01-24',
     dueDate: '2025-01-26',
     assignees: [
@@ -139,6 +126,7 @@ const initialTasks: Task[] = [
     description: 'Update API documentation and user guides',
     status: 'testing',
     priority: 'low',
+    projectId: 'default-project',
     startDate: '2025-01-25',
     dueDate: '2025-01-30',
     assignees: [
@@ -152,6 +140,7 @@ const initialTasks: Task[] = [
     description: 'Deploy application to production environment',
     status: 'done',
     priority: 'medium',
+    projectId: 'default-project',
     startDate: '2025-01-20',
     dueDate: '2025-01-21',
     assignees: [
@@ -161,10 +150,41 @@ const initialTasks: Task[] = [
   }
 ];
 
+// Default project for migration
+const DEFAULT_PROJECT: Project = {
+  id: 'default-project',
+  name: 'Основной проект',
+  description: 'Проект по умолчанию для существующих задач',
+  color: '#3B82F6',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  taskCount: initialTasks.length,
+  isActive: true
+};
+
 // Data layer - pure data structure
 interface KanbanData {
   tasks: Task[];
+  projects: Project[];
+  currentProjectId: string | null;
   filters: TaskFilters;
+}
+
+// Project actions
+interface ProjectActions {
+  // CRUD operations for projects
+  createProject: (projectData: CreateProjectInput) => void;
+  updateProject: (id: string, updates: UpdateProjectInput) => void;
+  deleteProject: (id: string) => void;
+
+  // Project navigation
+  setCurrentProject: (projectId: string | null) => void;
+  getCurrentProject: () => Project | null;
+
+  // Project-specific task operations
+  getProjectTasks: (projectId: string) => Task[];
+  getCurrentProjectTasks: () => Task[];
+  updateProjectTaskCounts: () => void;
 }
 
 // Actions layer - operations on data
@@ -190,7 +210,7 @@ interface KanbanFilters {
   getFilteredTasks: () => Task[];
 }
 
-type KanbanStore = KanbanData & KanbanActions & KanbanFilters;
+type KanbanStore = KanbanData & KanbanActions & ProjectActions & KanbanFilters;
 
 // Helper function to generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -200,6 +220,8 @@ export const useKanbanStore = create<KanbanStore>()(
     (set, get) => ({
       // Initial data - use the predefined initialTasks
       tasks: initialTasks,
+      projects: [DEFAULT_PROJECT],
+      currentProjectId: 'default-project',
 
       // Initial filters - all empty
       filters: {
@@ -213,14 +235,91 @@ export const useKanbanStore = create<KanbanStore>()(
         }
       },
 
+      // Project Actions
+      createProject: (projectData) => set((state) => {
+        const newProject: Project = {
+          id: generateId(),
+          name: projectData.name,
+          description: projectData.description,
+          color: projectData.color,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          taskCount: 0,
+          isActive: false
+        };
+
+        return {
+          projects: [...state.projects, newProject]
+        };
+      }),
+
+      updateProject: (id, updates) => set((state) => ({
+        projects: state.projects.map(project =>
+          project.id === id
+            ? { ...project, ...updates, updatedAt: new Date().toISOString() }
+            : project
+        )
+      })),
+
+      deleteProject: (id) => set((state) => {
+        // Don't allow deletion of the default project
+        if (id === 'default-project') {
+          console.warn('Cannot delete default project');
+          return state;
+        }
+
+        const updatedProjects = state.projects.filter(p => p.id !== id);
+
+        // If deleting current project, switch to default
+        const newCurrentId = state.currentProjectId === id ? 'default-project' : state.currentProjectId;
+
+        return {
+          projects: updatedProjects,
+          currentProjectId: newCurrentId
+        };
+      }),
+
+      setCurrentProject: (projectId) => set((state) => ({
+        currentProjectId: projectId
+      })),
+
+      getCurrentProject: () => {
+        const state = get();
+        return state.projects.find(p => p.id === state.currentProjectId) || null;
+      },
+
+      getProjectTasks: (projectId) => {
+        const state = get();
+        return state.tasks.filter(task => task.projectId === projectId);
+      },
+
+      getCurrentProjectTasks: () => {
+        const state = get();
+        return state.tasks.filter(task => task.projectId === state.currentProjectId);
+      },
+
+      updateProjectTaskCounts: () => set((state) => {
+        const updatedProjects = state.projects.map(project => ({
+          ...project,
+          taskCount: state.tasks.filter(task => task.projectId === project.id).length
+        }));
+
+        return {
+          projects: updatedProjects
+        };
+      }),
+
       // Actions
       addTask: (status, taskData) => set((state) => {
+        const currentProject = state.projects.find(p => p.id === state.currentProjectId) || DEFAULT_PROJECT;
+
         const newTask: Task = {
           id: generateId(),
           title: taskData?.title || 'Новая задача',
           description: taskData?.description || 'Введите описание...',
           status,
           priority: taskData?.priority || 'medium',
+          projectId: currentProject.id,
           // Default values for new fields
           startDate: taskData?.startDate,
           dueDate: taskData?.dueDate,
@@ -228,8 +327,17 @@ export const useKanbanStore = create<KanbanStore>()(
           progress: taskData?.progress ?? 0,
           ...taskData
         };
+
+        // Update task count for the project
+        const updatedProjects = state.projects.map(project =>
+          project.id === currentProject.id
+            ? { ...project, taskCount: project.taskCount + 1 }
+            : project
+        );
+
         return {
-          tasks: [...state.tasks, newTask]
+          tasks: [...state.tasks, newTask],
+          projects: updatedProjects
         };
       }),
 
@@ -239,6 +347,11 @@ export const useKanbanStore = create<KanbanStore>()(
 
           // Validate and sanitize updates
           const sanitizedUpdates = { ...updates };
+
+          // Remove tags field if present (tags feature has been removed)
+          if ('tags' in sanitizedUpdates) {
+            delete sanitizedUpdates.tags;
+          }
 
           // Validate progress is within 0-100
           if ('progress' in sanitizedUpdates) {
@@ -373,15 +486,55 @@ export const useKanbanStore = create<KanbanStore>()(
       // Only persist the data, not the actions
       partialize: (state) => ({
         tasks: state.tasks,
+        projects: state.projects,
+        currentProjectId: state.currentProjectId,
         filters: state.filters
       }),
       // Ensure we always have data on hydration
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // Migration: if no projects exist, create default project
+          if (!state.projects || state.projects.length === 0) {
+            console.log('No projects found in storage, creating default project');
+            state.projects = [DEFAULT_PROJECT];
+            state.currentProjectId = 'default-project';
+          }
+
+          // Migration: add projectId to existing tasks
+          if (state.tasks && state.tasks.length > 0) {
+            const needsMigration = state.tasks.some(task => !('projectId' in task));
+            if (needsMigration) {
+              console.log('Migrating tasks to project structure');
+              state.tasks = state.tasks.map(task => ({
+                ...task,
+                projectId: task.projectId || 'default-project'
+              }));
+            }
+          }
+
+          // Initialize tasks if empty
           if (!state.tasks || state.tasks.length === 0) {
             console.log('No tasks found in storage, initializing with mock data');
             state.tasks = initialTasks;
+          } else {
+            // Clean up tags from existing tasks
+            state.tasks = state.tasks.map(task => {
+              const { tags, ...taskWithoutTags } = task as any;
+              return taskWithoutTags as Task;
+            });
           }
+
+          // Ensure current project exists
+          if (!state.currentProjectId || !state.projects.find(p => p.id === state.currentProjectId)) {
+            state.currentProjectId = state.projects[0]?.id || 'default-project';
+          }
+
+          // Update task counts
+          state.projects = state.projects.map(project => ({
+            ...project,
+            taskCount: state.tasks.filter(task => task.projectId === project.id).length
+          }));
+
           // Ensure filters exist
           if (!state.filters) {
             state.filters = {
