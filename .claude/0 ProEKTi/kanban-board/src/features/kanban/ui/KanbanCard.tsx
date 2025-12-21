@@ -3,11 +3,10 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { Task, Priority } from '@/shared/types/task';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { GripVertical, Trash2, Calendar, Clock } from 'lucide-react';
 import { ProgressBar } from '@/shared/ui/ProgressBar';
 import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
-import { CompactDateRange } from '@/shared/ui/DateRange';
-import { DueDateIndicator, CompactDueDate } from '@/shared/ui/DueDateIndicator';
+import { DueDateIndicator } from '@/shared/ui/DueDateIndicator';
 import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
@@ -45,51 +44,47 @@ export const KanbanCard = ({ task }: { task: Task }) => {
 
   const dueDateStatus = getDueDateStatus();
 
-  const gradientClass = task.priority === 'urgent' ? 'from-red-600/20 to-red-400/5' :
-                        task.priority === 'high' ? 'from-red-500/10 to-pink-500/5' :
-                        task.priority === 'medium' ? 'from-yellow-500/10 to-orange-500/5' :
-                        'from-green-500/10 to-emerald-500/5';
-
-  const dueDateBorderClass = dueDateStatus === 'overdue' ? 'border-l-4 border-l-red-500' :
-                              dueDateStatus === 'due-today' ? 'border-l-4 border-l-orange-500' :
-                              dueDateStatus === 'due-soon' ? 'border-l-2 border-l-yellow-500' :
-                              'border-l-2 border-l-transparent';
+  // Subtle left border based on priority
+  const priorityBorder = task.priority === 'urgent' ? 'border-l-2 border-l-red-500' :
+                         task.priority === 'high' ? 'border-l-2 border-l-orange-500' :
+                         task.priority === 'medium' ? 'border-l-2 border-l-yellow-500' :
+                         'border-l-2 border-l-emerald-500';
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group glass-card bg-gradient-to-br ${gradientClass} ${dueDateBorderClass} p-4 rounded-xl shadow-lg transition-all duration-200 card-entrance ${
+      className={`group glass-card inner-glow ${priorityBorder} p-4 rounded-card card-entrance ${
         isDragging ? 'drag-preview' : ''
       }`}
     >
+      {/* Top row: Priority + Actions */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <PriorityBadge priority={task.priority} size="xs" />
-        </div>
-        <div className="flex items-center gap-1">
+        <PriorityBadge priority={task.priority} size="xs" />
+
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <div
             {...attributes}
             {...listeners}
-            className="opacity-40 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-white/30 hover:text-white/80 transition-all duration-200 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm"
+            className="btn-ghost p-1.5 rounded cursor-grab active:cursor-grabbing"
           >
-            <GripVertical size={20} />
+            <GripVertical size={14} className="text-text-subtle" />
           </div>
           <button
             onClick={() => deleteTask(task.id)}
-            className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 transition-all duration-200 p-1.5 rounded-lg hover:bg-red-500/20 backdrop-blur-sm"
+            className="btn-ghost p-1.5 rounded hover:text-error hover:bg-error/10"
           >
-            <Trash2 size={14} />
+            <Trash2 size={14} className="text-text-subtle" />
           </button>
         </div>
       </div>
 
       {isEditing ? (
-        <div className="space-y-2 relative z-[100]">
+        <div className="space-y-3 relative z-[100]">
           <input
             autoFocus
-            placeholder={task.title ? "" : "Название задачи..."}
-            className="w-full bg-white/5 text-white border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-400/50 transition-all placeholder-blue-400/50"
+            placeholder="Название задачи..."
+            className="w-full bg-white/[0.03] text-text-primary border border-border-subtle rounded-button px-3 py-2 text-[14px] outline-none focus:border-accent/50 transition-colors placeholder:text-text-subtle"
             value={task.title}
             onChange={(e) => updateTask(task.id, { title: e.target.value })}
             onBlur={() => setIsEditing(false)}
@@ -102,30 +97,26 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               if (e.key === 'Escape') setIsEditing(false);
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            onFocus={(e) => e.stopPropagation()}
           />
           <textarea
-            placeholder={task.description ? "" : "Описание..."}
-            className="w-full bg-white/5 text-white/90 border border-white/10 rounded-lg px-3 py-2 text-xs outline-none min-h-[60px] focus:border-blue-400/30 transition-all resize-none placeholder-blue-400/50"
+            placeholder="Описание..."
+            className="w-full bg-white/[0.03] text-text-secondary border border-border-subtle rounded-button px-3 py-2 text-[12px] outline-none min-h-[60px] focus:border-accent/30 transition-colors resize-none placeholder:text-text-subtle"
             value={task.description}
             onChange={(e) => updateTask(task.id, { description: e.target.value })}
-            onBlur={() => setIsEditing(false)}
             onKeyDown={(e) => {
               e.stopPropagation();
-              if (e.key === 'Escape' && !e.shiftKey) {
+              if (e.key === 'Escape') {
                 e.preventDefault();
                 setIsEditing(false);
               }
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            onFocus={(e) => e.stopPropagation()}
           />
 
-          {/* Priority and Construction Fields Editing */}
-          <div className="space-y-2 pt-2 border-t border-white/10">
-            {/* Priority */}
+          {/* Priority and Fields Editing */}
+          <div className="space-y-3 pt-3 border-t border-border-subtle">
             <div>
-              <label className="text-[9px] text-gray-400 block mb-1">Priority</label>
+              <label className="text-[11px] text-text-muted block mb-1.5 font-medium">Приоритет</label>
               <PrioritySelector
                 value={task.priority}
                 onChange={(priority) => updateTask(task.id, { priority })}
@@ -133,101 +124,101 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               />
             </div>
 
-            {/* Dates */}
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-[9px] text-gray-400 block mb-1">Start Date</label>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-[11px] text-text-muted block mb-1.5 font-medium">Начало</label>
                 <input
                   type="date"
-                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  className="w-full bg-white/[0.03] text-text-primary text-[12px] border border-border-subtle rounded-button px-2 py-1.5 outline-none focus:border-accent/50 transition-colors"
                   value={task.startDate || ''}
                   onChange={(e) => updateTask(task.id, { startDate: e.target.value || undefined })}
                   onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => e.stopPropagation()}
                 />
               </div>
-              <div className="flex-1">
-                <label className="text-[9px] text-gray-400 block mb-1">Due Date</label>
+              <div>
+                <label className="text-[11px] text-text-muted block mb-1.5 font-medium">Дедлайн</label>
                 <input
                   type="date"
-                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  className="w-full bg-white/[0.03] text-text-primary text-[12px] border border-border-subtle rounded-button px-2 py-1.5 outline-none focus:border-accent/50 transition-colors"
                   value={task.dueDate || ''}
                   onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
                   onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => e.stopPropagation()}
                 />
               </div>
             </div>
 
-            {/* Progress */}
             <div>
-              <label className="text-[9px] text-gray-400 block mb-1">
-                Progress: {task.progress || 0}%
+              <label className="text-[11px] text-text-muted block mb-1.5 font-medium">
+                Прогресс: {task.progress || 0}%
               </label>
               <input
                 type="range"
                 min="0"
                 max="100"
-                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-accent"
                 value={task.progress || 0}
                 onChange={(e) => {
                   const progress = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                   updateTask(task.id, { progress });
                 }}
                 onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
               />
             </div>
           </div>
         </div>
       ) : (
         <div onClick={() => setIsEditing(true)} className="cursor-text">
-          <h4 className="text-white font-semibold text-sm mb-1.5 leading-tight">{task.title}</h4>
+          {/* Title */}
+          <h4 className="text-text-primary font-medium text-[14px] mb-1 leading-snug line-clamp-2">
+            {task.title}
+          </h4>
+
+          {/* Description */}
           {task.description && (
-            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-3">
+            <p className="text-text-muted text-[12px] line-clamp-2 leading-relaxed mb-3">
               {task.description}
             </p>
           )}
 
-          {/* Construction Fields Display */}
-          <div className="space-y-2">
+          {/* Meta info */}
+          <div className="space-y-2 mt-3">
             {/* Due Date */}
-            <div
-              className="mb-2 cursor-pointer hover:bg-white/5 p-1 rounded transition-colors"
-              onClick={() => setIsEditing(true)}
-            >
-              {task.dueDate ? (
-                <DueDateIndicator
-                  dueDate={task.dueDate}
-                  startDate={task.startDate}
-                  size="xs"
-                  showStatus={true}
-                  showDaysCount={true}
-                />
-              ) : (
-                <div className="text-[9px] text-gray-500 italic">
-                  + Add due date
-                </div>
-              )}
-            </div>
-
-            {/* Assignees */}
-            {task.assignees && task.assignees.length > 0 && (
-              <div className="mb-2">
-                <AssigneeGroup
-                  assignees={task.assignees}
-                  maxVisible={3}
-                  size="xs"
-                />
+            {task.dueDate ? (
+              <DueDateIndicator
+                dueDate={task.dueDate}
+                startDate={task.startDate}
+                size="xs"
+                showStatus={true}
+                showDaysCount={true}
+              />
+            ) : (
+              <div
+                className="flex items-center gap-1.5 text-[11px] text-text-subtle hover:text-text-muted transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
+              >
+                <Calendar size={12} />
+                <span>Добавить дату</span>
               </div>
             )}
 
+            {/* Assignees */}
+            {task.assignees && task.assignees.length > 0 && (
+              <AssigneeGroup
+                assignees={task.assignees}
+                maxVisible={3}
+                size="xs"
+              />
+            )}
+
             {/* Progress */}
-            {task.progress !== undefined ? (
+            {task.progress !== undefined && task.progress > 0 ? (
               <ProgressBar
                 progress={task.progress}
                 size="sm"
-                showLabel={task.progress > 0}
+                showLabel={true}
                 color={task.progress >= 75 ? 'green' :
                        task.progress >= 50 ? 'yellow' :
                        task.progress >= 25 ? 'blue' : 'red'}
@@ -236,21 +227,20 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               />
             ) : (
               <div
-                className="text-[9px] text-gray-500 italic p-1 cursor-pointer hover:bg-white/5 rounded transition-colors"
-                onClick={() => {
+                className="flex items-center gap-1.5 text-[11px] text-text-subtle hover:text-text-muted transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
                   updateTask(task.id, { progress: 0 });
+                  setIsEditing(true);
                 }}
               >
-                + Add progress
+                <Clock size={12} />
+                <span>Добавить прогресс</span>
               </div>
             )}
           </div>
         </div>
       )}
-
-      <div className="mt-3 flex items-center justify-between">
-        <PriorityBadge priority={task.priority} size="xs" showLabel={true} />
-      </div>
     </div>
   );
 };

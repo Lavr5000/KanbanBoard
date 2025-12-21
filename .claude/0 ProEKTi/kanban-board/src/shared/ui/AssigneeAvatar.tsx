@@ -20,7 +20,6 @@ export const AssigneeAvatar = ({
     md: 'w-8 h-8 text-xs'
   };
 
-  // Get initials from name
   const getInitials = (name: string) => {
     const names = name.trim().split(' ');
     if (names.length === 1) {
@@ -30,11 +29,11 @@ export const AssigneeAvatar = ({
   };
 
   const initials = getInitials(assignee.name);
-  const bgColor = assignee.color || '#3B82F6';
+  const bgColor = assignee.color || '#6366f1';
 
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white font-semibold relative transition-all duration-200 hover:scale-110 ${className}`}
+      className={`${sizeClasses[size]} rounded-full flex items-center justify-center text-white font-medium ring-1 ring-white/10 transition-transform duration-150 hover:scale-105 hover:ring-white/20 ${className}`}
       style={{ backgroundColor: bgColor }}
       title={showTooltip ? assignee.name : undefined}
     >
@@ -71,8 +70,14 @@ export const AssigneeGroup = ({
   const visibleAssignees = assignees.slice(0, maxVisible);
   const remainingCount = assignees.length - maxVisible;
 
+  const sizeClasses = {
+    xs: 'w-5 h-5 text-[8px]',
+    sm: 'w-6 h-6 text-[10px]',
+    md: 'w-8 h-8 text-xs'
+  };
+
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`flex items-center -space-x-1 ${className}`}>
       {visibleAssignees.map((assignee) => (
         <AssigneeAvatar
           key={assignee.id}
@@ -83,11 +88,8 @@ export const AssigneeGroup = ({
       ))}
       {remainingCount > 0 && (
         <div
-          className={`${size === 'xs' ? 'w-5 h-5 text-[8px]' :
-                      size === 'sm' ? 'w-6 h-6 text-[10px]' :
-                      'w-8 h-8 text-xs'}
-                      rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-gray-300 font-semibold border border-white/20`}
-          title={`${remainingCount} more assignee${remainingCount > 1 ? 's' : ''}`}
+          className={`${sizeClasses[size]} rounded-full bg-elevated flex items-center justify-center text-text-secondary font-medium ring-1 ring-border-subtle`}
+          title={`+${remainingCount} ещё`}
         >
           +{remainingCount}
         </div>

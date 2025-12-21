@@ -17,30 +17,30 @@ export const PriorityBadge = ({
 }: PriorityBadgeProps) => {
   const priorityConfig = {
     urgent: {
-      color: 'bg-red-500',
+      color: 'bg-red-500/20',
+      dotColor: 'bg-red-500',
       textColor: 'text-red-400',
-      borderColor: 'border-red-500',
       icon: AlertTriangle,
       label: 'Срочный'
     },
     high: {
-      color: 'bg-orange-500',
+      color: 'bg-orange-500/20',
+      dotColor: 'bg-orange-500',
       textColor: 'text-orange-400',
-      borderColor: 'border-orange-500',
       icon: ChevronUp,
       label: 'Высокий'
     },
     medium: {
-      color: 'bg-yellow-500',
-      textColor: 'text-yellow-400',
-      borderColor: 'border-yellow-500',
+      color: 'bg-amber-500/20',
+      dotColor: 'bg-amber-500',
+      textColor: 'text-amber-400',
       icon: Minus,
       label: 'Средний'
     },
     low: {
-      color: 'bg-green-500',
-      textColor: 'text-green-400',
-      borderColor: 'border-green-500',
+      color: 'bg-emerald-500/20',
+      dotColor: 'bg-emerald-500',
+      textColor: 'text-emerald-400',
       icon: ChevronDown,
       label: 'Низкий'
     }
@@ -50,38 +50,35 @@ export const PriorityBadge = ({
   const Icon = config.icon;
 
   const sizeClasses = {
-    xs: 'w-4 h-4 text-[10px]',
-    sm: 'w-5 h-5 text-[11px]',
-    md: 'w-6 h-6 text-xs'
+    xs: 'text-[10px] gap-1 px-1.5 py-0.5',
+    sm: 'text-[11px] gap-1.5 px-2 py-0.5',
+    md: 'text-xs gap-1.5 px-2 py-1'
   };
 
   const iconSize = {
-    xs: 8,
-    sm: 10,
+    xs: 10,
+    sm: 11,
     md: 12
+  };
+
+  const dotSize = {
+    xs: 'w-1.5 h-1.5',
+    sm: 'w-2 h-2',
+    md: 'w-2 h-2'
   };
 
   if (showLabel) {
     return (
-      <div className={`flex items-center gap-1 ${config.textColor} ${className}`}>
-        <Icon size={iconSize[size]} />
-        <span className="text-[10px] font-medium">{config.label}</span>
+      <div className={`inline-flex items-center ${sizeClasses[size]} ${config.color} ${config.textColor} rounded-full font-medium ${className}`}>
+        <span className={`${dotSize[size]} ${config.dotColor} rounded-full`}></span>
+        <span>{config.label}</span>
       </div>
     );
   }
 
   return (
     <div
-      className={`
-        ${sizeClasses[size]}
-        ${config.color}
-        rounded-full
-        flex
-        items-center
-        justify-center
-        text-white
-        ${className}
-      `}
+      className={`inline-flex items-center ${sizeClasses[size]} ${config.color} ${config.textColor} rounded-full font-medium ${className}`}
       title={config.label}
     >
       <Icon size={iconSize[size]} />
@@ -104,37 +101,48 @@ export const PrioritySelector = ({
 }: PrioritySelectorProps) => {
   const priorities: Priority[] = ['urgent', 'high', 'medium', 'low'];
 
+  const priorityStyles = {
+    urgent: { active: 'bg-red-500 text-white', inactive: 'bg-white/[0.05] text-text-muted hover:bg-red-500/20 hover:text-red-400' },
+    high: { active: 'bg-orange-500 text-white', inactive: 'bg-white/[0.05] text-text-muted hover:bg-orange-500/20 hover:text-orange-400' },
+    medium: { active: 'bg-amber-500 text-white', inactive: 'bg-white/[0.05] text-text-muted hover:bg-amber-500/20 hover:text-amber-400' },
+    low: { active: 'bg-emerald-500 text-white', inactive: 'bg-white/[0.05] text-text-muted hover:bg-emerald-500/20 hover:text-emerald-400' }
+  };
+
+  const labels = {
+    urgent: 'Срочный',
+    high: 'Высокий',
+    medium: 'Средний',
+    low: 'Низкий'
+  };
+
+  const buttonSize = size === 'xs' ? 'w-5 h-5' : size === 'sm' ? 'w-6 h-6' : 'w-7 h-7';
+  const iconSizeValue = size === 'xs' ? 10 : size === 'sm' ? 12 : 14;
+
   return (
-    <div className={`flex gap-1 ${className}`}>
+    <div className={`flex gap-1.5 ${className}`}>
       {priorities.map((priority) => (
         <button
           key={priority}
-          onClick={() => onChange(priority)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange(priority);
+          }}
           className={`
-            ${value === priority
-              ? priority === 'urgent' ? 'bg-red-500 text-white' :
-                priority === 'high' ? 'bg-orange-500 text-white' :
-                priority === 'medium' ? 'bg-yellow-500 text-white' :
-                'bg-green-500 text-white'
-              : 'bg-white/10 text-gray-400 hover:bg-white/20'
-            }
-            w-6 h-6
+            ${buttonSize}
+            ${value === priority ? priorityStyles[priority].active : priorityStyles[priority].inactive}
             rounded-full
             flex
             items-center
             justify-center
-            transition-colors
-            ${size === 'xs' ? 'scale-75' : ''}
+            transition-all
+            duration-150
           `}
-          title={priority === 'urgent' ? 'Срочный' :
-                 priority === 'high' ? 'Высокий' :
-                 priority === 'medium' ? 'Средний' :
-                 'Низкий'}
+          title={labels[priority]}
         >
-          {priority === 'urgent' && <AlertTriangle size={size === 'xs' ? 8 : 10} />}
-          {priority === 'high' && <ChevronUp size={size === 'xs' ? 8 : 10} />}
-          {priority === 'medium' && <Minus size={size === 'xs' ? 8 : 10} />}
-          {priority === 'low' && <ChevronDown size={size === 'xs' ? 8 : 10} />}
+          {priority === 'urgent' && <AlertTriangle size={iconSizeValue} />}
+          {priority === 'high' && <ChevronUp size={iconSizeValue} />}
+          {priority === 'medium' && <Minus size={iconSizeValue} />}
+          {priority === 'low' && <ChevronDown size={iconSizeValue} />}
         </button>
       ))}
     </div>
