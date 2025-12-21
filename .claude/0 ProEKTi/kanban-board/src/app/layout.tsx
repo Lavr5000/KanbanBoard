@@ -1,7 +1,6 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 
 export const metadata = {
   title: 'Linear Kanban',
@@ -14,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ru" className="dark">
-      <body className={`${inter.className} bg-[#0B0D11] text-zinc-100 antialiased`}>
+    <html lang="ru" className={`dark ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="bg-canvas text-text-primary antialiased font-sans">
         {children}
       </body>
     </html>

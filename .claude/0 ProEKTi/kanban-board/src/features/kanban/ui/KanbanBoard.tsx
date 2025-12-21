@@ -9,7 +9,6 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -17,7 +16,7 @@ import {
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { useKanbanDnD } from '@/features/kanban/hooks/useKanbanDnD';
 import { KanbanColumn } from './KanbanColumn';
-import { Task, TaskStatus, Column } from '@/shared/types/task';
+import { Task, Column } from '@/shared/types/task';
 
 export const KanbanBoard = () => {
   const [mounted, setMounted] = useState(false);
@@ -26,25 +25,21 @@ export const KanbanBoard = () => {
     setMounted(true);
   }, []);
 
-  // Loading state - NO hooks called yet
   if (!mounted) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-gray-500 text-center">
-          <div className="w-8 h-8 border-2 border-gray-600 rounded-full animate-spin border-t-blue-400 mx-auto mb-3"></div>
-          <div>Initializing Kanban Board...</div>
+        <div className="text-text-muted text-center">
+          <div className="w-8 h-8 border-2 border-border-default rounded-full animate-spin border-t-accent mx-auto mb-3"></div>
+          <div className="text-[13px]">Инициализация...</div>
         </div>
       </div>
     );
   }
 
-  // Return the actual board component
   return <KanbanBoardContent />;
 };
 
-// Inner component that contains all the hooks
 const KanbanBoardContent = () => {
-  // Now all hooks are called consistently in every render
   const { getTasksByStatus, addTask } = useKanbanStore();
   const { handleDragEnd } = useKanbanDnD();
 
@@ -59,16 +54,15 @@ const KanbanBoardContent = () => {
     })
   );
 
-  // Define columns configuration following AppFlowy pattern
+  // Column configuration - no caps in titles
   const columnConfig: Column[] = [
-    { id: 'todo', title: 'Новая задача', taskIds: [] },
-    { id: 'in-progress', title: 'Выполняется', taskIds: [] },
-    { id: 'review', title: 'Ожидает проверки', taskIds: [] },
+    { id: 'todo', title: 'Новые', taskIds: [] },
+    { id: 'in-progress', title: 'В работе', taskIds: [] },
+    { id: 'review', title: 'На проверке', taskIds: [] },
     { id: 'testing', title: 'Тестирование', taskIds: [] },
     { id: 'done', title: 'Готово', taskIds: [] }
   ];
 
-  // Create columns with current task data using selectors
   const columnsWithData: (Column & { tasks: Task[] })[] = columnConfig.map(column => {
     const tasks = getTasksByStatus(column.id);
     return {
@@ -84,8 +78,8 @@ const KanbanBoardContent = () => {
       collisionDetection={closestCorners}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-full gap-8 overflow-x-auto pb-6 w-full kanban-scrollbar p-4">
-        <div className="flex gap-8 min-w-max">
+      <div className="flex h-full gap-4 overflow-x-auto pb-4 w-full kanban-scrollbar px-2">
+        <div className="flex gap-4 min-w-max">
           {columnsWithData.map((column, index) => (
             <SortableContext
               key={column.id}
@@ -94,8 +88,8 @@ const KanbanBoardContent = () => {
               strategy={verticalListSortingStrategy}
             >
               <div
-                className="card-entrance"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="card-entrance group"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 <KanbanColumn
                   column={column}

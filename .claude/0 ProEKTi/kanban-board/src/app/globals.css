@@ -2,65 +2,160 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global focus reset to eliminate browser outline */
-*:focus {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Custom focus styles for form elements */
-input:focus, textarea:focus, button:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important;
-}
+/* ========================================
+   Premium Dark Theme - Design Tokens
+   ======================================== */
 
 :root {
-  /* Simplified glass effects */
-  --board: #0f0f17;
-  --card: #1e1e2d;
-  --accent: #3b82f6;
-  --glass-bg: rgba(30, 30, 45, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --gradient-bg: linear-gradient(135deg, #0f0f17 0%, #1a1a2e 100%);
+  /* Core backgrounds - Deep anthracite palette */
+  --canvas: #09090b;
+  --sidebar: #0c0c0e;
+  --card: #18181b;
+  --elevated: #27272a;
+
+  /* Text hierarchy */
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-subtle: #52525b;
+
+  /* Accent - Sophisticated indigo */
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-muted: #4f46e5;
+
+  /* Borders - Ultra subtle */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.15);
+
+  /* Glass effects */
+  --glass-bg: rgba(24, 24, 27, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Gradients */
+  --gradient-bg: linear-gradient(180deg, #09090b 0%, #0c0c0e 100%);
+  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+
+  /* Legacy support */
+  --board: #09090b;
 }
 
+/* ========================================
+   Global Styles
+   ======================================== */
+
 body {
-  background: var(--gradient-bg);
-  color: #e2e8f0;
+  background: var(--canvas);
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Simplified Glassmorphism utility classes */
+/* ========================================
+   Focus States - Subtle & Accessible
+   ======================================== */
+
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+
+input:focus,
+textarea:focus,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* ========================================
+   Premium Glass Components
+   ======================================== */
+
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.2s ease;
 }
 
-.glass-column {
-  background: rgba(20, 20, 35, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
 .glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transform: translateY(-1px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* Simple animations */
+.glass-column {
+  background: rgba(12, 12, 14, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.glass-header {
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.glass-sidebar {
+  background: var(--sidebar);
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* ========================================
+   Inner Glow Effect for Cards
+   ======================================== */
+
+.inner-glow {
+  position: relative;
+}
+
+.inner-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 50%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ========================================
+   Animations - Smooth & Professional
+   ======================================== */
+
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -68,34 +163,140 @@ body {
   }
 }
 
-.card-entrance {
-  animation: slideInUp 0.3s ease-out;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.card-entrance {
+  animation: slideInUp 0.3s ease-out forwards;
+}
+
+/* ========================================
+   Drag & Drop States
+   ======================================== */
+
 .drag-preview {
-  transform: scale(1.05) translateY(-2px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+  transform: scale(1.02) rotate(1deg);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4) !important;
   z-index: 1000;
-  opacity: 0.85;
-  transition: transform 0.2s ease-out;
+  opacity: 0.95;
 }
 
 .drop-target-active {
-  background: rgba(59, 130, 246, 0.1);
-  border: 2px dashed rgba(59, 130, 246, 0.4);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+  border-radius: 8px;
 }
 
-/* Simplified scrollbar */
+/* ========================================
+   Scrollbar - Minimal & Elegant
+   ======================================== */
+
 .kanban-scrollbar::-webkit-scrollbar {
-  height: 8px;
+  height: 6px;
+  width: 6px;
 }
 
 .kanban-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background: transparent;
 }
 
 .kanban-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.6);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Column scrollbar */
+.column-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.column-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.column-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.column-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ========================================
+   Typography Utilities
+   ======================================== */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.font-display {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* ========================================
+   Ghost Button Style
+   ======================================== */
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+/* ========================================
+   Active Indicator for Sidebar
+   ======================================== */
+
+.sidebar-item-active {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-item-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ========================================
+   Empty State - Minimal
+   ======================================== */
+
+.empty-drop-zone {
+  border: 1px dashed var(--border-default);
+  border-radius: 8px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.empty-drop-zone:hover,
+.empty-drop-zone.active {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.05);
 }
