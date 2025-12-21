@@ -12,7 +12,6 @@ const statusLabels: Record<TaskStatus, string> = {
   'todo': 'Новая задача',
   'in-progress': 'Выполняется',
   'review': 'Ожидает проверки',
-  'testing': 'Тестирование',
   'done': 'Готово'
 };
 

@@ -68,25 +68,7 @@ const initialTasks: Task[] = [
     startDate: '2025-01-22',
     dueDate: '2025-01-23'
   },
-  {
-    id: '7',
-    title: 'Integration Testing',
-    description: 'Test API integrations and data flow',
-    status: 'testing',
-    projectId: 'default-project',
-    startDate: '2025-01-24',
-    dueDate: '2025-01-26'
-  },
-  {
-    id: '8',
-    title: 'Documentation Update',
-    description: 'Update API documentation and user guides',
-    status: 'testing',
-    projectId: 'default-project',
-    startDate: '2025-01-25',
-    dueDate: '2025-01-30'
-  },
-  {
+    {
     id: '9',
     title: 'Deploy to Production',
     description: 'Deploy application to production environment',

@@ -1,4 +1,4 @@
-export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'testing' | 'done';
+export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'done';
 
 export interface DateRange {
   startDate?: string; // ISO date format

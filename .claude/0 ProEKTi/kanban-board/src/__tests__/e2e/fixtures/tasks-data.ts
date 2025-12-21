@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Task, TaskStatus, Priority, Assignee, Tag } from '@/shared/types/task';
 
 // Constants for realistic task generation
-export const TASK_STATUSES: TaskStatus[] = ['todo', 'in-progress', 'review', 'testing', 'done'];
+export const TASK_STATUSES: TaskStatus[] = ['todo', 'in-progress', 'review', 'done'];
 export const PRIORITIES: Priority[] = ['urgent', 'high', 'medium', 'low'];
 
 export const SAMPLE_ASSIGNNIES: Assignee[] = [
@@ -170,8 +170,8 @@ export const createTestScenario = {
       title: 'Review Implementation',
       progress: 80
     }),
-    createTaskInStatus('testing', {
-      title: 'Test User Acceptance',
+    createTaskInStatus('review', {
+      title: 'Review User Acceptance',
       progress: 90
     }),
     createTaskInStatus('done', {
@@ -210,7 +210,7 @@ export const createTestScenario = {
     createRealisticTask({
       title: 'Cross-Team Integration',
       assignees: createRandomAssignees(2, 4),
-      status: 'testing',
+      status: 'review',
       progress: 75
     }),
   ],
@@ -321,7 +321,7 @@ export const createFilterTestDataset = (): Task[] => {
     createRealisticTask({
       title: 'User Authentication Fix',
       description: 'Resolve login session timeout and security issues',
-      status: 'testing',
+      status: 'review',
       priority: 'low',
       tags: [SAMPLE_TAGS[2], SAMPLE_TAGS[9]], // Bug, Security
       assignees: [SAMPLE_ASSIGNNIES[1]], // Bob
@@ -402,7 +402,7 @@ export const createSpecialCharTestDataset = (): Task[] => {
     createRealisticTask({
       title: 'File-Path Handling',
       description: 'Handle Windows/Unix file paths correctly',
-      status: 'testing',
+      status: 'review',
       priority: 'low',
     }),
     createRealisticTask({
@@ -543,7 +543,7 @@ export const FILTER_COMBINATIONS = {
     {
       search: 'Database',
       priorities: ['medium'],
-      statuses: ['review', 'testing'],
+      statuses: ['review', 'done'],
       tags: [SAMPLE_TAGS[1].id, SAMPLE_TAGS[7].id],
     },
   ],
