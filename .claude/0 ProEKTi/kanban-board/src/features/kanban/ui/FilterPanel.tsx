@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TaskFilters, TaskStatus, Priority } from '@/shared/types/task';
+import { TaskFilters, TaskStatus } from '@/shared/types/task';
 import { Search, Filter, X, RotateCcw } from 'lucide-react';
 
 interface FilterPanelProps {
@@ -16,19 +16,6 @@ const statusLabels: Record<TaskStatus, string> = {
   'done': 'Готово'
 };
 
-const priorityLabels: Record<Priority, string> = {
-  'urgent': 'Срочно',
-  'high': 'Высокий',
-  'medium': 'Средний',
-  'low': 'Низкий'
-};
-
-const priorityColors: Record<Priority, string> = {
-  'urgent': 'bg-red-500',
-  'high': 'bg-orange-500',
-  'medium': 'bg-yellow-500',
-  'low': 'bg-green-500'
-};
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChange, taskCount }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -37,13 +24,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChan
     onFiltersChange({ ...filters, ...updates });
   };
 
-  const handlePriorityToggle = (priority: Priority) => {
-    const newPriorities = filters.priorities.includes(priority)
-      ? filters.priorities.filter(p => p !== priority)
-      : [...filters.priorities, priority];
-    handleFilterChange({ priorities: newPriorities });
-  };
-
+  
   const handleStatusToggle = (status: TaskStatus) => {
     const newStatuses = filters.statuses.includes(status)
       ? filters.statuses.filter(s => s !== status)
@@ -54,7 +35,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChan
   const handleClearFilters = () => {
     onFiltersChange({
       search: '',
-      priorities: [],
       statuses: [],
       dateRange: {
         start: undefined,
@@ -66,7 +46,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChan
 
   const hasActiveFilters = !!(
     filters.search ||
-    filters.priorities.length > 0 ||
     filters.statuses.length > 0 ||
     filters.dateRange.start ||
     filters.dateRange.end ||
@@ -124,33 +103,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFiltersChan
             </div>
           </div>
 
-          {/* Priority Filters */}
-          <div>
-            <label className="text-gray-400 text-sm block mb-2">Приоритет</label>
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(priorityLabels) as Priority[]).map((priority) => (
-                <button
-                  key={priority}
-                  data-testid={`priority-${priority}`}
-                  onClick={() => handlePriorityToggle(priority)}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
-                    filters.priorities.includes(priority)
-                      ? 'text-white ring-2 ring-white/50'
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
-                  }`}
-                  style={{
-                    backgroundColor: filters.priorities.includes(priority)
-                      ? `${priorityColors[priority]}33`
-                      : 'transparent'
-                  }}
-                >
-                  <span className={`w-2 h-2 rounded-full ${priorityColors[priority]}`}></span>
-                  {priorityLabels[priority]}
-                </button>
-              ))}
-            </div>
-          </div>
-
+          
           {/* Status Filters */}
           <div>
             <label className="text-gray-400 text-sm block mb-2">Статус</label>

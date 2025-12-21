@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Task, TaskStatus, Priority, TaskFilters } from '@/shared/types/task';
+import { Task, TaskStatus, TaskFilters } from '@/shared/types/task';
 import { Project, CreateProjectInput, UpdateProjectInput, PROJECT_COLORS } from '@/shared/types/project';
 
 // Initial mock data to ensure board is never empty
@@ -10,143 +10,90 @@ const initialTasks: Task[] = [
     title: 'Bug Fix: Login validation issue',
     description: 'Fix critical login form validation bug affecting user authentication',
     status: 'todo',
-    priority: 'urgent',
     projectId: 'default-project',
     startDate: '2025-01-19',
-    dueDate: '2025-01-20',
-    assignees: [
-      { id: 'dev1', name: 'QA Team', color: '#EF4444' }
-    ],
-    progress: 0
+    dueDate: '2025-01-20'
   },
   {
     id: '1',
     title: 'Critical Bug Fix - Payment System',
     description: 'Fix critical payment processing bug affecting production users',
     status: 'todo',
-    priority: 'urgent',
     projectId: 'default-project',
     startDate: '2025-01-15',
-    dueDate: '2024-12-17', // Overdue - shows red indicator
-    assignees: [
-      { id: 'a1', name: 'Alex Smith', color: '#EF4444' },
-      { id: 'a2', name: 'Sarah Lee', color: '#F59E0B' }
-    ],
-    progress: 0
+    dueDate: '2025-01-17' // Overdue - shows red indicator
   },
   {
     id: '2',
     title: 'Analysis of competitors',
     description: 'Analyze competitor products and features',
     status: 'todo',
-    priority: 'medium',
     projectId: 'default-project',
     startDate: '2025-01-15',
-    dueDate: '2025-01-20',
-    assignees: [
-      { id: 'a3', name: 'Mike Chen', color: '#3B82F6' },
-      { id: 'a4', name: 'Tom Analyst', color: '#EC4899' }
-    ],
-    progress: 25
+    dueDate: '2025-01-20'
   },
   {
     id: '3',
     title: 'Create UI Kit',
     description: 'Design and develop component library',
     status: 'todo',
-    priority: 'high',
     projectId: 'default-project',
     startDate: '2025-01-15',
-    dueDate: '2024-12-19', // Due today - shows orange indicator
-    assignees: [
-      { id: 'a5', name: 'Lisa Designer', color: '#10B981' }
-    ],
-    progress: 0
+    dueDate: '2025-01-19' // Due today - shows orange indicator
   },
   {
     id: '4',
     title: 'Foundation Works',
     description: 'Excavation and concrete foundation for the main building',
     status: 'in-progress',
-    priority: 'urgent',
     projectId: 'default-project',
     startDate: '2025-01-10',
-    dueDate: '2024-12-22', // Due in 3 days - shows yellow indicator
-    assignees: [
-      { id: 'a6', name: 'John Builder', color: '#F59E0B' },
-      { id: 'a7', name: 'Tom Engineer', color: '#8B5CF6' }
-    ],
-    progress: 60
+    dueDate: '2025-01-22' // Due in 3 days - shows yellow indicator
   },
   {
     id: '5',
     title: 'User Authentication',
     description: 'Implement user login and registration system',
     status: 'in-progress',
-    priority: 'high',
     projectId: 'default-project',
     startDate: '2025-01-12',
-    dueDate: '2025-01-20',
-    assignees: [
-      { id: 'a8', name: 'Backend Team', color: '#6366F1' }
-    ],
-    progress: 40
+    dueDate: '2025-01-20'
   },
   {
     id: '6',
     title: 'Code Review',
     description: 'Review pull requests and provide feedback',
     status: 'review',
-    priority: 'medium',
     projectId: 'default-project',
     startDate: '2025-01-22',
-    dueDate: '2025-01-23',
-    assignees: [
-      { id: 'a9', name: 'Senior Devs', color: '#8B5CF6' }
-    ],
-    progress: 80
+    dueDate: '2025-01-23'
   },
   {
     id: '7',
     title: 'Integration Testing',
     description: 'Test API integrations and data flow',
     status: 'testing',
-    priority: 'high',
     projectId: 'default-project',
     startDate: '2025-01-24',
-    dueDate: '2025-01-26',
-    assignees: [
-      { id: 'a10', name: 'QA Team', color: '#EC4899' }
-    ],
-    progress: 45
+    dueDate: '2025-01-26'
   },
   {
     id: '8',
     title: 'Documentation Update',
     description: 'Update API documentation and user guides',
     status: 'testing',
-    priority: 'low',
     projectId: 'default-project',
     startDate: '2025-01-25',
-    dueDate: '2025-01-30',
-    assignees: [
-      { id: 'a11', name: 'Tech Writer', color: '#10B981' }
-    ],
-    progress: 20
+    dueDate: '2025-01-30'
   },
   {
     id: '9',
     title: 'Deploy to Production',
     description: 'Deploy application to production environment',
     status: 'done',
-    priority: 'medium',
     projectId: 'default-project',
     startDate: '2025-01-20',
-    dueDate: '2025-01-21',
-    assignees: [
-      { id: 'a12', name: 'DevOps', color: '#F59E0B' }
-    ],
-    progress: 100
+    dueDate: '2025-01-21'
   }
 ];
 
@@ -226,7 +173,6 @@ export const useKanbanStore = create<KanbanStore>()(
       // Initial filters - all empty
       filters: {
         search: '',
-        priorities: [],
         statuses: [],
         dateRange: {
           start: undefined,
@@ -318,14 +264,10 @@ export const useKanbanStore = create<KanbanStore>()(
           title: taskData?.title || 'Новая задача',
           description: taskData?.description || 'Введите описание...',
           status,
-          priority: taskData?.priority || 'medium',
           projectId: currentProject.id,
           // Default values for new fields
           startDate: taskData?.startDate,
-          dueDate: taskData?.dueDate,
-          assignees: taskData?.assignees || [],
-          progress: taskData?.progress ?? 0,
-          ...taskData
+          dueDate: taskData?.dueDate
         };
 
         // Update task count for the project
@@ -348,16 +290,6 @@ export const useKanbanStore = create<KanbanStore>()(
           // Validate and sanitize updates
           const sanitizedUpdates = { ...updates };
 
-          // Remove tags field if present (tags feature has been removed)
-          if ('tags' in sanitizedUpdates) {
-            delete sanitizedUpdates.tags;
-          }
-
-          // Validate progress is within 0-100
-          if ('progress' in sanitizedUpdates) {
-            sanitizedUpdates.progress = Math.max(0, Math.min(100, sanitizedUpdates.progress ?? 0));
-          }
-
           // Validate dates are in proper format
           if ('startDate' in sanitizedUpdates && sanitizedUpdates.startDate) {
             const startDate = new Date(sanitizedUpdates.startDate);
@@ -371,11 +303,6 @@ export const useKanbanStore = create<KanbanStore>()(
             if (isNaN(dueDate.getTime())) {
               delete sanitizedUpdates.dueDate;
             }
-          }
-
-          // Validate assignees array
-          if ('assignees' in sanitizedUpdates && !Array.isArray(sanitizedUpdates.assignees)) {
-            delete sanitizedUpdates.assignees;
           }
 
           return { ...task, ...sanitizedUpdates };
@@ -423,7 +350,6 @@ export const useKanbanStore = create<KanbanStore>()(
       clearFilters: () => set({
         filters: {
           search: '',
-          priorities: [],
           statuses: [],
           dateRange: {
             start: undefined,
@@ -445,11 +371,7 @@ export const useKanbanStore = create<KanbanStore>()(
             if (!titleMatch && !descriptionMatch) return false;
           }
 
-          // Priority filter
-          if (filters.priorities.length > 0) {
-            if (!filters.priorities.includes(task.priority)) return false;
-          }
-
+          
           // Status filter
           if (filters.statuses.length > 0) {
             if (!filters.statuses.includes(task.status)) return false;
@@ -539,7 +461,6 @@ export const useKanbanStore = create<KanbanStore>()(
           if (!state.filters) {
             state.filters = {
               search: '',
-              priorities: [],
               statuses: [],
               dateRange: {
                 start: undefined,

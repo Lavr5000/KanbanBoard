@@ -80,11 +80,7 @@ const KanbanBoardContent = () => {
       return false;
     }
 
-    // Priority filter
-    if (filters.priorities.length > 0 && !filters.priorities.includes(task.priority)) {
-      return false;
-    }
-
+    
     // Status filter
     if (filters.statuses.length > 0 && !filters.statuses.includes(task.status)) {
       return false;

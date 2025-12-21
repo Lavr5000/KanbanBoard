@@ -4,10 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useKanbanStore } from '@/shared/store/kanbanStore';
 import { Task } from '@/shared/types/task';
 import { GripVertical, Trash2 } from 'lucide-react';
-import { ProgressBar } from '@/shared/ui/ProgressBar';
-import { AssigneeGroup } from '@/shared/ui/AssigneeAvatar';
 import { DueDateIndicator } from '@/shared/ui/DueDateIndicator';
-import { PriorityBadge, PrioritySelector } from '@/shared/ui/PriorityBadge';
 
 export const KanbanCard = ({ task }: { task: Task }) => {
   const { updateTask, deleteTask, projects } = useKanbanStore();
@@ -22,10 +19,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
   const [editValues, setEditValues] = useState({
     title: task.title,
     description: task.description,
-    priority: task.priority,
     startDate: task.startDate,
-    dueDate: task.dueDate,
-    progress: task.progress
+    dueDate: task.dueDate
   });
 
   const {
@@ -48,10 +43,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     setEditValues({
       title: task.title,
       description: task.description,
-      priority: task.priority,
       startDate: task.startDate,
-      dueDate: task.dueDate,
-      progress: task.progress
+      dueDate: task.dueDate
     });
     setIsEditing(true);
   };
@@ -79,10 +72,8 @@ export const KanbanCard = ({ task }: { task: Task }) => {
     setEditValues({
       title: task.title,
       description: task.description,
-      priority: task.priority,
       startDate: task.startDate,
-      dueDate: task.dueDate,
-      progress: task.progress
+      dueDate: task.dueDate
     });
     setIsEditing(false);
   };
@@ -140,9 +131,6 @@ export const KanbanCard = ({ task }: { task: Task }) => {
         {...listeners}
         className="flex items-center justify-between mb-3 cursor-grab active:cursor-grabbing"
       >
-        <div className="flex items-center gap-2">
-          <PriorityBadge priority={task.priority} size="xs" />
-        </div>
         <div className="flex items-center gap-1">
           <div className="opacity-40 group-hover:opacity-100 text-white/30 hover:text-white/80 transition-all duration-300 hover:bg-white/10 p-2 rounded-lg backdrop-blur-sm hover:scale-105">
             <GripVertical size={20} />
@@ -189,63 +177,38 @@ export const KanbanCard = ({ task }: { task: Task }) => {
             onFocus={(e) => e.stopPropagation()}
           />
 
-          {/* Priority and Construction Fields Editing */}
+          {/* Dates Editing */}
           <div className="space-y-2 pt-2 border-t border-white/10" onClick={(e) => e.stopPropagation()}>
-            {/* Priority */}
-            <div>
-              <label className="text-label text-gray-400 block mb-1">Priority</label>
-              <PrioritySelector
-                value={editValues.priority}
-                onChange={(priority) => setEditValues({ ...editValues, priority })}
-                size="xs"
-              />
-            </div>
-
             {/* Dates */}
             <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-label text-gray-400 block mb-1">Start Date</label>
+              <div
+                className="flex-1 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition-colors border border-white/10"
+                onClick={(e) => e.currentTarget.querySelector('input')?.focus()}
+              >
+                <label className="text-xs text-gray-400 block mb-2">Дата начала</label>
                 <input
                   type="date"
-                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer"
                   value={editValues.startDate || ''}
                   onChange={(e) => setEditValues({ ...editValues, startDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
-              <div className="flex-1">
-                <label className="text-label text-gray-400 block mb-1">Due Date</label>
+              <div
+                className="flex-1 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition-colors border border-white/10"
+                onClick={(e) => e.currentTarget.querySelector('input')?.focus()}
+              >
+                <label className="text-xs text-gray-400 block mb-2">Дата окончания</label>
                 <input
                   type="date"
-                  className="w-full bg-white/5 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-blue-400/50 transition-all"
+                  className="w-full bg-transparent text-sm text-white outline-none cursor-pointer"
                   value={editValues.dueDate || ''}
                   onChange={(e) => setEditValues({ ...editValues, dueDate: e.target.value || undefined })}
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
             </div>
-
-            {/* Progress */}
-            <div onClick={(e) => e.stopPropagation()}>
-              <label className="text-label text-gray-400 block mb-1">
-                Progress: {editValues.progress || 0}%
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                value={editValues.progress || 0}
-                onChange={(e) => {
-                  const progress = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                  setEditValues({ ...editValues, progress });
-                }}
-                onClick={(e) => e.stopPropagation()}
-                data-testid="progress-slider"
-              />
-            </div>
-
-                      </div>
+          </div>
         </div>
       ) : (
         <div onClick={handleStartEdit} className="cursor-text">
@@ -278,47 +241,9 @@ export const KanbanCard = ({ task }: { task: Task }) => {
               )}
             </div>
 
-            {/* Assignees */}
-            {task.assignees && task.assignees.length > 0 && (
-              <div className="mb-2">
-                <AssigneeGroup
-                  assignees={task.assignees}
-                  maxVisible={3}
-                  size="xs"
-                />
-              </div>
-            )}
-
-            
-            {/* Progress */}
-            {task.progress !== undefined ? (
-              <ProgressBar
-                progress={task.progress}
-                size="sm"
-                showLabel={task.progress > 0}
-                color={task.progress >= 75 ? 'green' :
-                       task.progress >= 50 ? 'yellow' :
-                       task.progress >= 25 ? 'blue' : 'red'}
-                editable={true}
-                onProgressChange={(newProgress) => updateTask(task.id, { progress: newProgress })}
-              />
-            ) : (
-              <div
-                className="text-caption text-zinc-500 italic p-2 cursor-pointer hover:bg-white/5 rounded transition-colors"
-                onClick={() => {
-                  updateTask(task.id, { progress: 0 });
-                }}
-              >
-                + Add progress
-              </div>
-            )}
-          </div>
+            </div>
         </div>
       )}
-
-      <div className="mt-3 flex items-center justify-between">
-        <PriorityBadge priority={task.priority} size="xs" showLabel={true} />
-      </div>
     </div>
   );
 };
