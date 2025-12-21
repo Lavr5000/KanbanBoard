@@ -7,11 +7,6 @@ export interface Assignee {
   color?: string;
 }
 
-export interface Tag {
-  id: string;
-  name: string;
-  color: string;
-}
 
 export interface DateRange {
   startDate?: string; // ISO date format
@@ -26,12 +21,12 @@ export interface Task {
   description: string;
   status: TaskStatus;
   priority: Priority;
+  projectId: string; // Link to project
   // Construction fields
   startDate?: string; // ISO date format
   dueDate?: string;   // ISO date format
   assignees?: Assignee[]; // Array of assignees
   progress?: number;   // 0-100
-  tags?: Tag[];        // Array of tags for categorization
 }
 
 export interface Column {

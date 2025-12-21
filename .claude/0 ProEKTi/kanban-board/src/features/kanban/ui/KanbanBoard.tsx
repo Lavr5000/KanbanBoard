@@ -46,7 +46,7 @@ export const KanbanBoard = () => {
 // Inner component that contains all the hooks
 const KanbanBoardContent = () => {
   // Now all hooks are called consistently in every render
-  const { addTask, filters, setFilters, getFilteredTasks } = useKanbanStore();
+  const { addTask, filters, setFilters, getCurrentProjectTasks } = useKanbanStore();
   const { handleDragEnd } = useKanbanDnD();
 
   const sensors = useSensors(
@@ -69,9 +69,51 @@ const KanbanBoardContent = () => {
     { id: 'done', title: 'Готово', taskIds: [] }
   ];
 
-  // Create columns with current task data using filtered tasks
+  // Get current project tasks
+  const currentProjectTasks = getCurrentProjectTasks();
+
+  // Apply filters to current project tasks
+  const filteredTasks = currentProjectTasks.filter(task => {
+    // Search filter
+    if (filters.search && !task.title.toLowerCase().includes(filters.search.toLowerCase()) &&
+        !task.description.toLowerCase().includes(filters.search.toLowerCase())) {
+      return false;
+    }
+
+    // Priority filter
+    if (filters.priorities.length > 0 && !filters.priorities.includes(task.priority)) {
+      return false;
+    }
+
+    // Status filter
+    if (filters.statuses.length > 0 && !filters.statuses.includes(task.status)) {
+      return false;
+    }
+
+    // Date range filter
+    if (filters.dateRange.start && task.dueDate) {
+      const taskDate = new Date(task.dueDate);
+      const startDate = new Date(filters.dateRange.start);
+      if (taskDate < startDate) return false;
+    }
+
+    if (filters.dateRange.end && task.dueDate) {
+      const taskDate = new Date(task.dueDate);
+      const endDate = new Date(filters.dateRange.end);
+      if (taskDate > endDate) return false;
+    }
+
+    if (filters.dateRange.hasDueDate !== undefined) {
+      const hasDueDate = !!task.dueDate;
+      if (filters.dateRange.hasDueDate !== hasDueDate) return false;
+    }
+
+    return true;
+  });
+
+  // Create columns with current task data
   const columnsWithData: (Column & { tasks: Task[] })[] = columnConfig.map(column => {
-    const tasks = getFilteredTasks().filter(task => task.status === column.id);
+    const tasks = filteredTasks.filter(task => task.status === column.id);
     return {
       ...column,
       taskIds: tasks.map((t: Task) => t.id),
@@ -84,7 +126,7 @@ const KanbanBoardContent = () => {
       <FilterPanel
         filters={filters}
         onFiltersChange={setFilters}
-        taskCount={getFilteredTasks().length}
+        taskCount={filteredTasks.length}
       />
       <div className="flex-1">
         <DndContext

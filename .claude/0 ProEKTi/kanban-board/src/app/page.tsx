@@ -1,7 +1,10 @@
 "use client";
 import { KanbanSquare, Search, Bell, LogOut } from "lucide-react";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { useKanbanStore } from "@/shared/store/kanbanStore";
+import { ProjectSidebar } from "@/features/projects/ui/ProjectSidebar";
+import { Project } from "@/shared/types/project";
 
 // Beautiful loading component
 const BoardLoader = () => (
@@ -24,37 +27,36 @@ const KanbanBoard = dynamic(() => import("@/features/kanban/ui/KanbanBoard"), {
 });
 
 export default function Home() {
+  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+
+  const handleProjectSelect = (project: Project) => {
+    setCurrentProject(project);
+  };
+
   return (
     <main className="flex h-screen w-full bg-[#0D1117] text-gray-300 font-sans overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-[250px] border-r border-[#30363D] bg-[#010409] p-4 flex flex-col">
-        <div className="flex items-center gap-3 mb-8 text-white">
-          <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg text-white shadow-lg">
-            <KanbanSquare size={20}/>
-          </div>
-          <div>
-            <h1 className="font-bold text-xl">Kanban Pro</h1>
-            <p className="text-caption text-gray-400">Task Management</p>
-          </div>
-        </div>
-
-        <nav className="space-y-1">
-            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#1F6FEB] text-white cursor-pointer transition-all duration-200 hover:bg-[#1F6FEB]/90">
-                <KanbanSquare size={20} /> <span className="text-sm font-medium">Канбан доска</span>
-            </div>
-        </nav>
-
-        <div className="mt-auto">
-             <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:text-red-400 cursor-pointer hover:bg-[#161B22]">
-                <LogOut size={20} /> <span className="text-sm font-medium">Выйти</span>
-            </div>
-        </div>
-      </aside>
+      {/* Dynamic Project Sidebar */}
+      <ProjectSidebar onProjectSelect={handleProjectSelect} />
 
       {/* Main Content */}
       <section className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="h-[70px] border-b border-[#30363D] flex items-center justify-between px-8 shrink-0 bg-[#0D1117]">
-          <h2 className="text-2xl font-semibold text-white">Канбан доска</h2>
+          <div className="flex items-center gap-3">
+            {currentProject && (
+              <>
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: currentProject.color }}
+                />
+                <h2 className="text-2xl font-semibold text-white">
+                  {currentProject.name}
+                </h2>
+              </>
+            )}
+            {!currentProject && (
+              <h2 className="text-2xl font-semibold text-white">Канбан доска</h2>
+            )}
+          </div>
           <div className="flex gap-6 items-center">
             <div className="flex items-center gap-2 bg-[#161B22] border border-[#30363D] px-3 py-1.5 rounded-lg text-sm text-gray-400 min-w-[200px]">
                 <Search size={16} /> <span>Поиск...</span>
