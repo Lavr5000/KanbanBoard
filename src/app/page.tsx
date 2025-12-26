@@ -2,6 +2,7 @@
 
 import { Sidebar } from "@/widgets/sidebar/ui/Sidebar";
 import { Board } from "@/widgets/board/ui/Board";
+import { UserMenu } from "@/widgets/user-menu/ui/UserMenu";
 import { Bell, Search } from "lucide-react";
 import { useBoardStore } from "@/entities/task/model/store";
 import { useBoardStats } from "@/entities/task/model/store";
@@ -57,15 +58,7 @@ export default function Home() {
                 3
               </span>
             </button>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-sm text-white font-medium">Евгений А.</p>
-                <p className="text-[10px] text-gray-500">UX/UI Designer</p>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 border border-white/10 flex items-center justify-center text-white font-bold">
-                EA
-              </div>
-            </div>
+            <UserMenu />
           </div>
         </header>
 
