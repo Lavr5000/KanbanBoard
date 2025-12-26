@@ -1,12 +1,13 @@
 "use client";
 
-import { Home, Users, LayoutDashboard, ListTodo, PieChart, Play, Download, Trash2 } from "lucide-react";
+import { Home, Users, LayoutDashboard, ListTodo, PieChart, Play, Download, Trash2, LogOut } from "lucide-react";
 import { clsx } from "clsx";
 import { useBoardStats, useBoardStore } from "@/entities/task/model/store";
 import { exportToJson } from "@/shared/lib/exportData";
 import { useState } from "react";
 import { Modal } from "@/shared/ui/Modal";
 import { TeamModal } from "@/features/team/ui/TeamModal";
+import { useAuth } from "@/providers/AuthProvider";
 
 const navItems = [
   { icon: Home, label: "На главную", id: "home" },
@@ -21,6 +22,7 @@ export const Sidebar = () => {
   const { tasks, columns, clearBoard, setSearchQuery, members } = useBoardStore();
   const [activeItem, setActiveItem] = useState("kanban");
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const handleExport = () => {
     exportToJson({ tasks, columns, exportedAt: new Date().toISOString() });
@@ -123,9 +125,32 @@ export const Sidebar = () => {
           <Trash2 size={14} />
           Очистить доску
         </button>
+        <button
+          onClick={signOut}
+          className="w-full flex items-center gap-3 px-4 py-2 text-xs text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
+        >
+          <LogOut size={14} />
+          Выйти
+        </button>
       </div>
 
-      <div className="p-4 mt-auto">
+      <div className="p-4 mt-auto space-y-3">
+        {user && (
+          <div className="bg-[#1c1c24] p-3 rounded-xl border border-gray-800">
+            <p className="text-xs text-gray-400 mb-1">Пользователь</p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                {user.email?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-white font-medium truncate">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="bg-[#1c1c24] p-4 rounded-2xl border border-gray-800">
           <p className="text-xs text-gray-400 mb-2">Проект</p>
           <div className="flex items-center justify-between">
