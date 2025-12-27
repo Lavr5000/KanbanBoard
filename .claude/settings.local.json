@@ -9,7 +9,14 @@
       "Bash(tree:*)",
       "Bash(git add:*)",
       "Bash(git reset:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(timeout:*)",
+      "Bash(test:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)"
     ]
   }
 }
