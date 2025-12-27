@@ -2,13 +2,57 @@
 
 import { Sidebar } from "@/widgets/sidebar/ui/Sidebar";
 import { Board } from "@/widgets/board/ui/Board";
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, LogOut } from "lucide-react";
 import { useBoardStore } from "@/entities/task/model/store";
 import { useBoardStats } from "@/entities/task/model/store";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Home() {
+  const { user, signOut } = useAuth();
   const { searchQuery, setSearchQuery } = useBoardStore();
   const stats = useBoardStats();
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = '/login';
+  };
+
+  // Get user initials
+  const getUserInitials = () => {
+    // Try to get from full_name metadata first (for Cyrillic names)
+    const fullName = user?.user_metadata?.full_name;
+    if (fullName) {
+      // For Cyrillic: take first 2 characters
+      const words = fullName.trim().split(' ');
+      if (words.length >= 2) {
+        // Take first letter of first name and first letter of last name
+        return (words[0][0] + words[1][0]).toUpperCase();
+      }
+      // If only one word, take first 2 characters
+      return fullName.substring(0, 2).toUpperCase();
+    }
+
+    // Fallback to email
+    if (!user?.email) return 'U';
+    const email = user.email;
+    const name = email.split('@')[0];
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  // Get display name
+  const getDisplayName = () => {
+    // Try to get from full_name metadata first (for Cyrillic names)
+    const fullName = user?.user_metadata?.full_name;
+    if (fullName) {
+      return fullName.trim();
+    }
+
+    // Fallback to email
+    if (!user?.email) return 'User';
+    const email = user.email;
+    const name = email.split('@')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
   const progressPercentage = Math.round((stats.done / (stats.total || 1)) * 100);
 
   return (
@@ -59,12 +103,19 @@ export default function Home() {
             </button>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm text-white font-medium">Евгений А.</p>
-                <p className="text-[10px] text-gray-500">UX/UI Designer</p>
+                <p className="text-sm text-white font-medium">{getDisplayName()}</p>
+                <p className="text-[10px] text-gray-500">{user?.email || 'User'}</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 border border-white/10 flex items-center justify-center text-white font-bold">
-                EA
+                {getUserInitials()}
               </div>
+              <button
+                onClick={handleSignOut}
+                className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+                title="Sign out"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
           </div>
         </header>
