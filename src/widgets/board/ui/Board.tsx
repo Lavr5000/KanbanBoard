@@ -25,19 +25,12 @@ export const Board = () => {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<Id | null>(null);
 
-  // Log tasks changes for debugging
-  useEffect(() => {
-    console.log('📊 Tasks updated:', tasks.map(t => ({ id: t.id, content: t.content?.substring(0, 20) || 'No content', columnId: t.columnId })));
-  }, [tasks]);
-
   // Filter tasks based on search query
   const filteredTasks = tasks.filter(
     (t) =>
       (t.content?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
       (t.tags?.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())) ?? false)
   );
-
-  console.log('🔍 Filtered tasks:', filteredTasks.length, 'Total:', tasks.length);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -69,37 +62,26 @@ export const Board = () => {
 
     // 1. Dropping a Task over another Task - just change column, don't reorder yet
     if (isActiveATask && isOverATask) {
-      const activeTaskObj = tasks.find((t) => t.id === activeId);
-      const overTaskObj = tasks.find((t) => t.id === overId);
-
-      console.log('🎯 DragOver: Task over Task', {
-        activeTask: activeTaskObj?.content?.substring(0, 30),
-        fromColumn: activeTaskObj?.columnId,
-        toColumn: overTaskObj?.columnId
-      });
+      const activeTaskObj = tasks.find((t) => t.id === String(activeId));
+      const overTaskObj = tasks.find((t) => t.id === String(overId));
 
       if (activeTaskObj && overTaskObj && activeTaskObj.columnId !== overTaskObj.columnId) {
-        // Use moveTask action from store instead of setTasks
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to', overTaskObj.columnId);
-        useBoardStore.getState().moveTask(activeId, overTaskObj.columnId);
+        useBoardStore.getState().moveTask(String(activeId), overTaskObj.columnId);
       }
     }
 
     // 2. Dropping a Task over a Column
     const overColumnId = over.id;
-    const activeTaskObj = tasks.find((t) => t.id === activeId);
+    const activeTaskObj = tasks.find((t) => t.id === String(activeId));
 
-    if (activeTaskObj && columns.some((c) => c.id === overColumnId)) {
-      if (activeTaskObj.columnId !== overColumnId) {
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to column', overColumnId);
-        // Use moveTask action from store
-        useBoardStore.getState().moveTask(activeId, overColumnId);
+    if (activeTaskObj && columns.some((c) => c.id === String(overColumnId))) {
+      if (activeTaskObj.columnId !== String(overColumnId)) {
+        useBoardStore.getState().moveTask(String(activeId), String(overColumnId));
       }
     }
   };
 
   const onDragEnd = (event: DragEndEvent) => {
-    console.log('🏁 DragEnd:', { activeId: event.active.id, overId: event.over?.id });
     setActiveTask(null);
   };
 
@@ -114,7 +96,6 @@ export const Board = () => {
         <div className="flex gap-8">
           {columns.map((col) => {
             const columnTasks = filteredTasks.filter((t) => t.columnId === col.id);
-            console.log(`📋 Column "${col.title}":`, columnTasks.length, 'tasks');
             return (
               <Column
                 key={col.id}
