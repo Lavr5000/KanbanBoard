@@ -1,6 +1,8 @@
 "use client";
 
 import { useBoardStore } from "@/entities/task/model/store";
+import { useBoardContext } from "@/widgets/board/model/BoardContext";
+import { uiTaskToSupabase } from "@/lib/adapters/taskAdapter";
 import { Task, TaskType } from "@/entities/task/model/types";
 import { useState, useEffect } from "react";
 import { typeStyles } from "@/entities/task/lib/getColorByType";
@@ -15,7 +17,7 @@ export const EditTaskModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const updateTask = useBoardStore((state) => state.updateTask);
+  const { updateTask } = useBoardContext();
   const members = useBoardStore((state) => state.members);
   const [content, setContent] = useState(task.content);
   const [priority, setPriority] = useState(task.priority);
@@ -30,15 +32,12 @@ export const EditTaskModal = ({
   }, [task]);
 
   const handleSave = () => {
-    updateTask(task.id, {
-      content,
-      priority,
-      type,
-      assigneeId,
-      status: task.status,
-      tags: task.tags,
-      createdAt: task.createdAt,
-      columnId: task.columnId
+    // Convert UI fields to Supabase format
+    // Only update fields that exist in Supabase schema
+    updateTask(String(task.id), {
+      title: content,
+      priority: priority,
+      // Note: type, assigneeId, status, tags not yet in Supabase schema
     });
     onClose();
   };

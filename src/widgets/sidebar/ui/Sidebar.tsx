@@ -2,9 +2,11 @@
 
 import { Home, Users, LayoutDashboard, ListTodo, PieChart, Play, Download, Trash2, LogOut } from "lucide-react";
 import { clsx } from "clsx";
-import { useBoardStats, useBoardStore } from "@/entities/task/model/store";
+import { useBoardStore } from "@/entities/task/model/store";
+import { useBoardData } from "@/hooks/useBoardData";
+import { useUIStore } from "@/entities/ui/model/store";
 import { exportToJson } from "@/shared/lib/exportData";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Modal } from "@/shared/ui/Modal";
 import { TeamModal } from "@/features/team/ui/TeamModal";
 import { useAuth } from "@/providers/AuthProvider";
@@ -18,11 +20,44 @@ const navItems = [
 ];
 
 export const Sidebar = () => {
-  const stats = useBoardStats();
-  const { tasks, columns, clearBoard, setSearchQuery, members } = useBoardStore();
+  const { columns, tasks } = useBoardData();
+  const { setSearchQuery } = useUIStore();
+  const { members } = useBoardStore(); // Keep members from old store for now
   const [activeItem, setActiveItem] = useState("kanban");
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const { user, signOut } = useAuth();
+
+  // Calculate stats from Supabase tasks
+  const stats = useMemo(() => {
+    const columnNames = columns.map(c => c.title.toLowerCase());
+    return {
+      total: tasks.length,
+      todo: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('новая') || col?.title.toLowerCase().includes('new');
+      }).length,
+      inProgress: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('выполняется') || col?.title.toLowerCase().includes('progress');
+      }).length,
+      awaitingReview: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('проверки') || col?.title.toLowerCase().includes('review');
+      }).length,
+      testing: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('тестировании') || col?.title.toLowerCase().includes('testing');
+      }).length,
+      revision: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('доработку') || col?.title.toLowerCase().includes('revision');
+      }).length,
+      done: tasks.filter(t => {
+        const col = columns.find(c => c.id === t.column_id);
+        return col?.title.toLowerCase().includes('готово') || col?.title.toLowerCase().includes('done');
+      }).length,
+    };
+  }, [tasks, columns]);
 
   const handleExport = () => {
     exportToJson({ tasks, columns, exportedAt: new Date().toISOString() });
@@ -118,6 +153,7 @@ export const Sidebar = () => {
           <Download size={14} />
           Экспортировать данные
         </button>
+        {/* TODO: Implement clearBoard with Supabase delete
         <button
           onClick={clearBoard}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
@@ -125,6 +161,7 @@ export const Sidebar = () => {
           <Trash2 size={14} />
           Очистить доску
         </button>
+        */}
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"

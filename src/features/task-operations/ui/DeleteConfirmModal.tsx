@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal } from "@/shared/ui/Modal";
-import { useBoardStore } from "@/entities/task/model/store";
+import { useBoardContext } from "@/widgets/board/model/BoardContext";
 import { Id } from "@/entities/task/model/types";
 
 export const DeleteConfirmModal = ({
@@ -13,11 +13,11 @@ export const DeleteConfirmModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const deleteTask = useBoardStore((state) => state.deleteTask);
+  const { deleteTask } = useBoardContext();
 
   const handleConfirm = () => {
     if (taskId) {
-      deleteTask(taskId);
+      deleteTask(String(taskId));
       onClose();
     }
   };
