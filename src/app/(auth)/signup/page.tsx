@@ -20,20 +20,27 @@ export default function SignupPage() {
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
       if (error) throw error
 
-      router.push('/')
-      router.refresh()
+      // Check if user was created and if email confirmation is required
+      if (data.user && !data.session) {
+        setError('Registration successful! Please check your email to confirm your account.')
+      } else if (data.session) {
+        // Auto-login if email confirmation is disabled
+        router.push('/')
+        router.refresh()
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign up')
     } finally {
@@ -71,7 +78,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
               placeholder="John Doe"
             />
           </div>
@@ -89,7 +96,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
               placeholder="you@example.com"
             />
           </div>
@@ -108,7 +115,7 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
               placeholder="••••••••"
             />
             <p className="mt-1 text-sm text-gray-500">
