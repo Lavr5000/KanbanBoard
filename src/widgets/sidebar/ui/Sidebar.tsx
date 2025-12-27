@@ -18,7 +18,7 @@ const navItems = [
 
 export const Sidebar = () => {
   const stats = useBoardStats();
-  const { tasks, columns, clearBoard, setSearchQuery, members } = useBoardStore();
+  const { tasks, columns, clearBoard, confirmClearBoard, setSearchQuery, members, isConfirmClearOpen, setConfirmClearOpen } = useBoardStore();
   const [activeItem, setActiveItem] = useState("kanban");
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 
@@ -38,7 +38,7 @@ export const Sidebar = () => {
         setSearchQuery(""); // Show all tasks (same as kanban for now)
         break;
       case "home":
-        console.log(`Navigation to ${label} - Coming soon!`);
+        // Navigation to home - Coming soon
         break;
       case "team":
         setIsTeamModalOpen(true); // Open team modal
@@ -117,7 +117,7 @@ export const Sidebar = () => {
           Экспортировать данные
         </button>
         <button
-          onClick={clearBoard}
+          onClick={confirmClearBoard}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
         >
           <Trash2 size={14} />
@@ -130,7 +130,7 @@ export const Sidebar = () => {
           <p className="text-xs text-gray-400 mb-2">Проект</p>
           <div className="flex items-center justify-between">
             <span className="text-sm text-white font-medium truncate">
-              Dashboard дизайн
+              Kanban Board 2.0
             </span>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           </div>
@@ -143,6 +143,33 @@ export const Sidebar = () => {
         title="Наша команда"
       >
         <TeamModal members={members} />
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmClearOpen}
+        onClose={() => setConfirmClearOpen(false)}
+        title="Подтверждение"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-400 text-sm">
+            Вы уверены, что хотите удалить <span className="font-bold text-red-500">ВСЕ задачи</span>?
+            Это действие нельзя отменить.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setConfirmClearOpen(false)}
+              className="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-medium py-2 rounded-lg transition-all"
+            >
+              Отмена
+            </button>
+            <button
+              onClick={clearBoard}
+              className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold py-2 rounded-lg transition-all"
+            >
+              Удалить всё
+            </button>
+          </div>
+        </div>
       </Modal>
     </aside>
   );

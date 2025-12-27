@@ -13,6 +13,7 @@ interface BoardState {
   tasks: Task[];
   searchQuery: string;
   members: Member[];
+  isConfirmClearOpen: boolean;
 
   // Actions
   setTasks: (tasks: Task[]) => void;
@@ -22,6 +23,8 @@ interface BoardState {
   updateTask: (id: Id, data: Partial<Task>) => void;
   moveTask: (taskId: Id, columnId: Id) => void;
   setSearchQuery: (query: string) => void;
+  setConfirmClearOpen: (isOpen: boolean) => void;
+  confirmClearBoard: () => void;
   clearBoard: () => void;
 }
 
@@ -40,22 +43,24 @@ export const useBoardStore = create<BoardState>()(
       tasks: [],
       searchQuery: "",
       members: mockMembers,
+      isConfirmClearOpen: false,
 
       setTasks: (tasks) => set({ tasks }),
       setColumns: (columns) => set({ columns }),
       setSearchQuery: (query) => set({ searchQuery: query }),
+      setConfirmClearOpen: (isOpen) => set({ isConfirmClearOpen: isOpen }),
 
       addTask: (columnId) => set((state) => ({
         tasks: [
           ...state.tasks,
           {
-            id: Math.floor(Math.random() * 10001),
+            id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             columnId,
             content: `Новая задача ${state.tasks.length + 1}`,
             priority: "medium",
             status: "active",
             type: "feature",
-            tags: ["UI"],
+            tags: [],
             createdAt: new Date().toISOString(),
           },
         ],
@@ -70,18 +75,18 @@ export const useBoardStore = create<BoardState>()(
       })),
 
       moveTask: (taskId, columnId) => {
-        console.log('📦 moveTask called:', { taskId, columnId });
         set((state) => {
           const updatedTasks = state.tasks.map((t) => (t.id === taskId ? { ...t, columnId } : t));
-          console.log('📦 Updated tasks:', updatedTasks.map(t => ({ id: t.id, columnId: t.columnId })));
           return { tasks: updatedTasks };
         });
       },
 
+      confirmClearBoard: () => {
+        set({ isConfirmClearOpen: true });
+      },
+
       clearBoard: () => {
-        if (confirm("Вы уверены, что хотите удалить ВСЕ задачи?")) {
-          set({ tasks: [] });
-        }
+        set({ tasks: [], isConfirmClearOpen: false });
       },
     }),
     {
@@ -94,13 +99,18 @@ export const useBoardStore = create<BoardState>()(
 export const useBoardStats = () => {
   const tasks = useBoardStore((state) => state.tasks);
 
-  return {
+  const stats = {
     total: tasks.length,
     todo: tasks.filter((t) => t.columnId === "todo").length,
     inProgress: tasks.filter((t) => t.columnId === "in-progress").length,
     awaitingReview: tasks.filter((t) => t.columnId === "awaiting-review").length,
     testing: tasks.filter((t) => t.columnId === "testing").length,
     revision: tasks.filter((t) => t.columnId === "revision").length,
-    done: tasks.filter((t) => t.columnId === "revision").length, // Revision = done
+  };
+
+  // Calculate done as sum of testing + revision (tasks that passed review)
+  return {
+    ...stats,
+    done: stats.testing + stats.revision,
   };
 };

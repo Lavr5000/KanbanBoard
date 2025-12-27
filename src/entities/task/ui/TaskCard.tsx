@@ -100,7 +100,7 @@ export const TaskCard = ({ task, onDeleteTrigger }: Props) => {
         </p>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {task.tags.map((tag) => (
+          {task.tags?.map((tag) => (
             <span
               key={tag}
               className="px-2 py-1 bg-[#252530] text-gray-300 text-[10px] rounded-md border border-gray-800"
