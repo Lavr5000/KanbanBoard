@@ -14,14 +14,32 @@ import {
 } from "@dnd-kit/core";
 import { createPortal } from "react-dom";
 
-import { useBoardStore } from "@/entities/task/model/store";
+import { useUIStore } from "@/entities/ui/model/store";
+import { useBoardData } from "@/hooks/useBoardData";
+import { supabaseTaskToUI, supabaseColumnToUI } from "@/lib/adapters/taskAdapter";
+import { BoardContext } from "@/widgets/board/model/BoardContext";
 import { Column } from "@/entities/column/ui/Column";
 import { TaskCard } from "@/entities/task/ui/TaskCard";
 import { Task, Id } from "@/entities/task/model/types";
 import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmModal";
 
 export const Board = () => {
-  const { columns, tasks, searchQuery } = useBoardStore();
+  const { searchQuery } = useUIStore();
+  const {
+    columns: supabaseColumns,
+    tasks: supabaseTasks,
+    loading,
+    error,
+    addTask,
+    updateTask,
+    deleteTask,
+    moveTask
+  } = useBoardData();
+
+  // Convert Supabase data to UI format
+  const columns = supabaseColumns.map(supabaseColumnToUI);
+  const tasks = supabaseTasks.map(supabaseTaskToUI);
+
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<Id | null>(null);
 
@@ -79,9 +97,12 @@ export const Board = () => {
       });
 
       if (activeTaskObj && overTaskObj && activeTaskObj.columnId !== overTaskObj.columnId) {
-        // Use moveTask action from store instead of setTasks
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to', overTaskObj.columnId);
-        useBoardStore.getState().moveTask(activeId, overTaskObj.columnId);
+        // Calculate position (place at end of target column)
+        const targetColumnTasks = supabaseTasks.filter((t) => t.column_id === String(overTaskObj.columnId));
+        const newPosition = targetColumnTasks.length;
+
+        console.log('✅ Moving task from', activeTaskObj.columnId, 'to', overTaskObj.columnId, 'at position', newPosition);
+        moveTask(String(activeId), String(overTaskObj.columnId), newPosition);
       }
     }
 
@@ -91,9 +112,12 @@ export const Board = () => {
 
     if (activeTaskObj && columns.some((c) => c.id === overColumnId)) {
       if (activeTaskObj.columnId !== overColumnId) {
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to column', overColumnId);
-        // Use moveTask action from store
-        useBoardStore.getState().moveTask(activeId, overColumnId);
+        // Calculate position (place at end of target column)
+        const targetColumnTasks = supabaseTasks.filter((t) => t.column_id === String(overColumnId));
+        const newPosition = targetColumnTasks.length;
+
+        console.log('✅ Moving task from', activeTaskObj.columnId, 'to column', overColumnId, 'at position', newPosition);
+        moveTask(String(activeId), String(overColumnId), newPosition);
       }
     }
   };
@@ -103,14 +127,33 @@ export const Board = () => {
     setActiveTask(null);
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex w-full items-center justify-center min-h-screen bg-[#121218]">
+        <div className="text-white text-lg">Loading board data...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex w-full items-center justify-center min-h-screen bg-[#121218]">
+        <div className="text-red-500 text-lg">Error loading board: {error.message}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex w-full overflow-x-auto overflow-y-hidden px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide">
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
-      >
+    <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask }}>
+      <div className="flex w-full overflow-x-auto overflow-y-hidden px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide">
+        <DndContext
+          sensors={sensors}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+        >
         <div className="flex gap-8">
           {columns.map((col) => {
             const columnTasks = filteredTasks.filter((t) => t.columnId === col.id);
@@ -150,6 +193,7 @@ export const Board = () => {
         isOpen={deletingTaskId !== null}
         onClose={() => setDeletingTaskId(null)}
       />
-    </div>
+      </div>
+    </BoardContext.Provider>
   );
 };

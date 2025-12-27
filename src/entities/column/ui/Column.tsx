@@ -5,7 +5,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { Column as ColumnType, Task } from "../../task/model/types";
 import { TaskCard } from "../../task/ui/TaskCard";
 import { Plus } from "lucide-react";
-import { useBoardStore } from "../../task/model/store";
+import { useBoardContext } from "@/widgets/board/model/BoardContext";
 
 interface Props {
   column: ColumnType;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
-  const addTask = useBoardStore((state) => state.addTask);
+  const { addTask } = useBoardContext();
   const taskIds = tasks.map((t) => t.id);
   const { setNodeRef } = useDroppable({
     id: column.id,
@@ -31,7 +31,7 @@ export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
           <Plus
             size={18}
             className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5"
-            onClick={() => addTask(column.id)}
+            onClick={() => addTask(String(column.id), {})}
           />
           <h3 className="text-gray-200 font-semibold text-sm">
             {column.title}
