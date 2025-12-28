@@ -10,6 +10,10 @@ interface UIState {
   searchQuery: string
   setSearchQuery: (query: string) => void
 
+  // Priority filter
+  priorityFilter: 'all' | 'low' | 'medium' | 'high'
+  setPriorityFilter: (filter: 'all' | 'low' | 'medium' | 'high') => void
+
   // Modal state
   isTaskModalOpen: boolean
   selectedTaskId: string | null
@@ -28,6 +32,10 @@ export const useUIStore = create<UIState>((set) => ({
   // Search
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
+
+  // Priority filter
+  priorityFilter: 'all',
+  setPriorityFilter: (filter) => set({ priorityFilter: filter }),
 
   // Modal state
   isTaskModalOpen: false,

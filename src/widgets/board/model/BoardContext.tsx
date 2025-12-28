@@ -8,6 +8,7 @@ interface BoardContextType {
   updateTask: (taskId: string, updates: Partial<SupabaseTask>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
   moveTask: (taskId: string, newColumnId: string, newPosition: number) => Promise<void>
+  progressStats: { total: number; done: number; percentage: number }
 }
 
 export const BoardContext = createContext<BoardContextType | null>(null)

@@ -194,7 +194,12 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
 
   // Mutations
   const addTask = async (columnId: string, taskData: Partial<Task>) => {
-    if (!board) return
+    if (!board) {
+      console.error('❌ No board found')
+      return
+    }
+
+    console.log('📝 Adding task:', { columnId, taskData, boardId: board.id })
 
     try {
       const { data, error } = await supabase
@@ -202,25 +207,46 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         .insert({
           board_id: board.id,
           column_id: columnId,
-          title: taskData.title || 'New Task',
+          title: taskData.title || '',
           description: taskData.description || '',
-          priority: taskData.priority || 'medium',
+          priority: (taskData.priority as any) || 'medium',
           position: tasks.filter((t) => t.column_id === columnId).length,
         })
         .select()
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Supabase error detected')
+        console.error('Error object keys:', Object.keys(error))
+        console.error('Error message:', (error as any).message)
+        console.error('Error code:', (error as any).code)
+        console.error('Error details:', (error as any).details)
+        console.error('Error hint:', (error as any).hint)
+        console.error('Full error:', error)
+        throw error
+      }
+
+      console.log('✅ Task added:', data)
 
       // Optimistic update - update UI immediately
       setTasks((prev) => [...prev, data])
     } catch (err) {
-      console.error('Error adding task:', err)
+      console.error('❌ Error adding task:', err)
       throw err
     }
   }
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    // Save current state for rollback
+    const previousTasks = tasks
+
+    // Optimistic update - update UI immediately
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId ? { ...t, ...updates } : t
+      )
+    )
+
     try {
       const { error } = await supabase
         .from('tasks')
@@ -230,11 +256,19 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
       if (error) throw error
     } catch (err) {
       console.error('Error updating task:', err)
+      // Rollback optimistic update
+      setTasks(previousTasks)
       throw err
     }
   }
 
   const deleteTask = async (taskId: string) => {
+    // Save current state for rollback
+    const previousTasks = tasks
+
+    // Optimistic update - remove from UI immediately
+    setTasks((prev) => prev.filter((t) => t.id !== taskId))
+
     try {
       const { error } = await supabase
         .from('tasks')
@@ -244,6 +278,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
       if (error) throw error
     } catch (err) {
       console.error('Error deleting task:', err)
+      // Rollback optimistic update
+      setTasks(previousTasks)
       throw err
     }
   }
@@ -253,28 +289,49 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     newColumnId: string,
     newPosition: number
   ) => {
+    console.log('🚚 moveTask called:', { taskId, newColumnId, newPosition })
+
     // Save current state for rollback
     const previousTasks = tasks
 
     // Optimistic update - update UI immediately
-    setTasks((prev) =>
-      prev.map((t) =>
+    console.log('📤 Optimistic update: updating task', taskId, 'to column', newColumnId)
+    setTasks((prev) => {
+      const updated = prev.map((t) =>
         t.id === taskId
           ? { ...t, column_id: newColumnId, position: newPosition }
           : t
       )
-    )
+      console.log('📤 Optimistic update result:', updated.map(t => ({ id: t.id, column_id: t.column_id })))
+      return updated
+    })
 
     try {
-      const { error } = await supabase
+      console.log('🌐 Sending Supabase update request...')
+      const { error, data } = await supabase
         .from('tasks')
         .update({
           column_id: newColumnId,
           position: newPosition,
         })
         .eq('id', taskId)
+        .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Supabase update error:', error)
+        throw error
+      }
+      console.log('✅ Supabase update success, data:', data)
+
+      // Manually update state with confirmed data from Supabase
+      // This ensures all useBoardData() calls see the update
+      if (data && data.length > 0) {
+        setTasks((prev) => {
+          const updated = prev.map((t) => (t.id === taskId ? data[0] : t))
+          console.log('✅ State updated with Supabase data, new length:', updated.length)
+          return updated
+        })
+      }
     } catch (err) {
       console.error('Error moving task:', err)
       // Rollback optimistic update

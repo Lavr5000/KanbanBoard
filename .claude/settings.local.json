@@ -30,7 +30,9 @@
       "Bash(node:*)",
       "Bash(powershell:*)",
       "Bash(where:*)",
-      "Bash(git --version:*)"
+      "Bash(git --version:*)",
+      "Bash(Get-Process -Name node -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object Id, ProcessName)"
     ]
   }
 }
