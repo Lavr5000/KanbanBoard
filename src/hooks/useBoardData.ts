@@ -60,6 +60,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
 
         // Create default board if none exists
         if (!boards || boards.length === 0) {
+          if (!user) return // Extra safety check for TypeScript
+
           const { data: newBoard, error: createError } = await supabase
             .from('boards')
             .insert({
@@ -210,7 +212,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
 
       if (error) throw error
 
-      // Realtime will update the state
+      // Optimistic update - update UI immediately
+      setTasks((prev) => [...prev, data])
     } catch (err) {
       console.error('Error adding task:', err)
       throw err
@@ -250,8 +253,11 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     newColumnId: string,
     newPosition: number
   ) => {
-    // Optimistic update
-    setOptimisticTasks((prev) =>
+    // Save current state for rollback
+    const previousTasks = tasks
+
+    // Optimistic update - update UI immediately
+    setTasks((prev) =>
       prev.map((t) =>
         t.id === taskId
           ? { ...t, column_id: newColumnId, position: newPosition }
@@ -272,7 +278,7 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     } catch (err) {
       console.error('Error moving task:', err)
       // Rollback optimistic update
-      setOptimisticTasks(tasks)
+      setTasks(previousTasks)
       throw err
     }
   }
