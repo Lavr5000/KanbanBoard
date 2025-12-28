@@ -48,6 +48,11 @@ export default function LoginPage() {
           <p className="text-gray-600">Sign in to your Kanban account</p>
         </div>
 
+        {/* Region notice */}
+        <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
+          <span className="font-medium">ℹ️ Note:</span> For access from certain regions, you may need to use international connection tools
+        </div>
+
         <form onSubmit={handleLogin} className="space-y-6">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
