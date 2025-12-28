@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import { Column as ColumnType, Task } from "../../task/model/types";
 import { TaskCard } from "../../task/ui/TaskCard";
 import { Plus } from "lucide-react";
-import { useBoardContext } from "@/widgets/board/model/BoardContext";
+import { Modal } from "@/shared/ui/Modal";
+import { AddTaskModal } from "@/features/task-operations/ui/AddTaskModal";
 
 interface Props {
   column: ColumnType;
@@ -14,7 +16,7 @@ interface Props {
 }
 
 export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
-  const { addTask } = useBoardContext();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const taskIds = tasks.map((t) => t.id);
   const { setNodeRef } = useDroppable({
     id: column.id,
@@ -31,7 +33,7 @@ export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
           <Plus
             size={18}
             className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5"
-            onClick={() => addTask(String(column.id), {})}
+            onClick={() => setIsAddModalOpen(true)}
           />
           <h3 className="text-gray-200 font-semibold text-sm">
             {column.title}
@@ -46,6 +48,17 @@ export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
           ))}
         </SortableContext>
       </div>
+
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Новая задача"
+      >
+        <AddTaskModal
+          columnId={String(column.id)}
+          onClose={() => setIsAddModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 };

@@ -1,34 +1,26 @@
 "use client";
 
-import { Home, Users, LayoutDashboard, ListTodo, PieChart, Play, Download, Trash2, LogOut } from "lucide-react";
+import { LayoutDashboard, PieChart, Play, Download, LogOut } from "lucide-react";
 import { clsx } from "clsx";
-import { useBoardStore } from "@/entities/task/model/store";
 import { useBoardData } from "@/hooks/useBoardData";
 import { useUIStore } from "@/entities/ui/model/store";
 import { exportToJson } from "@/shared/lib/exportData";
 import { useState, useMemo } from "react";
-import { Modal } from "@/shared/ui/Modal";
-import { TeamModal } from "@/features/team/ui/TeamModal";
 import { useAuth } from "@/providers/AuthProvider";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Канбан", id: "kanban" },
-  { icon: Users, label: "Команда", id: "team" },
-  { icon: ListTodo, label: "Все задачи", id: "all-tasks" },
   { icon: PieChart, label: "Отчет", id: "reports" },
 ];
 
 export const Sidebar = () => {
   const { columns, tasks } = useBoardData();
   const { setSearchQuery } = useUIStore();
-  const { members } = useBoardStore(); // Keep members from old store for now
   const [activeItem, setActiveItem] = useState("kanban");
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   // Calculate stats from Supabase tasks
   const stats = useMemo(() => {
-    const columnNames = columns.map(c => c.title.toLowerCase());
     return {
       total: tasks.length,
       todo: tasks.filter(t => {
@@ -62,19 +54,13 @@ export const Sidebar = () => {
     exportToJson({ tasks, columns, exportedAt: new Date().toISOString() });
   };
 
-  const handleNavClick = (itemId: string, label: string) => {
+  const handleNavClick = (itemId: string) => {
     setActiveItem(itemId);
 
     // Simple navigation logic
     switch (itemId) {
       case "kanban":
         setSearchQuery(""); // Show all tasks
-        break;
-      case "all-tasks":
-        setSearchQuery(""); // Show all tasks (same as kanban for now)
-        break;
-      case "team":
-        setIsTeamModalOpen(true); // Open team modal
         break;
       case "reports":
         // Show report with statistics
@@ -112,7 +98,7 @@ export const Sidebar = () => {
         {navItems.map((item) => (
           <button
             key={item.label}
-            onClick={() => handleNavClick(item.id, item.label)}
+            onClick={() => handleNavClick(item.id)}
             className={clsx(
               "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group",
               activeItem === item.id
@@ -132,11 +118,6 @@ export const Sidebar = () => {
                 {stats.total}
               </span>
             )}
-            {item.label === "Все задачи" && (
-              <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full border border-gray-700">
-                {stats.done}/{stats.total}
-              </span>
-            )}
           </button>
         ))}
       </nav>
@@ -149,15 +130,6 @@ export const Sidebar = () => {
           <Download size={14} />
           Экспортировать данные
         </button>
-        {/* TODO: Implement clearBoard with Supabase delete
-        <button
-          onClick={clearBoard}
-          className="w-full flex items-center gap-3 px-4 py-2 text-xs text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-        >
-          <Trash2 size={14} />
-          Очистить доску
-        </button>
-        */}
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
@@ -194,14 +166,6 @@ export const Sidebar = () => {
           </div>
         </div>
       </div>
-
-      <Modal
-        isOpen={isTeamModalOpen}
-        onClose={() => setIsTeamModalOpen(false)}
-        title="Наша команда"
-      >
-        <TeamModal members={members} />
-      </Modal>
     </aside>
   );
 };
