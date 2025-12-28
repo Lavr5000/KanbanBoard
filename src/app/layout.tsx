@@ -3,8 +3,11 @@ import "./globals.css";
 import { AuthProvider } from "@/providers/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "Kanban University",
-  description: "Premium Kanban Board",
+  title: "Lavr Kanban AI",
+  description: "Kanban Board AI powered by Lavr",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
