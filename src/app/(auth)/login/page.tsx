@@ -45,7 +45,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome Back
           </h1>
-          <p className="text-gray-600">Sign in to your Kanban account</p>
+          <p className="text-gray-600">Sign in to your Lavr Kanban AI account</p>
         </div>
 
         {/* Region notice */}
@@ -114,6 +114,21 @@ export default function LoginPage() {
             >
               Sign up
             </Link>
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-500">
+            ✨ Built with AI by{' '}
+            <a
+              href="https://github.com/Lavr5000"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Lavr
+            </a>
           </p>
         </div>
       </div>

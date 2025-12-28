@@ -85,12 +85,12 @@ export const Sidebar = () => {
   return (
     <aside className="w-64 border-r border-gray-800 flex flex-col h-screen sticky top-0 bg-[#121218]">
       <div className="p-6 mb-8 flex items-center gap-2">
-        <div className="bg-white rounded-lg p-1">
-          <Play className="fill-black text-black" size={20} />
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg p-1.5">
+          <Play className="fill-white text-white" size={20} />
         </div>
         <div className="flex flex-col leading-tight">
-          <span className="font-bold text-white text-lg tracking-tight">Kanban</span>
-          <span className="text-gray-500 text-xs font-medium">University</span>
+          <span className="font-bold text-white text-lg tracking-tight">Lavr</span>
+          <span className="text-gray-500 text-xs font-medium">Kanban AI</span>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export const Sidebar = () => {
           <p className="text-xs text-gray-400 mb-2">Проект</p>
           <div className="flex items-center justify-between">
             <span className="text-sm text-white font-medium truncate">
-              Dashboard дизайн
+              Kanban Board AI
             </span>
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           </div>
