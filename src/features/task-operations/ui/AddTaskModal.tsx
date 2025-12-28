@@ -1,31 +1,23 @@
 "use client";
 
 import { useBoardContext } from "@/widgets/board/model/BoardContext";
-import { Task } from "@/entities/task/model/types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export const EditTaskModal = ({
-  task,
-  isOpen,
-  onClose,
-}: {
-  task: Task;
-  isOpen: boolean;
+interface Props {
+  columnId: string;
   onClose: () => void;
-}) => {
-  const { updateTask } = useBoardContext();
-  const [content, setContent] = useState(task.content);
-  const [priority, setPriority] = useState(task.priority);
+}
 
-  useEffect(() => {
-    setContent(task.content);
-    setPriority(task.priority);
-  }, [task]);
+export const AddTaskModal = ({ columnId, onClose }: Props) => {
+  const { addTask } = useBoardContext();
+  const [content, setContent] = useState("");
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
 
   const handleSave = () => {
-    // Convert UI fields to Supabase format
-    updateTask(String(task.id), {
-      title: content,
+    if (!content.trim()) return; // Don't create empty tasks
+
+    addTask(columnId, {
+      title: content.trim(),
       priority: priority,
     });
     onClose();
@@ -42,6 +34,7 @@ export const EditTaskModal = ({
           onChange={(e) => setContent(e.target.value)}
           placeholder="Введите текст..."
           className="w-full bg-[#121218] border border-gray-800 rounded-lg p-3 text-sm text-white placeholder:text-gray-600 focus:border-blue-500 outline-none h-32 resize-none"
+          autoFocus
         />
       </div>
 
@@ -78,9 +71,10 @@ export const EditTaskModal = ({
 
       <button
         onClick={handleSave}
-        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all mt-4"
+        disabled={!content.trim()}
+        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Сохранить изменения
+        Создать задачу
       </button>
     </div>
   );

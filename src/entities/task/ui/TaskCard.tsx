@@ -8,8 +8,6 @@ import { clsx } from "clsx";
 import { useState } from "react";
 import { Modal } from "@/shared/ui/Modal";
 import { EditTaskModal } from "@/features/task-operations/ui/EditTaskModal";
-import { getTypeStyle } from "../lib/getColorByType";
-import { useBoardStore } from "../model/store";
 
 interface Props {
   task: Task;
@@ -18,9 +16,6 @@ interface Props {
 
 export const TaskCard = ({ task, onDeleteTrigger }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const typeStyle = getTypeStyle(task.type);
-  const members = useBoardStore((state) => state.members);
-  const assignee = members.find((m) => m.id === task.assigneeId);
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } =
     useSortable({
       id: task.id,
@@ -55,12 +50,15 @@ export const TaskCard = ({ task, onDeleteTrigger }: Props) => {
         <div className="flex justify-between items-start mb-2">
           <span
             className={clsx(
-              "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-block",
-              typeStyle.bg,
-              typeStyle.color
+              "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
+              task.priority === "high"
+                ? "bg-red-500/20 text-red-500 border border-red-500/30"
+                : task.priority === "medium"
+                ? "bg-green-500/20 text-green-500 border border-green-500/30"
+                : "bg-blue-500/20 text-blue-500 border border-blue-500/30"
             )}
           >
-            {typeStyle.label}
+            {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
           </span>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
@@ -81,53 +79,15 @@ export const TaskCard = ({ task, onDeleteTrigger }: Props) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mb-3">
-          <span
-            className={clsx(
-              "text-[10px] font-bold uppercase tracking-wider",
-              task.priority === "high" ? "text-red-500" : "text-green-500"
-            )}
-          >
-            • {task.status === "active" ? "Активен" : "В ожидании"}
-          </span>
-          <span className="text-[10px] text-gray-500">
-            {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
-          </span>
-        </div>
-
-        <p className="text-gray-400 text-xs mb-4 line-clamp-3 leading-relaxed">
+        <p className="text-gray-400 text-xs mb-2 line-clamp-3 leading-relaxed">
           {task.content}
         </p>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {task.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-1 bg-[#252530] text-gray-300 text-[10px] rounded-md border border-gray-800"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-gray-800 pt-3">
-          <div className="flex items-center text-gray-500 gap-1.5">
-            <Calendar size={12} />
-            <span className="text-[10px]">
-              {new Date(task.createdAt).toLocaleDateString()}
-            </span>
-          </div>
-          <div className="flex -space-x-2">
-            {assignee ? (
-              <div className={clsx("w-6 h-6 rounded-full border-2 border-[#1c1c24] flex items-center justify-center text-[8px] text-white font-bold", assignee.avatarColor)}>
-                {assignee.initials}
-              </div>
-            ) : (
-              <div className="w-6 h-6 rounded-full border-2 border-dashed border-gray-700 flex items-center justify-center text-[8px] text-gray-500">
-                ?
-              </div>
-            )}
-          </div>
+        <div className="flex items-center text-gray-500 gap-1.5 border-t border-gray-800 pt-3">
+          <Calendar size={12} />
+          <span className="text-[10px]">
+            {new Date(task.createdAt).toLocaleDateString()}
+          </span>
         </div>
       </div>
 
