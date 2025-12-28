@@ -13,8 +13,16 @@ import { createBrowserClient } from '@supabase/ssr'
  * ```
  */
 export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key) {
+    // During build time, env vars may not be available
+    // Return a mock client that will be replaced at runtime
+    throw new Error(
+      'Supabase environment variables are missing. Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.'
+    )
+  }
+
+  return createBrowserClient(url, key)
 }
