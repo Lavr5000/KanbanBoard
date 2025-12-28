@@ -4,7 +4,11 @@
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
+
+# Required environment variables (add these in Netlify UI):
+# NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -13,9 +17,3 @@
   command = "npm run dev"
   port = 3000
   publish = ".next"
-
-# Redirects for Next.js
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
