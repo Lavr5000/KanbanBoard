@@ -32,7 +32,7 @@ export default function LoginPage() {
       router.push('/')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in')
+      setError(err instanceof Error ? err.message : 'Не удалось войти')
     } finally {
       setLoading(false)
     }
@@ -43,14 +43,14 @@ export default function LoginPage() {
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back
+            Добро пожаловать
           </h1>
-          <p className="text-gray-600">Sign in to your Lavr Kanban AI account</p>
+          <p className="text-gray-600">Войдите в ваш аккаунт Lavr Kanban AI</p>
         </div>
 
         {/* Region notice */}
         <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
-          <span className="font-medium">ℹ️ Note:</span> For access from certain regions, you may need to use international connection tools
+          <span className="font-medium">ℹ️ Примечание:</span> Для доступа из некоторых регионов могут потребоваться инструменты международного соединения
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -74,7 +74,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
-              placeholder="you@example.com"
+              placeholder="primer@example.com"
             />
           </div>
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              Пароль
             </label>
             <input
               id="password"
@@ -101,18 +101,18 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            Нет аккаунта?{' '}
             <Link
               href="/signup"
               className="text-indigo-600 font-semibold hover:text-indigo-700"
             >
-              Sign up
+              Зарегистрироваться
             </Link>
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-500">
-            ✨ Built with AI by{' '}
+            ✨ Создано с помощью AI{' '}
             <a
               href="https://github.com/Lavr5000"
               target="_blank"
