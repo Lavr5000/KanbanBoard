@@ -38,14 +38,14 @@ export default function SignupPage() {
 
       // Check if user was created and if email confirmation is required
       if (data.user && !data.session) {
-        setError('Registration successful! Please check your email to confirm your account.')
+        setError('Регистрация успешна! Пожалуйста, проверьте вашу почту для подтверждения аккаунта.')
       } else if (data.session) {
         // Auto-login if email confirmation is disabled
         router.push('/')
         router.refresh()
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign up')
+      setError(err instanceof Error ? err.message : 'Не удалось зарегистрироваться')
     } finally {
       setLoading(false)
     }
@@ -56,14 +56,14 @@ export default function SignupPage() {
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Create Account
+            Создать аккаунт
           </h1>
-          <p className="text-gray-600">Join Lavr Kanban AI today</p>
+          <p className="text-gray-600">Присоединяйтесь к Lavr Kanban AI</p>
         </div>
 
         {/* Region notice */}
         <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
-          <span className="font-medium">ℹ️ Note:</span> For access from certain regions, you may need to use international connection tools
+          <span className="font-medium">ℹ️ Примечание:</span> Для доступа из некоторых регионов могут потребоваться инструменты международного соединения
         </div>
 
         <form onSubmit={handleSignup} className="space-y-6">
@@ -78,7 +78,7 @@ export default function SignupPage() {
               htmlFor="fullName"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Full Name
+              Полное имя
             </label>
             <input
               id="fullName"
@@ -87,7 +87,7 @@ export default function SignupPage() {
               onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
-              placeholder="John Doe"
+              placeholder="Иван Иванов"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-gray-900"
-              placeholder="you@example.com"
+              placeholder="primer@example.com"
             />
           </div>
 
@@ -114,7 +114,7 @@ export default function SignupPage() {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              Пароль
             </label>
             <input
               id="password"
@@ -127,7 +127,7 @@ export default function SignupPage() {
               placeholder="••••••••"
             />
             <p className="mt-1 text-sm text-gray-500">
-              Minimum 6 characters
+              Минимум 6 символов
             </p>
           </div>
 
@@ -136,18 +136,18 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {loading ? 'Создание аккаунта...' : 'Зарегистрироваться'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Already have an account?{' '}
+            Уже есть аккаунт?{' '}
             <Link
               href="/login"
               className="text-indigo-600 font-semibold hover:text-indigo-700"
             >
-              Sign in
+              Войти
             </Link>
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function SignupPage() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-500">
-            ✨ Built with AI by{' '}
+            ✨ Создано с помощью AI{' '}
             <a
               href="https://github.com/Lavr5000"
               target="_blank"
