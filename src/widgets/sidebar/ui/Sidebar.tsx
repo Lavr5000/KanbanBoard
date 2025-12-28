@@ -12,9 +12,8 @@ import { TeamModal } from "@/features/team/ui/TeamModal";
 import { useAuth } from "@/providers/AuthProvider";
 
 const navItems = [
-  { icon: Home, label: "На главную", id: "home" },
-  { icon: Users, label: "Команда", id: "team" },
   { icon: LayoutDashboard, label: "Канбан", id: "kanban" },
+  { icon: Users, label: "Команда", id: "team" },
   { icon: ListTodo, label: "Все задачи", id: "all-tasks" },
   { icon: PieChart, label: "Отчет", id: "reports" },
 ];
@@ -73,9 +72,6 @@ export const Sidebar = () => {
         break;
       case "all-tasks":
         setSearchQuery(""); // Show all tasks (same as kanban for now)
-        break;
-      case "home":
-        console.log(`Navigation to ${label} - Coming soon!`);
         break;
       case "team":
         setIsTeamModalOpen(true); // Open team modal

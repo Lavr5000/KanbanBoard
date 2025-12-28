@@ -6,11 +6,21 @@ import { Bell, Search, LogOut } from "lucide-react";
 import { useBoardStore } from "@/entities/task/model/store";
 import { useBoardStats } from "@/entities/task/model/store";
 import { useAuth } from "@/providers/AuthProvider";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { user, signOut } = useAuth();
   const { searchQuery, setSearchQuery } = useBoardStore();
   const stats = useBoardStats();
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (user === null) {
+      router.push('/login');
+    }
+  }, [user, router]);
 
   const handleSignOut = async () => {
     await signOut();
