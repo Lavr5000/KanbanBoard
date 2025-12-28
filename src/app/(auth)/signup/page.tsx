@@ -162,7 +162,16 @@ export default function SignupPage() {
               rel="noopener noreferrer"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              Lavr
+              Lavrov Denis
+            </a>
+            {' '}&bull;{' '}
+            <a
+              href="https://t.me/Lavr5000"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Telegram
             </a>
           </p>
         </div>
