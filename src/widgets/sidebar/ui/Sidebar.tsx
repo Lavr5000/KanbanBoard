@@ -1,26 +1,21 @@
 "use client";
 
-import { Home, Users, LayoutDashboard, ListTodo, PieChart, Play, Download, Trash2 } from "lucide-react";
+import { Home, LayoutDashboard, PieChart, Play, Download, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
 import { useBoardStats, useBoardStore } from "@/entities/task/model/store";
 import { exportToJson } from "@/shared/lib/exportData";
 import { useState } from "react";
-import { Modal } from "@/shared/ui/Modal";
-import { TeamModal } from "@/features/team/ui/TeamModal";
 
 const navItems = [
   { icon: Home, label: "На главную", id: "home" },
-  { icon: Users, label: "Команда", id: "team" },
   { icon: LayoutDashboard, label: "Канбан", id: "kanban" },
-  { icon: ListTodo, label: "Все задачи", id: "all-tasks" },
   { icon: PieChart, label: "Отчет", id: "reports" },
 ];
 
 export const Sidebar = () => {
   const stats = useBoardStats();
-  const { tasks, columns, clearBoard, setSearchQuery, members } = useBoardStore();
+  const { tasks, columns, clearBoard, setSearchQuery } = useBoardStore();
   const [activeItem, setActiveItem] = useState("kanban");
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
 
   const handleExport = () => {
     exportToJson({ tasks, columns, exportedAt: new Date().toISOString() });
@@ -34,14 +29,8 @@ export const Sidebar = () => {
       case "kanban":
         setSearchQuery(""); // Show all tasks
         break;
-      case "all-tasks":
-        setSearchQuery(""); // Show all tasks (same as kanban for now)
-        break;
       case "home":
         console.log(`Navigation to ${label} - Coming soon!`);
-        break;
-      case "team":
-        setIsTeamModalOpen(true); // Open team modal
         break;
       case "reports":
         // Show report with statistics
@@ -99,11 +88,6 @@ export const Sidebar = () => {
                 {stats.total}
               </span>
             )}
-            {item.label === "Все задачи" && (
-              <span className="bg-gray-700/50 text-gray-400 text-[10px] px-2 py-0.5 rounded-full border border-gray-700">
-                {stats.done}/{stats.total}
-              </span>
-            )}
           </button>
         ))}
       </nav>
@@ -136,14 +120,6 @@ export const Sidebar = () => {
           </div>
         </div>
       </div>
-
-      <Modal
-        isOpen={isTeamModalOpen}
-        onClose={() => setIsTeamModalOpen(false)}
-        title="Наша команда"
-      >
-        <TeamModal members={members} />
-      </Modal>
     </aside>
   );
 };
