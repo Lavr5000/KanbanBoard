@@ -13,9 +13,10 @@ interface Props {
   column: ColumnType;
   tasks: Task[];
   onDeleteTrigger?: (id: Task["id"]) => void;
+  boardName?: string;
 }
 
-export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
+export const Column = ({ column, tasks, onDeleteTrigger, boardName }: Props) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const taskIds = tasks.map((t) => t.id);
   const { setNodeRef } = useDroppable({
@@ -44,7 +45,14 @@ export const Column = ({ column, tasks, onDeleteTrigger }: Props) => {
       <div ref={setNodeRef} className="flex-grow flex flex-col gap-4 bg-[#121218]/50 rounded-xl p-3 border-2 border-transparent transition-colors">
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onDeleteTrigger={onDeleteTrigger} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              onDeleteTrigger={onDeleteTrigger}
+              columnTitle={column.title}
+              boardName={boardName}
+              allTasks={tasks}
+            />
           ))}
         </SortableContext>
       </div>
