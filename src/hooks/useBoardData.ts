@@ -28,7 +28,7 @@ interface UseBoardDataReturn {
  * Handles data loading, real-time subscriptions, and mutations
  */
 export function useBoardData(boardId?: string): UseBoardDataReturn {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
 
   const [board, setBoard] = useState<Board | null>(null)
@@ -43,80 +43,120 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
 
   // Load initial data
   useEffect(() => {
-    if (!user) return
+    // Wait for auth to complete before loading data
+    if (authLoading || !user) return
 
     async function loadData() {
       try {
         setLoading(true)
 
-        // Get user's first board (or create one if doesn't exist)
-        let { data: boards, error: boardsError } = await supabase
-          .from('boards')
-          .select('*')
-          .order('created_at', { ascending: true })
-          .limit(1)
+        // Get active board ID from localStorage or use provided boardId
+        const ACTIVE_BOARD_KEY = 'activeBoardId'
+        let targetBoardId = boardId || (typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_BOARD_KEY) : null)
 
-        if (boardsError) throw boardsError
+        // Get the board to load
+        let boardToLoad: Board | null = null
 
-        // Create default board if none exists
-        if (!boards || boards.length === 0) {
-          if (!user) return // Extra safety check for TypeScript
-
-          const { data: newBoard, error: createError } = await supabase
+        if (targetBoardId) {
+          // Load specific board
+          const { data: targetBoard, error: targetError } = await supabase
             .from('boards')
-            .insert({
-              user_id: user.id,
-              name: 'My Kanban Board',
-              description: 'Default board'
-            })
-            .select()
+            .select('*')
+            .eq('id', targetBoardId)
             .single()
 
-          if (createError) throw createError
-          setBoard(newBoard)
-
-          // Create default columns for new board
-          const defaultColumns = [
-            { board_id: newBoard.id, title: 'Новая задача', position: 0 },
-            { board_id: newBoard.id, title: 'Выполняется', position: 1 },
-            { board_id: newBoard.id, title: 'Ожидает проверки', position: 2 },
-            { board_id: newBoard.id, title: 'На тестировании', position: 3 },
-            { board_id: newBoard.id, title: 'В доработку', position: 4 },
-          ]
-
-          const { data: newColumns, error: columnsError } = await supabase
-            .from('columns')
-            .insert(defaultColumns)
-            .select()
-
-          if (columnsError) throw columnsError
-          setColumns(newColumns)
-        } else {
-          setBoard(boards[0])
-
-          // Load columns
-          const { data: columnsData, error: columnsError } = await supabase
-            .from('columns')
-            .select('*')
-            .eq('board_id', boards[0].id)
-            .order('position', { ascending: true })
-
-          if (columnsError) throw columnsError
-          setColumns(columnsData || [])
-
-          // Load tasks
-          const { data: tasksData, error: tasksError } = await supabase
-            .from('tasks')
-            .select('*')
-            .eq('board_id', boards[0].id)
-            .order('position', { ascending: true })
-
-          if (tasksError) throw tasksError
-          setTasks(tasksData || [])
+          if (!targetError && targetBoard) {
+            boardToLoad = targetBoard
+          }
         }
 
-        setOptimisticTasks(tasks)
-        setOptimisticColumns(columns)
+        // If no board found, get user's first board (or create one)
+        if (!boardToLoad) {
+          let { data: boards, error: boardsError } = await supabase
+            .from('boards')
+            .select('*')
+            .order('created_at', { ascending: true })
+            .limit(1)
+
+          if (boardsError) throw boardsError
+
+          // Create default board if none exists
+          if (!boards || boards.length === 0) {
+            if (!user) return // Extra safety check for TypeScript
+
+            const { data: newBoard, error: createError } = await supabase
+              .from('boards')
+              .insert({
+                user_id: user.id,
+                name: 'My Kanban Board',
+                description: 'Default board'
+              })
+              .select()
+              .single()
+
+            if (createError) throw createError
+            boardToLoad = newBoard
+
+            // Save to localStorage
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(ACTIVE_BOARD_KEY, newBoard.id)
+            }
+
+            // Create default columns for new board
+            const defaultColumns = [
+              { board_id: newBoard.id, title: 'Новая задача', position: 0 },
+              { board_id: newBoard.id, title: 'Выполняется', position: 1 },
+              { board_id: newBoard.id, title: 'Ожидает проверки', position: 2 },
+              { board_id: newBoard.id, title: 'На тестировании', position: 3 },
+              { board_id: newBoard.id, title: 'В доработку', position: 4 },
+            ]
+
+            const { data: newColumns, error: columnsError } = await supabase
+              .from('columns')
+              .insert(defaultColumns)
+              .select()
+
+            if (columnsError) throw columnsError
+            setBoard(newBoard)
+            setColumns(newColumns || [])
+            setTasks([])
+            setOptimisticTasks([])
+            setOptimisticColumns(newColumns || [])
+            setLoading(false)
+            return
+          } else {
+            boardToLoad = boards[0]
+            // Save to localStorage
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(ACTIVE_BOARD_KEY, boards[0].id)
+            }
+          }
+        }
+
+        setBoard(boardToLoad)
+
+        // Load columns
+        const { data: columnsData, error: columnsError } = await supabase
+          .from('columns')
+          .select('*')
+          .eq('board_id', boardToLoad!.id)
+          .order('position', { ascending: true })
+
+        if (columnsError) throw columnsError
+        setColumns(columnsData || [])
+
+        // Load tasks
+        const { data: tasksData, error: tasksError } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('board_id', boardToLoad!.id)
+          .order('position', { ascending: true })
+
+        if (tasksError) throw tasksError
+        setTasks(tasksData || [])
+
+        setOptimisticTasks(tasksData || [])
+        setOptimisticColumns(columnsData || [])
       } catch (err) {
         console.error('Error loading board data:', err)
         setError(err as Error)
@@ -126,7 +166,7 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     }
 
     loadData()
-  }, [user])
+  }, [user, authLoading, boardId])
 
   // Real-time subscriptions
   useEffect(() => {
