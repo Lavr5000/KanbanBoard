@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 
 import { useUIStore } from "@/entities/ui/model/store";
 import { useBoardData } from "@/hooks/useBoardData";
+import { useBoards } from "@/hooks/useBoards";
 import { supabaseTaskToUI, supabaseColumnToUI } from "@/lib/adapters/taskAdapter";
 import { BoardContext } from "@/widgets/board/model/BoardContext";
 import { Column } from "@/entities/column/ui/Column";
@@ -28,6 +29,9 @@ import { useAuth } from "@/providers/AuthProvider";
 export const Board = () => {
   const { searchQuery, priorityFilter, setSearchQuery, setPriorityFilter } = useUIStore();
   const { user, signOut } = useAuth();
+  const { activeBoard } = useBoards();
+  const boardName = activeBoard?.name || 'Проект';
+
   const {
     columns: supabaseColumns,
     tasks: supabaseTasks,
@@ -315,6 +319,7 @@ export const Board = () => {
                 column={col}
                 tasks={columnTasks}
                 onDeleteTrigger={setDeletingTaskId}
+                boardName={boardName}
               />
             );
           })}
