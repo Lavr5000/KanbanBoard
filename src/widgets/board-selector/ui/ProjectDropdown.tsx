@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
-import { Folder, Pencil, Check, X } from 'lucide-react'
+import { Folder, Pencil, Check, X, Trash2 } from 'lucide-react'
 import { useBoards } from '@/hooks/useBoards'
 import { clsx } from 'clsx'
 
@@ -15,7 +15,7 @@ interface ProjectDropdownProps {
  * Allows switching, creating, and editing boards
  */
 export function ProjectDropdown({ onClose, onBoardChange }: ProjectDropdownProps) {
-  const { boards, activeBoardId, switchBoard, createBoard, updateBoard } = useBoards()
+  const { boards, activeBoardId, switchBoard, createBoard, updateBoard, deleteBoard } = useBoards()
   const [newBoardName, setNewBoardName] = useState('')
   const [creating, setCreating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -139,6 +139,27 @@ export function ProjectDropdown({ onClose, onBoardChange }: ProjectDropdownProps
     }
   }
 
+  const handleDelete = async (boardId: string, boardName: string) => {
+    if (boards.length === 1) {
+      setError('Нельзя удалить единственный проект')
+      return
+    }
+
+    if (!confirm(`Удалить проект "${boardName}"? Все задачи и колонки будут удалены.`)) {
+      return
+    }
+
+    try {
+      await deleteBoard(boardId)
+      if (boardId === activeBoardId) {
+        onBoardChange('')
+      }
+    } catch (err) {
+      setError('Не удалось удалить проект')
+      console.error(err)
+    }
+  }
+
   return (
     <div ref={dropdownRef} className="mt-3 border-t border-gray-800 pt-3">
       {/* Board list */}
@@ -205,6 +226,13 @@ export function ProjectDropdown({ onClose, onBoardChange }: ProjectDropdownProps
                     className="text-gray-500 hover:text-gray-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Pencil size={12} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(board.id, board.name)}
+                    className="text-gray-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Удалить проект"
+                  >
+                    <Trash2 size={12} />
                   </button>
                 </>
               )}

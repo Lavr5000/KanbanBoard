@@ -23,14 +23,18 @@ import { Column } from "@/entities/column/ui/Column";
 import { TaskCard } from "@/entities/task/ui/TaskCard";
 import { Task, Id } from "@/entities/task/model/types";
 import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmModal";
+import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
 import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
+import { createClient } from "@/lib/supabase/client";
+import { deleteColumn } from "@/lib/supabase/queries/columns";
 
 export const Board = () => {
   const { searchQuery, priorityFilter, setSearchQuery, setPriorityFilter } = useUIStore();
   const { user, signOut } = useAuth();
   const { activeBoard } = useBoards();
   const boardName = activeBoard?.name || 'Проект';
+  const supabase = createClient();
 
   const {
     columns: supabaseColumns,
@@ -40,7 +44,8 @@ export const Board = () => {
     addTask,
     updateTask,
     deleteTask,
-    moveTask
+    moveTask,
+    refetchColumns,
   } = useBoardData();
 
   // Convert Supabase data to UI format (memoized to prevent infinite re-renders)
@@ -73,6 +78,7 @@ export const Board = () => {
   );
 
   console.log('🔍 Filtered tasks:', filteredTasks.length, 'Total:', tasks.length, 'Priority:', priorityFilter);
+  console.log('📊 Board info:', { boardId: activeBoard?.id, boardName: activeBoard?.name, columnCount: columns.length });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -212,6 +218,46 @@ export const Board = () => {
     window.location.href = '/login';
   };
 
+  // Column operations
+  const handleColumnUpdate = async (columnId: string, newTitle: string) => {
+    // Refetch columns to get fresh data from Supabase
+    await refetchColumns();
+  };
+
+  const handleColumnDelete = async (columnId: string) => {
+    if (!activeBoard) return;
+
+    // Get first column ID
+    const firstColumnId = supabaseColumns[0]?.id;
+    if (!firstColumnId) {
+      console.error('No columns found');
+      return;
+    }
+
+    if (columnId === firstColumnId) {
+      console.error('Cannot delete first column');
+      return;
+    }
+
+    try {
+      // Move all tasks from deleted column to first column
+      const tasksInColumn = supabaseTasks.filter(t => t.column_id === columnId);
+
+      for (const task of tasksInColumn) {
+        await moveTask(task.id, firstColumnId, 0);
+      }
+
+      // Delete the column
+      await deleteColumn(supabase, columnId);
+      console.log('Column deleted:', columnId);
+
+      // Refetch columns to update UI
+      await refetchColumns();
+    } catch (error) {
+      console.error('Failed to delete column:', error);
+    }
+  };
+
   return (
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
       <div className="flex-grow flex flex-col">
@@ -310,7 +356,7 @@ export const Board = () => {
           onDragEnd={onDragEnd}
         >
         <div className="flex gap-8">
-          {columns.map((col) => {
+          {columns.map((col, index) => {
             const columnTasks = filteredTasks.filter((t) => t.columnId === col.id);
             console.log(`📋 Column "${col.title}":`, columnTasks.length, 'tasks');
             return (
@@ -320,9 +366,18 @@ export const Board = () => {
                 tasks={columnTasks}
                 onDeleteTrigger={setDeletingTaskId}
                 boardName={boardName}
+                isFirst={index === 0}
+                onColumnUpdate={handleColumnUpdate}
+                onColumnDelete={handleColumnDelete}
               />
             );
           })}
+          <AddColumnButton
+            boardId={activeBoard?.id || ''}
+            currentColumnCount={columns.length}
+            maxColumns={8}
+            onColumnAdded={async () => await refetchColumns()}
+          />
         </div>
 
         {typeof document !== "undefined" &&

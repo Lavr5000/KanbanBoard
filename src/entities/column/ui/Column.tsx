@@ -8,15 +8,19 @@ import { TaskCard } from "../../task/ui/TaskCard";
 import { Plus } from "lucide-react";
 import { Modal } from "@/shared/ui/Modal";
 import { AddTaskModal } from "@/features/task-operations/ui/AddTaskModal";
+import { ColumnHeader } from "./ColumnHeader";
 
 interface Props {
   column: ColumnType;
   tasks: Task[];
   onDeleteTrigger?: (id: Task["id"]) => void;
   boardName?: string;
+  isFirst?: boolean;
+  onColumnUpdate?: (columnId: string, newTitle: string) => void;
+  onColumnDelete?: (columnId: string) => void;
 }
 
-export const Column = ({ column, tasks, onDeleteTrigger, boardName }: Props) => {
+export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = false, onColumnUpdate, onColumnDelete }: Props) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const taskIds = tasks.map((t) => t.id);
   const { setNodeRef } = useDroppable({
@@ -29,17 +33,19 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName }: Props) => 
 
   return (
     <div className="flex flex-col w-[300px] min-h-[500px]">
-      <div className="flex items-center justify-between mb-4 group">
-        <div className="flex items-center gap-2">
-          <Plus
-            size={18}
-            className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5"
-            onClick={() => setIsAddModalOpen(true)}
-          />
-          <h3 className="text-gray-200 font-semibold text-sm">
-            {column.title}
-          </h3>
-        </div>
+      <div className="flex items-center gap-2 mb-4">
+        <Plus
+          size={18}
+          className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5 flex-shrink-0"
+          onClick={() => setIsAddModalOpen(true)}
+        />
+        <ColumnHeader
+          columnId={String(column.id)}
+          title={column.title}
+          isFirst={isFirst}
+          onColumnUpdated={onColumnUpdate}
+          onColumnDelete={onColumnDelete}
+        />
       </div>
 
       <div ref={setNodeRef} className="flex-grow flex flex-col gap-4 bg-[#121218]/50 rounded-xl p-3 border-2 border-transparent transition-colors">

@@ -16,6 +16,7 @@ interface UseBoardsReturn {
   switchBoard: (boardId: string) => void
   createBoard: (name: string) => Promise<Board>
   updateBoard: (boardId: string, name: string) => Promise<void>
+  deleteBoard: (boardId: string) => Promise<void>
 }
 
 /**
@@ -137,9 +138,8 @@ export function useBoards(): UseBoardsReturn {
       const defaultColumns = [
         { board_id: newBoard.id, title: 'Новая задача', position: 0 },
         { board_id: newBoard.id, title: 'Выполняется', position: 1 },
-        { board_id: newBoard.id, title: 'Ожидает проверки', position: 2 },
-        { board_id: newBoard.id, title: 'На тестировании', position: 3 },
-        { board_id: newBoard.id, title: 'В доработку', position: 4 },
+        { board_id: newBoard.id, title: 'На тестировании', position: 2 },
+        { board_id: newBoard.id, title: 'Выполнено', position: 3 },
       ]
 
       const { error: columnsError } = await supabase
@@ -170,6 +170,35 @@ export function useBoards(): UseBoardsReturn {
     }
   }, [supabase])
 
+  // Delete board
+  const deleteBoard = useCallback(async (boardId: string) => {
+    try {
+      // Delete board (cascade will delete columns and tasks)
+      const { error } = await supabase
+        .from('boards')
+        .delete()
+        .eq('id', boardId)
+
+      if (error) throw error
+
+      // If deleted board was active, switch to another board
+      if (boardId === activeBoardId) {
+        const remainingBoards = boards.filter(b => b.id !== boardId)
+        if (remainingBoards.length > 0) {
+          switchBoard(remainingBoards[0].id)
+        } else {
+          setActiveBoardId(null)
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(ACTIVE_BOARD_KEY)
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error deleting board:', err)
+      throw err
+    }
+  }, [supabase, activeBoardId, boards, switchBoard])
+
   // Find active board
   const activeBoard = boards.find(b => b.id === activeBoardId) || null
 
@@ -182,5 +211,6 @@ export function useBoards(): UseBoardsReturn {
     switchBoard,
     createBoard,
     updateBoard,
+    deleteBoard,
   }
 }

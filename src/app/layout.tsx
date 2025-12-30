@@ -6,8 +6,14 @@ export const metadata: Metadata = {
   title: "Lavr Kanban AI",
   description: "Kanban Board AI powered by Lavr",
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
