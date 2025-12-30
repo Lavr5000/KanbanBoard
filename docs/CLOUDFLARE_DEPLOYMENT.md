@@ -32,7 +32,7 @@ If either step fails, **do not deploy**.
 npm run deploy:cloudflare
 ```
 
-This builds and deploys to Cloudflare Pages in one step.
+This builds and deploys to Cloudflare Workers in one step.
 
 **Manual deployment (if needed):**
 
@@ -41,7 +41,7 @@ This builds and deploys to Cloudflare Pages in one step.
 npm run validate:cloudflare
 
 # 2. Deploy
-npx wrangler pages deploy .open-next --project-name=lavr-ai-kanban-doska
+npx wrangler deploy
 ```
 
 ### First-Time Setup
@@ -52,8 +52,10 @@ npx wrangler login
 ```
 
 2. **Set environment variables** in Cloudflare Dashboard:
-   - Go to: Cloudflare Pages → lavr-ai-kanban-doska → Settings → Environment variables
+   - Go to: Cloudflare Workers & Pages → lavr-ai-kanban-doska → Settings → **Variables**
    - Add: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`
+
+   **Note:** These variables are already configured. No need to re-add them unless adding new secrets.
 
 ## Code Checks
 
@@ -75,12 +77,12 @@ npx wrangler login
 
 ## Environment Variables (Cloudflare Dashboard)
 
-Set these in Cloudflare Pages → Settings → Environment variables:
+Set these in Cloudflare Dashboard → Workers & Pages → lavr-ai-kanban-doska → Settings → **Variables**:
 
-- [ ] `NEXT_PUBLIC_SUPABASE_URL`
-- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- [ ] `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] `DEEPSEEK_API_KEY`
+- [x] `NEXT_PUBLIC_SUPABASE_URL` ✅ (already configured)
+- [x] `NEXT_PUBLIC_SUPABASE_ANON_KEY` ✅ (already configured)
+- [x] `SUPABASE_SERVICE_ROLE_KEY` ✅ (already configured)
+- [x] `DEEPSEEK_API_KEY` ✅ (already configured)
 
 ## Common Issues
 
