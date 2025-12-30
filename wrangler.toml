@@ -1,0 +1,12 @@
+# Cloudflare Workers/Pages configuration for OpenNext
+name = "lavr-ai-kanban-doska"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".open-next"
+
+# Environment variables (set in Cloudflare Dashboard)
+# These should NOT be hardcoded here for security
+# vars = { ENV_VAR = "value" }
+
+# Node.js compatibility
+[compatibility_flags]
+nodejs_compat = true
