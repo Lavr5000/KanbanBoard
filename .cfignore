@@ -1,0 +1,3 @@
+# Exclude cache directories from Cloudflare Pages deployment
+.next/cache/**
+*.log
