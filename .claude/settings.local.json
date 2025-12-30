@@ -38,7 +38,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
       "Bash(del:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(npm run deploy:cloudflare:*)"
     ]
   }
 }
