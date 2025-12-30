@@ -1,5 +1,5 @@
 {
   "version": 1,
-  "include": ["/*"],
-  "exclude": ["/_next/*", "/static/*"]
+  "include": ["/*", "/_next/data/*"],
+  "exclude": ["/_next/static/*", "/static/*"]
 }
