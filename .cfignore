@@ -1,3 +1,4 @@
-# Exclude cache directories from Cloudflare Pages deployment
-.next/cache/**
+# Exclude build artifacts from Cloudflare Pages deployment
+.open-next/**
+.next/**
 *.log
