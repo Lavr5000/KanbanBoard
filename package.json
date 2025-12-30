@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:cloudflare": "npx @opennextjs/cloudflare",
     "start": "next start",
     "lint": "next lint"
   },
@@ -25,6 +26,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.14.7",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

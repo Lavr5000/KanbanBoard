@@ -1,9 +1,0 @@
-name = "lavr-ai-kanban-doska"
-compatibility_date = "2024-01-01"
-pages_build_output_dir = ".next"
-
-[vars]
-NEXT_PUBLIC_SUPABASE_URL = "https://sqhtukwjmlaxuvemkydn.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_fobrz0BC9PxBtUl_dtcZPg_GxBJOs6u"
-DEEPSEEK_API_KEY = "sk-5b24ee34458047a09ee8936c930bf625"
-SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxaHR1a3dqbWxheHV2ZW1reWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3NjA4NTEsImV4cCI6MjA4MjMzNjg1MX0.gsvmQXVNNiCCYPHZvnSJK7Rx080gJjv2qrWKoBuQrd4"
