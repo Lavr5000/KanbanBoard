@@ -37,7 +37,8 @@
       "Skill(brainstorming:*)",
       "Bash(npx tsc:*)",
       "Bash(npm uninstall:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(npx:*)"
     ]
   }
 }
