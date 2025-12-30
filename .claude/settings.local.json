@@ -32,7 +32,12 @@
       "Bash(where:*)",
       "Bash(git --version:*)",
       "Bash(Get-Process -Name node -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object Id, ProcessName)"
+      "Bash(Select-Object Id, ProcessName)",
+      "Skill(brainstorming)",
+      "Skill(brainstorming:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(del:*)"
     ]
   }
 }
