@@ -48,7 +48,7 @@ Set these in Cloudflare Pages → Settings → Environment variables:
 In Cloudflare Pages → Settings → Builds and deployments:
 
 - **Framework preset**: Next.js
-- **Build command**: `npm run build && npm run build:cloudflare`
+- **Build command**: `npm run validate:cloudflare`
 - **Build output directory**: `.open-next/assets`
 - **Node.js version**: `22`
 
