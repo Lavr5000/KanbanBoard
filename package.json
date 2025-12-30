@@ -7,6 +7,7 @@
     "build": "next build",
     "build:cloudflare": "npx @opennextjs/cloudflare build --skipWranglerConfigCheck",
     "validate:cloudflare": "npm run build && npm run build:cloudflare",
+    "deploy:cloudflare": "npx wrangler pages deploy .open-next --project-name=lavr-ai-kanban-doska",
     "start": "next start",
     "lint": "next lint"
   },

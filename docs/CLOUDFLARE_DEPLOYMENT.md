@@ -1,10 +1,18 @@
-# Cloudflare Pages Deployment Checklist
+# Cloudflare Deployment Guide
 
-This checklist helps verify code is ready for Cloudflare Pages deployment before pushing to GitHub.
+This guide explains how to deploy the Next.js application to Cloudflare using OpenNext adapter.
 
-## Pre-Push Validation (REQUIRED)
+## Deployment Method: Wrangler CLI
 
-**Always run before pushing changes:**
+This project uses **Wrangler CLI** for deployment (NOT GitHub integration).
+
+### Why Wrangler instead of Git-based deployment?
+
+OpenNext generates a bundle that works with Cloudflare Workers. Git-based deployment in Cloudflare Pages doesn't properly support the Worker-based routing that OpenNext uses. Wrangler CLI deploys the correct bundle structure.
+
+### Pre-Deployment Checklist
+
+**Always run before deploying:**
 
 ```bash
 npm run validate:cloudflare
@@ -14,7 +22,38 @@ This command:
 1. Runs `next build` - validates Next.js builds correctly
 2. Runs `@opennextjs/cloudflare build` - generates `.open-next` bundle
 
-If either step fails, **do not push** to GitHub.
+If either step fails, **do not deploy**.
+
+### Deploying to Cloudflare
+
+**One-command deployment:**
+
+```bash
+npm run deploy:cloudflare
+```
+
+This builds and deploys to Cloudflare Pages in one step.
+
+**Manual deployment (if needed):**
+
+```bash
+# 1. Build
+npm run validate:cloudflare
+
+# 2. Deploy
+npx wrangler pages deploy .open-next --project-name=lavr-ai-kanban-doska
+```
+
+### First-Time Setup
+
+1. **Authenticate Wrangler:**
+```bash
+npx wrangler login
+```
+
+2. **Set environment variables** in Cloudflare Dashboard:
+   - Go to: Cloudflare Pages → lavr-ai-kanban-doska → Settings → Environment variables
+   - Add: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`
 
 ## Code Checks
 
@@ -42,15 +81,6 @@ Set these in Cloudflare Pages → Settings → Environment variables:
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`
 - [ ] `DEEPSEEK_API_KEY`
-
-## Cloudflare Pages Build Settings
-
-In Cloudflare Pages → Settings → Builds and deployments:
-
-- **Framework preset**: Next.js
-- **Build command**: `npm run validate:cloudflare`
-- **Build output directory**: `.open-next/assets`
-- **Node.js version**: `22`
 
 ## Common Issues
 
@@ -93,7 +123,9 @@ rm -rf .next && npm run validate:cloudflare
 
 | Command | Purpose |
 |---------|---------|
-| `npm run validate:cloudflare` | Full build validation (run before push) |
+| `npm run validate:cloudflare` | Full build validation (run before deploy) |
+| `npm run deploy:cloudflare` | Build and deploy to Cloudflare |
 | `npm run build` | Next.js production build |
-| `npm run build:cloudflare` | OpenNext Cloudflare bundle |
+| `npm run build:cloudflare` | OpenNext Cloudflare bundle only |
+| `npx wrangler login` | Authenticate with Cloudflare |
 | `rm -rf .next .open-next` | Clean build artifacts |
