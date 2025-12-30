@@ -1,0 +1,17 @@
+{
+  "name": "Lavr Kanban AI",
+  "short_name": "Kanban AI",
+  "description": "Kanban Board AI powered by Lavr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121218",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

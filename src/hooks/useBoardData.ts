@@ -21,6 +21,9 @@ interface UseBoardDataReturn {
   // Optimistic state
   optimisticTasks: Task[]
   optimisticColumns: Column[]
+
+  // Refetch
+  refetchColumns: () => Promise<void>
 }
 
 /**
@@ -40,6 +43,21 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
   // Optimistic state (for instant UI updates before server confirms)
   const [optimisticTasks, setOptimisticTasks] = useState<Task[]>([])
   const [optimisticColumns, setOptimisticColumns] = useState<Column[]>([])
+
+  // Refetch function for columns
+  const refetchColumns = async () => {
+    if (!board) return
+    const { data, error } = await supabase
+      .from('columns')
+      .select('*')
+      .eq('board_id', board.id)
+      .order('position', { ascending: true })
+
+    if (!error && data) {
+      setColumns(data)
+      setOptimisticColumns(data)
+    }
+  }
 
   // Load initial data
   useEffect(() => {
@@ -106,9 +124,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
             const defaultColumns = [
               { board_id: newBoard.id, title: 'Новая задача', position: 0 },
               { board_id: newBoard.id, title: 'Выполняется', position: 1 },
-              { board_id: newBoard.id, title: 'Ожидает проверки', position: 2 },
-              { board_id: newBoard.id, title: 'На тестировании', position: 3 },
-              { board_id: newBoard.id, title: 'В доработку', position: 4 },
+              { board_id: newBoard.id, title: 'На тестировании', position: 2 },
+              { board_id: newBoard.id, title: 'Выполнено', position: 3 },
             ]
 
             const { data: newColumns, error: columnsError } = await supabase
@@ -392,5 +409,6 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     moveTask,
     optimisticTasks,
     optimisticColumns,
+    refetchColumns,
   }
 }
