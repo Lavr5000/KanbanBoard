@@ -405,9 +405,9 @@ export const Board = () => {
         isOpen={deletingTaskId !== null}
         onClose={() => setDeletingTaskId(null)}
       />
+      </div>
 
       <RoadmapPanel boardId={activeBoard?.id || null} />
-      </div>
       </div>
     </BoardContext.Provider>
   );
