@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { Modal } from "@/shared/ui/Modal";
 import { EditTaskModal } from "@/features/task-operations/ui/EditTaskModal";
 import { useTaskAI, TaskAISuggestions, AISuggestionIcon } from "@/features/task-ai-suggestions";
+import { useAISuggestions } from "@/features/ai-suggestions/hooks/useAISuggestions";
 
 interface Props {
   task: Task;
@@ -30,7 +31,13 @@ export const TaskCard = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // AI suggestions hook
-  const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions, restoreSuggestions } = useTaskAI()
+  const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions, restoreSuggestions } = useTaskAI({ taskId: String(task.id) })
+
+  // Load saved AI suggestions from database
+  const { suggestions: savedSuggestions } = useAISuggestions({ taskId: String(task.id) })
+
+  // Use saved suggestions if available, otherwise use current suggestions
+  const displaySuggestions = savedSuggestions || suggestions
 
   // Generate AI suggestions for newly created tasks
   useEffect(() => {
@@ -104,7 +111,7 @@ export const TaskCard = ({
               {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
             </span>
             {/* AI Icon (shown when suggestions exist but hidden) */}
-            {!visible && suggestions && <AISuggestionIcon onRestore={restoreSuggestions} />}
+            {!visible && displaySuggestions && <AISuggestionIcon onRestore={restoreSuggestions} />}
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
@@ -162,9 +169,9 @@ export const TaskCard = ({
           </div>
         )}
 
-        {suggestions && visible && (
+        {displaySuggestions && visible && (
           <TaskAISuggestions
-            data={suggestions}
+            data={displaySuggestions}
             onHide={hideSuggestions}
           />
         )}

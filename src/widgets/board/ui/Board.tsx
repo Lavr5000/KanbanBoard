@@ -24,6 +24,7 @@ import { TaskCard } from "@/entities/task/ui/TaskCard";
 import { Task, Id } from "@/entities/task/model/types";
 import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmModal";
 import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
+import { RoadmapPanel } from "@/features/roadmap/ui/RoadmapPanel";
 import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
@@ -404,6 +405,8 @@ export const Board = () => {
         isOpen={deletingTaskId !== null}
         onClose={() => setDeletingTaskId(null)}
       />
+
+      <RoadmapPanel boardId={activeBoard?.id || null} />
       </div>
       </div>
     </BoardContext.Provider>
