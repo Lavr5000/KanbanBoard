@@ -39,7 +39,11 @@
       "Bash(npm uninstall:*)",
       "Bash(del:*)",
       "Bash(npx:*)",
-      "Bash(npm run deploy:cloudflare:*)"
+      "Bash(npm run deploy:cloudflare:*)",
+      "Bash(if not exist:*)",
+      "Bash(if exist:*)",
+      "Bash(npm run build:cloudflare:*)",
+      "Bash(ren:*)"
     ]
   }
 }

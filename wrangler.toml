@@ -9,6 +9,7 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 # Node.js compatibility
 compatibility_flags = ["nodejs_compat"]
 
-# Environment variables (set in Cloudflare Dashboard)
-# These should NOT be hardcoded here for security
-# vars = { ENV_VAR = "value" }
+# Environment variables
+# TODO: Move to secrets for production
+[vars]
+DEEPSEEK_API_KEY = "sk-5b24ee34458047a09ee8936c930bf625"

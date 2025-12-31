@@ -1,7 +1,41 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Copy } from 'lucide-react'
 import type { AISuggestion } from '../hooks/useTaskAI'
+
+interface CopyButtonProps {
+  text: string
+  className?: string
+}
+
+function CopyButton({ text, className = '' }: CopyButtonProps) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`opacity-0 group-hover:opacity-100 transition-opacity ${className}`}
+      title={copied ? 'Скопировано!' : 'Копировать'}
+    >
+      {copied ? (
+        <span className="text-green-400 text-xs">✓</span>
+      ) : (
+        <Copy size={14} className="text-gray-500 hover:text-gray-300" />
+      )}
+    </button>
+  )
+}
 
 interface TaskAISuggestionsProps {
   data: AISuggestion
@@ -41,9 +75,10 @@ export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000 }: TaskA
 
       {/* Improved Title */}
       {data.improvedTitle && (
-        <div className="mb-3">
-          <div className="text-xs text-gray-400 mb-1 flex items-center gap-1">
-            📌 Улучшенное название:
+        <div className="mb-3 group relative">
+          <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
+            <span className="flex items-center gap-1">📌 Улучшенное название:</span>
+            <CopyButton text={data.improvedTitle} />
           </div>
           <div className="text-sm text-white font-medium">{data.improvedTitle}</div>
         </div>
@@ -51,9 +86,10 @@ export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000 }: TaskA
 
       {/* Description */}
       {data.description && (
-        <div className="mb-3">
-          <div className="text-xs text-gray-400 mb-1 flex items-center gap-1">
-            📝 Описание:
+        <div className="mb-3 group relative">
+          <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
+            <span className="flex items-center gap-1">📝 Описание:</span>
+            <CopyButton text={data.description} />
           </div>
           <div className="text-sm text-gray-300 leading-relaxed">{data.description}</div>
         </div>
@@ -61,15 +97,16 @@ export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000 }: TaskA
 
       {/* Acceptance Criteria */}
       {data.acceptanceCriteria && data.acceptanceCriteria.length > 0 && (
-        <div className="mb-3">
-          <div className="text-xs text-gray-400 mb-1.5 flex items-center gap-1">
-            ✅ Критерии приемки:
+        <div className="mb-3 group relative">
+          <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
+            <span className="flex items-center gap-1">✅ Критерии приемки:</span>
+            <CopyButton text={data.acceptanceCriteria.join('\n')} />
           </div>
           <ul className="space-y-1">
             {data.acceptanceCriteria.map((criteria, index) => (
               <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
                 <span className="text-gray-500 mt-0.5">•</span>
-                <span>{criteria}</span>
+                <span className="flex-1">{criteria}</span>
               </li>
             ))}
           </ul>
@@ -78,15 +115,16 @@ export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000 }: TaskA
 
       {/* Risks */}
       {data.risks && data.risks.length > 0 && (
-        <div>
-          <div className="text-xs text-gray-400 mb-1.5 flex items-center gap-1">
-            ⚠️ Риски:
+        <div className="group relative">
+          <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
+            <span className="flex items-center gap-1">⚠️ Риски:</span>
+            <CopyButton text={data.risks.join('\n')} />
           </div>
           <ul className="space-y-1">
             {data.risks.map((risk, index) => (
               <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
                 <span className="text-gray-500 mt-0.5">•</span>
-                <span>{risk}</span>
+                <span className="flex-1">{risk}</span>
               </li>
             ))}
           </ul>

@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+const supabase = createClient()
 
 export interface AISuggestion {
   improvedTitle: string
@@ -10,11 +13,12 @@ export interface AISuggestion {
 }
 
 interface UseTaskAIOptions {
+  taskId?: string | null
   autoHideDelay?: number // milliseconds
 }
 
 export function useTaskAI(options: UseTaskAIOptions = {}) {
-  const { autoHideDelay = 30000 } = options
+  const { taskId, autoHideDelay = 30000 } = options
 
   const [suggestions, setSuggestions] = useState<AISuggestion | null>(null)
   const [loading, setLoading] = useState(false)
@@ -73,6 +77,25 @@ export function useTaskAI(options: UseTaskAIOptions = {}) {
         }
 
         setSuggestions(data)
+
+        // Auto-save to database if taskId is provided
+        if (taskId) {
+          supabase
+            .from('ai_suggestions')
+            .insert({
+              task_id: taskId,
+              improved_title: data.improvedTitle,
+              description: data.description,
+              acceptance_criteria: data.acceptanceCriteria,
+              risks: data.risks,
+            })
+            .then(({ error }) => {
+              if (error) {
+                console.error('Failed to save AI suggestions:', error)
+              }
+            })
+        }
+
         startHideTimer()
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to generate suggestions'
@@ -82,7 +105,7 @@ export function useTaskAI(options: UseTaskAIOptions = {}) {
         setLoading(false)
       }
     },
-    [startHideTimer]
+    [startHideTimer, taskId]
   )
 
   // Hide suggestions manually
