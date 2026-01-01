@@ -26,12 +26,14 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
   // Load roadmap on mount
   useEffect(() => {
     if (!boardId || !enabled) {
+      console.log('📋 Roadmap: skip load (boardId:', boardId, ', enabled:', enabled, ')')
       setContent('')
       setHasContent(false)
       return
     }
 
     const fetchRoadmap = async () => {
+      console.log('📋 Roadmap: loading for boardId:', boardId)
       setLoading(true)
       setError(null)
 
@@ -41,12 +43,16 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
         .eq('board_id', boardId)
         .maybeSingle()
 
+      console.log('📋 Roadmap: load result:', { data, error })
+
       if (error) {
+        console.error('❌ Roadmap: load error:', error)
         setError(error)
       } else {
         const roadmapContent = data?.content || ''
         setContent(roadmapContent)
         setHasContent(!!roadmapContent)
+        console.log('✅ Roadmap: loaded, content length:', roadmapContent.length)
       }
 
       setLoading(false)
@@ -57,21 +63,29 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
 
   // Save roadmap with debounce
   const saveRoadmap = useCallback(async (newContent: string) => {
-    if (!boardId) return
+    if (!boardId) {
+      console.log('📋 Roadmap: skip save (no boardId)')
+      return
+    }
 
+    console.log('💾 Roadmap: saving for boardId:', boardId, 'content length:', newContent.length)
     setSaving(true)
     setError(null)
 
-    const { error } = await supabase
+    const { error, data } = await supabase
       .from('roadmaps')
       .upsert(
         { board_id: boardId, content: newContent },
         { onConflict: 'board_id' }
       )
 
+    console.log('📋 Roadmap: save result:', { error, data })
+
     if (error) {
+      console.error('❌ Roadmap: save error:', error)
       setError(error)
     } else {
+      console.log('✅ Roadmap: saved successfully')
       setHasContent(!!newContent)
     }
 

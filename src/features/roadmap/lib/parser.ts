@@ -12,6 +12,32 @@ export function isAIGenerated(content: string): boolean {
 }
 
 /**
+ * Clean AI-generated roadmap by removing metadata and conversational text
+ * Keeps only the clean roadmap content between <!-- AI_GENERATED --> and options
+ */
+export function cleanRoadmapContent(content: string): string {
+  // Find the AI_GENERATED marker
+  const markerIndex = content.indexOf('<!-- AI_GENERATED -->')
+  if (markerIndex === -1) {
+    return content
+  }
+
+  // Get content after the marker
+  let cleaned = content.substring(markerIndex + '<!-- AI_GENERATED -->'.length).trim()
+
+  // Remove text after horizontal rule (---)
+  const hrMatch = cleaned.match(/\n---+/)
+  if (hrMatch) {
+    cleaned = cleaned.substring(0, hrMatch.index).trim()
+  }
+
+  // Remove markdown ## headers (but keep # main title)
+  cleaned = cleaned.replace(/^## (.+)$/gm, '$1')
+
+  return cleaned
+}
+
+/**
  * Parse roadmap and extract numbered tasks
  * Only works if <!-- AI_GENERATED --> marker is present
  */

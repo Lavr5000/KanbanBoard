@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 export interface ChatMessage {
   role: 'user' | 'assistant'
@@ -8,10 +8,66 @@ export interface ChatMessage {
   options?: string[]
 }
 
-export function useRoadmapAI() {
+interface UseRoadmapAIOptions {
+  boardId?: string | null
+}
+
+const STORAGE_KEY = 'roadmap_ai_chat'
+
+export function useRoadmapAI({ boardId }: UseRoadmapAIOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const loadedRef = useRef(false)
+
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined' || loadedRef.current) return
+
+    console.log('🤖 AI Chat: loading history, boardId:', boardId)
+
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      console.log('🤖 AI Chat: stored data:', stored)
+
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        console.log('🤖 AI Chat: parsed data:', parsed)
+
+        // Only restore if boardId matches or no boardId
+        if (!boardId || parsed.boardId === boardId) {
+          console.log('🤖 AI Chat: restoring', parsed.messages?.length || 0, 'messages')
+          setMessages(parsed.messages || [])
+        } else {
+          console.log('🤖 AI Chat: boardId mismatch, skipping restore')
+        }
+      } else {
+        console.log('🤖 AI Chat: no stored data found')
+      }
+
+      loadedRef.current = true
+    } catch (e) {
+      console.error('❌ AI Chat: failed to load history:', e)
+    }
+  }, [boardId])
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    console.log('💾 AI Chat: saving', messages.length, 'messages for boardId:', boardId)
+
+    try {
+      const data = JSON.stringify({
+        boardId,
+        messages
+      })
+      localStorage.setItem(STORAGE_KEY, data)
+      console.log('✅ AI Chat: saved successfully')
+    } catch (e) {
+      console.error('❌ AI Chat: failed to save history:', e)
+    }
+  }, [boardId, messages])
 
   const sendMessage = useCallback(async (userMessage: string) => {
     setLoading(true)
@@ -71,7 +127,7 @@ export function useRoadmapAI() {
   }, [messages])
 
   const startSession = useCallback(() => {
-    setMessages([])
+    // Don't clear messages anymore - they're persisted
     setError(null)
   }, [])
 
