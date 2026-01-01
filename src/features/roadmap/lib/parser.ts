@@ -39,32 +39,26 @@ export function cleanRoadmapContent(content: string): string {
 
 /**
  * Parse roadmap and extract numbered tasks
- * Only works if <!-- AI_GENERATED --> marker is present
+ * Works with any content that has numbered tasks
  */
 export function parseRoadmapTasks(content: string): ParsedTask[] {
-  // Check AI generation marker
-  if (!isAIGenerated(content)) {
-    return []
-  }
-
   const tasks: ParsedTask[] = []
   const lines = content.split('\n')
 
-  // Regex for "1. Task text" or "1) Task text"
-  const taskRegex = /^(\d+)[\.)]\s+(.+)$/
+  // Regex for "1. Task text" or "1) Task text" with optional bold ****
+  const taskRegex = /^\d+[\.)]\s+\*\*(.+?)\*\*\s+-\s+(.+)$/
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim()
     const match = line.match(taskRegex)
 
     if (match) {
-      const number = parseInt(match[1], 10)
-      const title = match[2].trim()
+      const title = match[1].trim()
+      const description = match[2].trim()
+      const fullTitle = `${title} - ${description}`
 
-      // Validate number (should be sequential)
-      if (number === tasks.length + 1) {
-        tasks.push({ number, title, lineNumber: i + 1 })
-      }
+      // Use sequential number
+      tasks.push({ number: tasks.length + 1, title: fullTitle, lineNumber: i + 1 })
     }
   }
 
