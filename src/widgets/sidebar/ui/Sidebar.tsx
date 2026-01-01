@@ -3,6 +3,7 @@
 import { Play, Download, LogOut } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { BoardSelector } from "@/widgets/board-selector";
+import { FeedbackButton, FeedbackModal } from "@/features/feedback";
 
 export const Sidebar = () => {
   const { user, signOut } = useAuth();
@@ -34,6 +35,7 @@ export const Sidebar = () => {
           <Download size={14} />
           Экспортировать данные
         </button>
+        <FeedbackButton />
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
@@ -59,6 +61,8 @@ export const Sidebar = () => {
           </div>
         )}
       </div>
+
+      <FeedbackModal />
     </aside>
   );
 };

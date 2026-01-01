@@ -43,7 +43,16 @@
       "Bash(if not exist:*)",
       "Bash(if exist:*)",
       "Bash(npm run build:cloudflare:*)",
-      "Bash(ren:*)"
+      "Bash(ren:*)",
+      "Bash(start \"\" \"https://github.com/Lavr5000/0-KanBanDoska/actions/runs/20618387683\")",
+      "Bash(start \"\" \"https://github.com/Lavr5000/0-KanBanDoska/actions/runs/20620701130\")",
+      "Bash(start \"\" \"https://github.com/Lavr5000/0-KanBanDoska/actions/runs/20620744660\")",
+      "Bash(start:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run retry:*)",
+      "Bash(gh run rerun:*)",
+      "Bash(npm run lint)"
     ]
   }
 }
