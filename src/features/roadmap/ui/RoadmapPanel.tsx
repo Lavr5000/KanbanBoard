@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { Map, ChevronUp, ChevronDown, Save } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
+import { Map, ChevronUp, ChevronDown, Save, Sparkles, Plus } from 'lucide-react'
 import { useRoadmap } from '../hooks/useRoadmap'
+import { RoadmapAIChat } from './RoadmapAIChat'
+import { isAIGenerated, parseRoadmapTasks } from '../lib/parser'
+import { createTasksFromRoadmap } from '../lib/task-creator'
 
 interface RoadmapPanelProps {
   boardId: string | null
@@ -13,9 +16,57 @@ interface RoadmapPanelProps {
  */
 export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false)
+  const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+  const [isCreating, setIsCreating] = useState(false)
   const { content, updateContent, immediateSave, loading, saving, error, hasContent } = useRoadmap({ boardId })
 
+  // Parse tasks from content
+  const parsedTasks = parseRoadmapTasks(content)
+  const isAI = isAIGenerated(content)
+  const tasksToShow = Math.min(5, parsedTasks.length)
+
+  // Show toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [toast])
+
+  // Handle create tasks
+  const handleCreateTasks = useCallback(async () => {
+    if (isCreating) return
+
+    if (!boardId) {
+      setToast({
+        type: 'error',
+        message: '✗ Ошибка: Не выбрана доска'
+      })
+      return
+    }
+
+    setIsCreating(true)
+    const result = await createTasksFromRoadmap(boardId, parsedTasks, 5)
+
+    if (result.success) {
+      setToast({
+        type: 'success',
+        message: `✓ Создано ${result.created} задач`
+      })
+      // Force page reload to show new tasks immediately
+      setTimeout(() => window.location.reload(), 1000)
+    } else {
+      setToast({
+        type: 'error',
+        message: `✗ Ошибка: ${result.errors.join(', ')}`
+      })
+      setIsCreating(false)
+    }
+  }, [boardId, parsedTasks, isCreating])
+
   return (
+    <>
     <div
       className={`fixed bottom-0 left-0 right-0 ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
         isExpanded ? 'h-[70vh]' : 'h-10'
@@ -36,6 +87,16 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsAIChatOpen(true)
+            }}
+            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30"
+            title="Сгенерировать с AI"
+          >
+            <Sparkles size={14} className="text-white" />
+          </button>
           {saving && (
             <span className="text-xs text-gray-500">Сохранение...</span>
           )}
@@ -80,9 +141,27 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
               />
 
               <div className="flex items-center justify-between mt-3">
-                <span className="text-xs text-gray-500">
-                  Автосохранение через 2 секунды после последнего изменения
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    Автосохранение через 2 секунды после последнего изменения
+                  </span>
+
+                  {/* Create tasks button for AI roadmaps */}
+                  {isAI && tasksToShow > 0 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCreateTasks()
+                      }}
+                      disabled={isCreating}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800 text-white rounded-md text-xs transition-colors"
+                    >
+                      <Plus size={12} />
+                      {isCreating ? 'Создание...' : `Создать ${tasksToShow} задач`}
+                    </button>
+                  )}
+                </div>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -99,5 +178,27 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
         </div>
       )}
     </div>
+
+    {/* AI Chat Modal */}
+    {isAIChatOpen && (
+      <RoadmapAIChat
+        boardId={boardId}
+        onApply={(content) => {
+          updateContent(content)
+          immediateSave()
+        }}
+        onClose={() => setIsAIChatOpen(false)}
+      />
+    )}
+
+    {/* Toast notification */}
+    {toast && (
+      <div className={`fixed bottom-20 right-8 px-4 py-3 rounded-lg shadow-lg text-sm font-medium z-[100] animate-slideUp ${
+        toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-500 text-white'
+      }`}>
+        {toast.message}
+      </div>
+    )}
+    </>
   )
 }
