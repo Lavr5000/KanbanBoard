@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Pages
+    name: Deploy to Cloudflare Workers
 
     steps:
       - name: Checkout code
@@ -24,23 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js for Cloudflare Pages
-        run: npx @opennextjs/cloudflare build --skipWranglerConfigCheck
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: Create missing config file (workaround for @opennextjs/cloudflare bug)
-        run: |
-          mkdir -p .open-next/middleware
-          echo "// Workaround for @opennextjs/cloudflare bug" > .open-next/middleware/open-next.config.mjs
-          echo "export default {};" >> .open-next/middleware/open-next.config.mjs
-          ls -la .open-next/middleware/
-
-      - name: Continue OpenNext build
-        run: npx @opennextjs/cloudflare build --skipWranglerConfigCheck --skipNextBuild
+      - name: Build for Cloudflare
+        run: npm run build:cloudflare
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
