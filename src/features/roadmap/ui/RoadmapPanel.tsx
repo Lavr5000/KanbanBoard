@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { Map, ChevronUp, ChevronDown, Save, Sparkles, Plus } from 'lucide-react'
 import { useRoadmap } from '../hooks/useRoadmap'
 import { RoadmapAIChat } from './RoadmapAIChat'
-import { isAIGenerated, parseRoadmapTasks } from '../lib/parser'
+import { parseRoadmapTasks } from '../lib/parser'
 import { createTasksFromRoadmap } from '../lib/task-creator'
 
 interface RoadmapPanelProps {
@@ -23,7 +23,6 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
 
   // Parse tasks from content
   const parsedTasks = parseRoadmapTasks(content)
-  const isAI = isAIGenerated(content)
   const tasksToShow = Math.min(5, parsedTasks.length)
 
   // Show toast
@@ -42,6 +41,14 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
       setToast({
         type: 'error',
         message: '✗ Ошибка: Не выбрана доска'
+      })
+      return
+    }
+
+    if (parsedTasks.length === 0) {
+      setToast({
+        type: 'error',
+        message: '✗ Нет задач для создания. Добавьте задачи в roadmap'
       })
       return
     }
@@ -146,20 +153,18 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
                     Автосохранение через 2 секунды после последнего изменения
                   </span>
 
-                  {/* Create tasks button for AI roadmaps */}
-                  {isAI && tasksToShow > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleCreateTasks()
-                      }}
-                      disabled={isCreating}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800 text-white rounded-md text-xs transition-colors"
-                    >
-                      <Plus size={12} />
-                      {isCreating ? 'Создание...' : `Создать ${tasksToShow} задач`}
-                    </button>
-                  )}
+                  {/* Create tasks button - always visible */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCreateTasks()
+                    }}
+                    disabled={isCreating}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800 text-white rounded-md text-xs transition-colors"
+                  >
+                    <Plus size={12} />
+                    {isCreating ? 'Создание...' : tasksToShow > 0 ? `Создать ${tasksToShow} задач` : 'Создать задачи'}
+                  </button>
                 </div>
 
                 <button
