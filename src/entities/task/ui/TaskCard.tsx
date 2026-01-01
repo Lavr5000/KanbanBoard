@@ -173,6 +173,7 @@ export const TaskCard = ({
           <TaskAISuggestions
             data={displaySuggestions}
             onHide={hideSuggestions}
+            isSaved={!!savedSuggestions}
           />
         )}
 

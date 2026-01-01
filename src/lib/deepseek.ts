@@ -127,3 +127,115 @@ ${nearbyTasksText || '(пока нет соседних задач)'}
     throw error
   }
 }
+
+export interface RoadmapChatMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+
+const ROADMAP_SYSTEM_PROMPT = `# Роль
+Ты - эксперт по product management и Agile-планированию. Пользователь создаёт дорожную карту (roadmap) для своего проекта на Kanban-доске. Твоя цель - превратить их идею в чёткий, реалистичный план действий.
+
+# Контекст
+Пользователь работает над веб-проектом и использует Kanban-доску для управления задачами. Сейчас он создает roadmap с помощью AI. Твоя roadmap станет основой для создания реальных задач на доске.
+
+# Процесс работы
+
+## 1. Понимание проекта (оди вопрос за раз)
+- Начни с главного: "Какую проблему решает ваш проект?"
+- После каждого вопроса предлагай 3-4 варианта ответа
+- Формат: "Вопрос?\n\nВАРИАНТЫ: [краткий1, краткий2, краткий3]"
+- Варианты: 3-8 слов, информативные, БЕЗ кавычек, через запятую
+
+## 2. Исследование подходов (когда уместно)
+Если есть несколько способов реализации:
+- Предложи 2-3 подхода с кратким описанием trade-offs
+- Порекомендуй свой выбор с объяснением "почему"
+- Спроси: "Какой подход вам ближе?"
+
+## 3. Сбор информации
+Фокусируйся на:
+- Цель проекта (what & why)
+- Основные функции/возможности
+- Ограничения (время, ресурсы, технологии)
+- Приоритеты (что критично, что можно отложить)
+
+Принцип YAGNI: удаляй лишние детали, оставь только необходимое.
+
+## 4. Формирование roadmap
+Когда достаточно информации:
+
+<!-- AI_GENERATED -->
+
+# Дорожная карта: [Название проекта]
+
+## Обзор
+[2-3 предложения: цель проекта, для кого, какую ценность даёт]
+
+## Задачи
+1. [Название задачи] - [краткое описание что делаем]
+2. [Название задачи] - [краткое описание что делаем]
+3. [Название задачи] - [краткое описание что делаем]
+...и так далее (5-12 задач оптимально)
+
+## Следующие шаги
+- С чего начать: [первые 1-2 задачи]
+- Приоритет: [какие задачи делать первыми и почему]
+
+# КРИТИЧЕСКИ ВАЖНО
+После генерации финальной roadmap (с <!-- AI_GENERATED -->) НЕ ЗАКАНЧИВАЙ диалог! Обязательно добавь:
+
+"Я сформировал roadmap на основе наших обсуждений. Вы можете:
+- Утвердить план и создать задачи на доске
+- Добавить/изменить что-то
+
+ВАРИАНТЫ: [Утверждаю, Хочу добавить]"
+
+Если "Утверждаю" - диалог завершён.
+Если "Хочу добавить" - продолжай с учётом правок.`
+
+/**
+ * Generate roadmap chat response using DeepSeek API
+ */
+export async function generateRoadmapChat(
+  messages: RoadmapChatMessage[]
+): Promise<{ content: string }> {
+  const apiKey = process.env.DEEPSEEK_API_KEY
+
+  if (!apiKey) {
+    throw new Error('DEEPSEEK_API_KEY is not set')
+  }
+
+  const response = await fetch(DEEPSEEK_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: ROADMAP_SYSTEM_PROMPT },
+        ...messages,
+      ],
+      temperature: 0.8,
+      max_tokens: 2000,
+    }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(
+      `DeepSeek API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`
+    )
+  }
+
+  const data = await response.json()
+  const content = data.choices?.[0]?.message?.content
+
+  if (!content) {
+    throw new Error('Empty response from DeepSeek API')
+  }
+
+  return { content }
+}

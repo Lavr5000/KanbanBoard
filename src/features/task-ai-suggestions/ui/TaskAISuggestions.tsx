@@ -41,94 +41,117 @@ interface TaskAISuggestionsProps {
   data: AISuggestion
   onHide: () => void
   autoHideDelay?: number
+  isSaved?: boolean // If true, these are saved suggestions (collapsed by default)
 }
 
 /**
  * Displays AI-generated suggestions for improving a task
  * Shows structured improvements: title, description, acceptance criteria, risks
  */
-export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000 }: TaskAISuggestionsProps) {
+export function TaskAISuggestions({ data, onHide, autoHideDelay = 30000, isSaved = false }: TaskAISuggestionsProps) {
+  const [isExpanded, setIsExpanded] = useState(!isSaved) // Saved suggestions are collapsed by default
   const [timeLeft, setTimeLeft] = useState(autoHideDelay / 1000)
 
   useEffect(() => {
+    // Only start timer for new (non-saved) suggestions
+    if (isSaved) return
+
     const interval = setInterval(() => {
       setTimeLeft((prev) => Math.max(0, prev - 1))
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [isSaved])
 
   return (
     <div className="mt-3 pt-3 border-t border-gray-700/50 bg-[#1a1a20] rounded-lg p-3">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-medium text-purple-400 flex items-center gap-2">
-          💡 AI-предложения
-        </span>
-        <button
-          onClick={onHide}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+        <span
+          className="text-sm font-medium text-purple-400 flex items-center gap-2 cursor-pointer hover:text-purple-300"
+          onClick={() => setIsExpanded(!isExpanded)}
         >
-          Скрыть через {timeLeft}с
-        </button>
+          💡 AI-предложения {isSaved && <span className="text-xs text-gray-500">(нажмите чтобы раскрыть)</span>}
+        </span>
+        {!isSaved && (
+          <button
+            onClick={onHide}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            Скрыть через {timeLeft}с
+          </button>
+        )}
+        {isSaved && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            {isExpanded ? '▲' : '▼'}
+          </button>
+        )}
       </div>
 
-      {/* Improved Title */}
-      {data.improvedTitle && (
-        <div className="mb-3 group relative">
-          <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
-            <span className="flex items-center gap-1">📌 Улучшенное название:</span>
-            <CopyButton text={data.improvedTitle} />
-          </div>
-          <div className="text-sm text-white font-medium">{data.improvedTitle}</div>
-        </div>
-      )}
+      {/* Content - only show if expanded OR if it's a new suggestion (always expanded initially) */}
+      {(isExpanded || !isSaved) && (
+        <>
+          {/* Improved Title */}
+          {data.improvedTitle && (
+            <div className="mb-3 group relative">
+              <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
+                <span className="flex items-center gap-1">📌 Улучшенное название:</span>
+                <CopyButton text={data.improvedTitle} />
+              </div>
+              <div className="text-sm text-white font-medium">{data.improvedTitle}</div>
+            </div>
+          )}
 
-      {/* Description */}
-      {data.description && (
-        <div className="mb-3 group relative">
-          <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
-            <span className="flex items-center gap-1">📝 Описание:</span>
-            <CopyButton text={data.description} />
-          </div>
-          <div className="text-sm text-gray-300 leading-relaxed">{data.description}</div>
-        </div>
-      )}
+          {/* Description */}
+          {data.description && (
+            <div className="mb-3 group relative">
+              <div className="text-xs text-gray-400 mb-1 flex items-center justify-between">
+                <span className="flex items-center gap-1">📝 Описание:</span>
+                <CopyButton text={data.description} />
+              </div>
+              <div className="text-sm text-gray-300 leading-relaxed">{data.description}</div>
+            </div>
+          )}
 
-      {/* Acceptance Criteria */}
-      {data.acceptanceCriteria && data.acceptanceCriteria.length > 0 && (
-        <div className="mb-3 group relative">
-          <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
-            <span className="flex items-center gap-1">✅ Критерии приемки:</span>
-            <CopyButton text={data.acceptanceCriteria.join('\n')} />
-          </div>
-          <ul className="space-y-1">
-            {data.acceptanceCriteria.map((criteria, index) => (
-              <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
-                <span className="text-gray-500 mt-0.5">•</span>
-                <span className="flex-1">{criteria}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+          {/* Acceptance Criteria */}
+          {data.acceptanceCriteria && data.acceptanceCriteria.length > 0 && (
+            <div className="mb-3 group relative">
+              <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1">✅ Критерии приемки:</span>
+                <CopyButton text={data.acceptanceCriteria.join('\n')} />
+              </div>
+              <ul className="space-y-1">
+                {data.acceptanceCriteria.map((criteria, index) => (
+                  <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
+                    <span className="text-gray-500 mt-0.5">•</span>
+                    <span className="flex-1">{criteria}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {/* Risks */}
-      {data.risks && data.risks.length > 0 && (
-        <div className="group relative">
-          <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
-            <span className="flex items-center gap-1">⚠️ Риски:</span>
-            <CopyButton text={data.risks.join('\n')} />
-          </div>
-          <ul className="space-y-1">
-            {data.risks.map((risk, index) => (
-              <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
-                <span className="text-gray-500 mt-0.5">•</span>
-                <span className="flex-1">{risk}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Risks */}
+          {data.risks && data.risks.length > 0 && (
+            <div className="group relative">
+              <div className="text-xs text-gray-400 mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1">⚠️ Риски:</span>
+                <CopyButton text={data.risks.join('\n')} />
+              </div>
+              <ul className="space-y-1">
+                {data.risks.map((risk, index) => (
+                  <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
+                    <span className="text-gray-500 mt-0.5">•</span>
+                    <span className="flex-1">{risk}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
