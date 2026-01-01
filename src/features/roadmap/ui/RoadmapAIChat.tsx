@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Send, Sparkles } from 'lucide-react'
 import { useRoadmapAI } from '../hooks/useRoadmapAI'
+import { cleanRoadmapContent } from '../lib/parser'
 import styles from './RoadmapAIChat.module.css'
 
 interface RoadmapAIChatProps {
@@ -12,7 +13,7 @@ interface RoadmapAIChatProps {
 }
 
 export function RoadmapAIChat({ boardId, onApply, onClose }: RoadmapAIChatProps) {
-  const { messages, loading, error, sendMessage, startSession, getFinalRoadmap, hasFinalResult, isPendingApproval } = useRoadmapAI()
+  const { messages, loading, error, sendMessage, startSession, reset, getFinalRoadmap, hasFinalResult, isPendingApproval } = useRoadmapAI({ boardId })
   const [input, setInput] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -46,10 +47,8 @@ export function RoadmapAIChat({ boardId, onApply, onClose }: RoadmapAIChatProps)
         // User approved - apply the roadmap
         let roadmap = getFinalRoadmap()
         if (roadmap) {
-          // Clean up the roadmap text - remove confirmation question if present
-          roadmap = roadmap.replace(/Вы утверждаете[\s\S]*?хотите что-то добавить[\s\S]*?$/gi, '')
-          roadmap = roadmap.replace(/ВАРИАНТЫ:\s*\[[^\]]*\]/gi, '')
-          roadmap = roadmap.trim()
+          // Clean the roadmap content - remove conversational text
+          roadmap = cleanRoadmapContent(roadmap)
 
           onApply(roadmap)
           showToast('success', 'Roadmap применён!')
@@ -65,13 +64,20 @@ export function RoadmapAIChat({ boardId, onApply, onClose }: RoadmapAIChatProps)
   const handleApply = useCallback(() => {
     const roadmap = getFinalRoadmap()
     if (roadmap) {
-      onApply(roadmap)
+      // Clean the roadmap content - remove conversational text
+      const cleaned = cleanRoadmapContent(roadmap)
+      onApply(cleaned)
       showToast('success', 'Roadmap применён!')
       setTimeout(() => onClose(), 500)
     } else {
       showToast('error', 'AI ещё не сгенерировал финальную roadmap')
     }
   }, [getFinalRoadmap, onApply, onClose, showToast])
+
+  const handleClear = useCallback(() => {
+    reset()
+    showToast('success', 'История очищена')
+  }, [reset, showToast])
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -156,6 +162,15 @@ export function RoadmapAIChat({ boardId, onApply, onClose }: RoadmapAIChatProps)
               disabled={!hasFinalResult}
             >
               ✓ Применить
+            </button>
+          )}
+          {messages.length > 0 && (
+            <button
+              onClick={handleClear}
+              className={styles.cancelButton}
+              disabled={loading}
+            >
+              🗑 Очистить
             </button>
           )}
           <button onClick={onClose} className={styles.cancelButton}>
