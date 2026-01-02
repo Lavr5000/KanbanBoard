@@ -12,7 +12,9 @@
     "deploy:cloudflare": "npx wrangler deploy",
     "start": "next start",
     "lint": "next lint",
-    "clean": "node -e \"const fs=require('fs'); ['.next', '.open-next'].forEach(d=>fs.existsSync(d)&&fs.rmSync(d,{recursive:true,force:true})); console.log('Cleaned build folders')\""
+    "clean": "node -e \"const fs=require('fs'); ['.next', '.open-next'].forEach(d=>fs.existsSync(d)&&fs.rmSync(d,{recursive:true,force:true})); console.log('Cleaned build folders')\"",
+    "clean:full": "npm run clean && node -e \"const {execSync}=require('child_process'); try{execSync('taskkill /F /IM node.exe',{stdio:'ignore'})}catch{}; console.log('Killed all Node processes')\"",
+    "restart": "npm run clean:full && npm run dev"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

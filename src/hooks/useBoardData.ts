@@ -68,7 +68,10 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
       try {
         setLoading(true)
 
-        // Get active board ID from localStorage or use provided boardId
+        // SECURITY NOTE: Active board ID is stored in localStorage for UX.
+        // This is low-risk (board IDs are validated via RLS), but be aware:
+        // - localStorage is accessible via XSS attacks
+        // - Board IDs alone don't expose user data (RLS protects access)
         const ACTIVE_BOARD_KEY = 'activeBoardId'
         let targetBoardId = boardId || (typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_BOARD_KEY) : null)
 
@@ -201,8 +204,6 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
           filter: `board_id=eq.${board.id}`,
         },
         (payload) => {
-          console.log('Task change:', payload)
-
           if (payload.eventType === 'INSERT') {
             setTasks((prev) => [...prev, payload.new as Task])
           } else if (payload.eventType === 'UPDATE') {
@@ -228,8 +229,6 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
           filter: `board_id=eq.${board.id}`,
         },
         (payload) => {
-          console.log('Column change:', payload)
-
           if (payload.eventType === 'INSERT') {
             setColumns((prev) => [...prev, payload.new as Column])
           } else if (payload.eventType === 'UPDATE') {
@@ -252,11 +251,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
   // Mutations
   const addTask = async (columnId: string, taskData: Partial<Task>) => {
     if (!board) {
-      console.error('❌ No board found')
-      return
+      throw new Error('No board found')
     }
-
-    console.log('📝 Adding task:', { columnId, taskData, boardId: board.id })
 
     try {
       const { data, error } = await supabase
@@ -273,22 +269,13 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         .single()
 
       if (error) {
-        console.error('❌ Supabase error detected')
-        console.error('Error object keys:', Object.keys(error))
-        console.error('Error message:', (error as any).message)
-        console.error('Error code:', (error as any).code)
-        console.error('Error details:', (error as any).details)
-        console.error('Error hint:', (error as any).hint)
-        console.error('Full error:', error)
         throw error
       }
-
-      console.log('✅ Task added:', data)
 
       // Optimistic update - update UI immediately
       setTasks((prev) => [...prev, data])
     } catch (err) {
-      console.error('❌ Error adding task:', err)
+      console.error('Error adding task:', err)
       throw err
     }
   }
@@ -346,25 +333,20 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     newColumnId: string,
     newPosition: number
   ) => {
-    console.log('🚚 moveTask called:', { taskId, newColumnId, newPosition })
-
     // Save current state for rollback
     const previousTasks = tasks
 
     // Optimistic update - update UI immediately
-    console.log('📤 Optimistic update: updating task', taskId, 'to column', newColumnId)
     setTasks((prev) => {
       const updated = prev.map((t) =>
         t.id === taskId
           ? { ...t, column_id: newColumnId, position: newPosition }
           : t
       )
-      console.log('📤 Optimistic update result:', updated.map(t => ({ id: t.id, column_id: t.column_id })))
       return updated
     })
 
     try {
-      console.log('🌐 Sending Supabase update request...')
       const { error, data } = await supabase
         .from('tasks')
         .update({
@@ -375,17 +357,14 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         .select()
 
       if (error) {
-        console.error('❌ Supabase update error:', error)
         throw error
       }
-      console.log('✅ Supabase update success, data:', data)
 
       // Manually update state with confirmed data from Supabase
       // This ensures all useBoardData() calls see the update
       if (data && data.length > 0) {
         setTasks((prev) => {
           const updated = prev.map((t) => (t.id === taskId ? data[0] : t))
-          console.log('✅ State updated with Supabase data, new length:', updated.length)
           return updated
         })
       }

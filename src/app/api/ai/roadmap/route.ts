@@ -1,8 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateRoadmapChat } from '@/lib/deepseek'
+import { requireAuth } from '@/lib/auth'
+import { checkRateLimit } from '@/lib/rate-limit'
+
+const RATE_LIMIT = 10 // 10 requests per minute
+const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify user is authenticated
+    const user = await requireAuth()
+
+    // Check rate limit
+    const rateLimit = checkRateLimit(user.id, RATE_LIMIT, RATE_LIMIT_WINDOW)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Too many requests. Please try again later.',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMIT.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
+          },
+        }
+      )
+    }
+
     const body = await request.json()
     const { messages } = body
 
@@ -15,8 +42,19 @@ export async function POST(request: NextRequest) {
 
     const response = await generateRoadmapChat(messages)
 
-    return NextResponse.json(response)
+    return NextResponse.json(response, {
+      headers: {
+        'X-RateLimit-Limit': RATE_LIMIT.toString(),
+        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
+      },
+    })
   } catch (error) {
+    // Handle authentication errors
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     console.error('AI roadmap API error:', error)
 
     if (error instanceof Error) {

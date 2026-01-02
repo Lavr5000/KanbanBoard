@@ -14,6 +14,12 @@ interface UseRoadmapAIOptions {
 
 const STORAGE_KEY = 'roadmap_ai_chat'
 
+// SECURITY NOTE: AI chat messages are stored in localStorage.
+// This is acceptable for non-sensitive roadmap content, but be aware:
+// - localStorage is accessible via XSS attacks
+// - Consider encrypting sensitive data or using server-side storage
+// - Users should be cautious about sharing sensitive project info
+
 export function useRoadmapAI({ boardId }: UseRoadmapAIOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [loading, setLoading] = useState(false)
@@ -24,30 +30,21 @@ export function useRoadmapAI({ boardId }: UseRoadmapAIOptions = {}) {
   useEffect(() => {
     if (typeof window === 'undefined' || loadedRef.current) return
 
-    console.log('🤖 AI Chat: loading history, boardId:', boardId)
-
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      console.log('🤖 AI Chat: stored data:', stored)
 
       if (stored) {
         const parsed = JSON.parse(stored)
-        console.log('🤖 AI Chat: parsed data:', parsed)
 
         // Only restore if boardId matches or no boardId
         if (!boardId || parsed.boardId === boardId) {
-          console.log('🤖 AI Chat: restoring', parsed.messages?.length || 0, 'messages')
           setMessages(parsed.messages || [])
-        } else {
-          console.log('🤖 AI Chat: boardId mismatch, skipping restore')
         }
-      } else {
-        console.log('🤖 AI Chat: no stored data found')
       }
 
       loadedRef.current = true
     } catch (e) {
-      console.error('❌ AI Chat: failed to load history:', e)
+      console.error('Failed to load chat history:', e)
     }
   }, [boardId])
 
@@ -55,17 +52,14 @@ export function useRoadmapAI({ boardId }: UseRoadmapAIOptions = {}) {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    console.log('💾 AI Chat: saving', messages.length, 'messages for boardId:', boardId)
-
     try {
       const data = JSON.stringify({
         boardId,
         messages
       })
       localStorage.setItem(STORAGE_KEY, data)
-      console.log('✅ AI Chat: saved successfully')
     } catch (e) {
-      console.error('❌ AI Chat: failed to save history:', e)
+      console.error('Failed to save chat history:', e)
     }
   }, [boardId, messages])
 

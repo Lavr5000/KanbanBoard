@@ -2,14 +2,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
-  const startTime = Date.now()
-  console.log('🔍 [MIDDLEWARE] Starting middleware for:', request.nextUrl.pathname)
-  console.log('🔍 [MIDDLEWARE] Environment check:', {
-    hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    hasKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  })
-
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -38,35 +30,32 @@ export async function middleware(request: NextRequest) {
       }
     )
 
-    console.log('🔍 [MIDDLEWARE] Supabase client created')
-
     const {
-      data: { session },
-    } = await supabase.auth.getSession()
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    console.log('🔍 [MIDDLEWARE] Session check:', {
-      hasSession: !!session,
-      pathname: request.nextUrl.pathname,
-    })
+    // Allow public access to static assets and API health checks
+    if (
+      request.nextUrl.pathname.startsWith('/_next') ||
+      request.nextUrl.pathname.startsWith('/api/health') ||
+      request.nextUrl.pathname.startsWith('/favicon.ico')
+    ) {
+      return supabaseResponse
+    }
 
     // Redirect to login if not authenticated and trying to access protected routes
-    if (!session && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/signup')) {
-      console.log('🔍 [MIDDLEWARE] Redirecting to /login (no session)')
+    if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/signup')) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       return NextResponse.redirect(url)
     }
 
     // Redirect to home if authenticated and trying to access auth pages
-    if (session && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
-      console.log('🔍 [MIDDLEWARE] Redirecting to / (has session on auth page)')
+    if (user && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)
     }
-
-    const duration = Date.now() - startTime
-    console.log('🔍 [MIDDLEWARE] Proceeding to:', request.nextUrl.pathname, `(${duration}ms)`)
 
     return supabaseResponse
   } catch (error) {
