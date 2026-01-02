@@ -2,6 +2,18 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import type { Task, InsertTask, UpdateTask, Priority } from '../types'
 
 /**
+ * Sanitize search query to prevent injection
+ */
+function sanitizeSearchQuery(query: string): string {
+  // Remove special characters that could be used for injection
+  // Keep only alphanumeric, spaces, and basic punctuation
+  return query
+    .replace(/[%;\\]/g, '') // Remove SQL special chars
+    .trim()
+    .slice(0, 100) // Limit length
+}
+
+/**
  * Get all tasks for a board
  */
 export async function getTasks(supabase: SupabaseClient, boardId: string) {
@@ -137,11 +149,19 @@ export async function searchTasks(
   boardId: string,
   query: string
 ) {
+  // Sanitize query to prevent injection
+  const sanitizedQuery = sanitizeSearchQuery(query)
+
+  // Skip search if sanitized query is empty
+  if (!sanitizedQuery) {
+    return []
+  }
+
   const { data, error } = await supabase
     .from('tasks')
     .select('*')
     .eq('board_id', boardId)
-    .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+    .or(`title.ilike.%${sanitizedQuery}%,description.ilike.%${sanitizedQuery}%`)
     .order('created_at', { ascending: false })
 
   if (error) throw error

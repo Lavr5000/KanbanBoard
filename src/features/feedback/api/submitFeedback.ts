@@ -31,10 +31,14 @@ export async function submitFeedback({
       console.error("Screenshot upload failed:", uploadError);
       // Continue without screenshot if upload fails
     } else {
-      const { data: { publicUrl } } = supabase.storage
+      // Create signed URL valid for 7 days (private bucket)
+      const { data } = await supabase.storage
         .from(UPLOAD_BUCKET)
-        .getPublicUrl(fileName);
-      screenshotUrl = publicUrl;
+        .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days
+
+      if (data?.signedUrl) {
+        screenshotUrl = data.signedUrl;
+      }
     }
   }
 
