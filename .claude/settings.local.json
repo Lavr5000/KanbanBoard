@@ -52,7 +52,12 @@
       "Bash(gh run view:*)",
       "Bash(gh run retry:*)",
       "Bash(gh run rerun:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh workflow run \"Deploy to Cloudflare Workers\")",
+      "Bash(Select-Object Id, ProcessName, Path)",
+      "Bash(npm run clean:full:*)",
+      "Bash(set:*)"
     ]
   }
 }

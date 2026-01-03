@@ -13,6 +13,7 @@ import {
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import { createPortal } from "react-dom";
+import { STATUS } from "react-joyride";
 
 import { useUIStore } from "@/entities/ui/model/store";
 import { useBoardData } from "@/hooks/useBoardData";
@@ -25,6 +26,7 @@ import { Task, Id } from "@/entities/task/model/types";
 import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmModal";
 import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
 import { RoadmapPanel } from "@/features/roadmap/ui/RoadmapPanel";
+import { OnboardingTour, useOnboarding } from "@/features/onboarding";
 import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
@@ -36,6 +38,12 @@ export const Board = () => {
   const { activeBoard } = useBoards();
   const boardName = activeBoard?.name || 'Проект';
   const supabase = createClient();
+
+  // Onboarding state
+  const { shouldRunTour, setTourCompleted } = useOnboarding();
+  const [runTour, setRunTour] = useState(false);
+  const [demoTaskAI, setDemoTaskAI] = useState(false);
+  const [forceShowAITaskId, setForceShowAITaskId] = useState<string | null>(null);
 
   const {
     columns: supabaseColumns,
@@ -169,6 +177,54 @@ export const Board = () => {
     return { total, done, percentage };
   }, [supabaseTasks, supabaseColumns]);
 
+  // Start onboarding tour after delay
+  useEffect(() => {
+    if (shouldRunTour && !loading) {
+      const timer = setTimeout(() => setRunTour(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldRunTour, loading]);
+
+  // Handle resize (disable tour on mobile)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768 && runTour) {
+        setRunTour(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [runTour]);
+
+  // Joyride events handler
+  const handleJoyrideCallback = (data: { index?: number; action?: string; status: string }) => {
+    const { index, action, status } = data;
+
+    // Open AI panel on step 5 (index 4)
+    if (index === 4 && action === 'next' && tasks.length > 0) {
+      setDemoTaskAI(true);
+      // Force show AI for first task
+      const firstTask = tasks[0];
+      if (firstTask) {
+        setForceShowAITaskId(String(firstTask.id));
+      }
+    }
+
+    // Close AI panel after step 6 (index 5)
+    if (index === 5 && action === 'next') {
+      setDemoTaskAI(false);
+      setForceShowAITaskId(null);
+    }
+
+    // Tour finished or skipped
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      setDemoTaskAI(false);
+      setForceShowAITaskId(null);
+      setTourCompleted();
+      setRunTour(false);
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -261,6 +317,7 @@ export const Board = () => {
 
   return (
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
+      <OnboardingTour run={runTour} onCallback={handleJoyrideCallback} />
       <div className="flex-grow flex flex-col">
         {/* Top Header */}
         <header className="h-20 border-b border-gray-800 flex items-center justify-between px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
@@ -370,6 +427,7 @@ export const Board = () => {
                 isFirst={index === 0}
                 onColumnUpdate={handleColumnUpdate}
                 onColumnDelete={handleColumnDelete}
+                forceShowAITask={forceShowAITaskId || undefined}
               />
             );
           })}

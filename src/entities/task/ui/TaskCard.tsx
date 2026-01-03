@@ -18,6 +18,7 @@ interface Props {
   columnTitle?: string;
   boardName?: string;
   allTasks?: Task[];
+  forceShowAI?: boolean; // For onboarding tour - force show AI suggestions
 }
 
 export const TaskCard = ({
@@ -26,12 +27,20 @@ export const TaskCard = ({
   newlyCreated = false,
   columnTitle,
   boardName,
-  allTasks = []
+  allTasks = [],
+  forceShowAI = false,
 }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // AI suggestions hook
   const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions, restoreSuggestions } = useTaskAI({ taskId: String(task.id) })
+
+  // Force show AI for onboarding tour
+  useEffect(() => {
+    if (forceShowAI && !visible) {
+      generateSuggestions(task.content, columnTitle || 'Демо колонка', boardName || 'Демо проект', [])
+    }
+  }, [forceShowAI])
 
   // Load saved AI suggestions from database
   const { suggestions: savedSuggestions } = useAISuggestions({ taskId: String(task.id) })
@@ -115,6 +124,7 @@ export const TaskCard = ({
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
+              data-tour="task-ai-icon"
               onClick={(e) => {
                 e.stopPropagation();
                 if (columnTitle && boardName) {
@@ -170,11 +180,13 @@ export const TaskCard = ({
         )}
 
         {displaySuggestions && visible && (
-          <TaskAISuggestions
-            data={displaySuggestions}
-            onHide={hideSuggestions}
-            isSaved={!!savedSuggestions}
-          />
+          <div data-tour="task-ai-suggestions">
+            <TaskAISuggestions
+              data={displaySuggestions}
+              onHide={hideSuggestions}
+              isSaved={!!savedSuggestions}
+            />
+          </div>
         )}
 
         <div className="flex items-center text-gray-500 gap-1.5 border-t border-gray-800 pt-3">

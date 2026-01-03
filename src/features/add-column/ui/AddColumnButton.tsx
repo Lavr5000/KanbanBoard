@@ -62,6 +62,7 @@ export const AddColumnButton = ({
 
   return (
     <button
+      data-tour="add-column-btn"
       onClick={handleAddColumn}
       disabled={isAdding}
       className="flex flex-col w-[300px] min-h-[500px] items-center justify-center bg-[#1a1a20]/50 hover:bg-[#1a1a20] border-2 border-dashed border-gray-700 hover:border-blue-500 rounded-xl transition-all group disabled:opacity-50"
