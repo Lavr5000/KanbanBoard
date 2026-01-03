@@ -1,12 +1,14 @@
-// Force dynamic rendering - don't prerender at build time
-export const dynamic = 'force-dynamic';
-
 export default function TestPage() {
   return (
-    <div style={{ padding: '50px', fontFamily: 'sans-serif' }}>
-      <h1>✅ Test Page Works!</h1>
-      <p>If you can see this, Next.js is working correctly.</p>
-      <p>Current time: {new Date().toLocaleString()}</p>
-    </div>
+    <html>
+      <body>
+        <div style={{ padding: '50px', fontFamily: 'sans-serif', background: '#121218', minHeight: '100vh', color: '#fff' }}>
+          <h1>✅ Test Page Works!</h1>
+          <p>If you can see this, Next.js is working correctly.</p>
+          <p>Current time: {new Date().toLocaleString()}</p>
+          <p style={{ color: '#10b981' }}>This page has NO dependencies on AuthProvider or Supabase.</p>
+        </div>
+      </body>
+    </html>
   )
 }

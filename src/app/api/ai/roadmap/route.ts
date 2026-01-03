@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateRoadmapChat } from '@/lib/deepseek'
 import { requireAuth } from '@/lib/auth'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { trackAIUsage } from '@/lib/analytics/tracker'
 
 const RATE_LIMIT = 10 // 10 requests per minute
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
@@ -41,6 +42,17 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await generateRoadmapChat(messages)
+
+    // Track AI usage
+    if (response.usage) {
+      await trackAIUsage({
+        model: 'deepseek-chat',
+        operation: 'roadmap_generation',
+        inputTokens: response.usage.inputTokens,
+        outputTokens: response.usage.outputTokens,
+        costUsd: 0.00014 * (response.usage.inputTokens + response.usage.outputTokens) / 1000 // DeepSeek pricing
+      })
+    }
 
     return NextResponse.json(response, {
       headers: {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateTaskSuggestions, type AISuggestionRequest } from '@/lib/deepseek'
 import { requireAuth } from '@/lib/auth'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { trackAIUsage, trackAISuggestionUsed } from '@/lib/analytics/tracker'
 
 const RATE_LIMIT = 20 // 20 requests per minute for suggestions
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
@@ -50,6 +51,20 @@ export async function POST(request: NextRequest) {
     }
 
     const suggestions = await generateTaskSuggestions(aiRequest)
+
+    // Track AI usage
+    if (suggestions.usage) {
+      await trackAIUsage({
+        model: 'deepseek-chat',
+        operation: 'suggestion_generation',
+        inputTokens: suggestions.usage.inputTokens,
+        outputTokens: suggestions.usage.outputTokens,
+        costUsd: 0.00014 * (suggestions.usage.inputTokens + suggestions.usage.outputTokens) / 1000
+      })
+    }
+
+    // Track suggestion used event
+    await trackAISuggestionUsed('N/A', 'N/A')
 
     return NextResponse.json(suggestions, {
       headers: {

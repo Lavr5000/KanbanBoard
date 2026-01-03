@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import type { Task, InsertTask, UpdateTask, Priority } from '../types'
+import { trackTaskCreated, trackTaskMoved, trackTaskDeleted, trackTaskUpdated } from '@/lib/analytics/tracker'
 
 /**
  * Sanitize search query to prevent injection
@@ -69,6 +70,10 @@ export async function createTask(supabase: SupabaseClient, task: InsertTask) {
     .single()
 
   if (error) throw error
+
+  // Track analytics
+  await trackTaskCreated(data.id, data.column_id, data.board_id)
+
   return data as Task
 }
 
@@ -80,6 +85,13 @@ export async function updateTask(
   taskId: string,
   updates: UpdateTask
 ) {
+  // Get old task data for analytics
+  const { data: oldTask } = await supabase
+    .from('tasks')
+    .select('column_id')
+    .eq('id', taskId)
+    .single()
+
   const { data, error } = await supabase
     .from('tasks')
     .update(updates)
@@ -88,6 +100,16 @@ export async function updateTask(
     .single()
 
   if (error) throw error
+
+  // Track analytics for column move
+  if (updates.column_id && oldTask && updates.column_id !== oldTask.column_id) {
+    await trackTaskMoved(taskId, oldTask.column_id, updates.column_id)
+  } else if (updates) {
+    // Track field updates
+    const updatedFields = Object.keys(updates)
+    await trackTaskUpdated(taskId, updatedFields)
+  }
+
   return data as Task
 }
 
@@ -95,9 +117,21 @@ export async function updateTask(
  * Delete a task
  */
 export async function deleteTask(supabase: SupabaseClient, taskId: string) {
+  // Get task data for analytics before deleting
+  const { data: task } = await supabase
+    .from('tasks')
+    .select('column_id')
+    .eq('id', taskId)
+    .single()
+
   const { error } = await supabase.from('tasks').delete().eq('id', taskId)
 
   if (error) throw error
+
+  // Track analytics
+  if (task) {
+    await trackTaskDeleted(taskId, task.column_id)
+  }
 }
 
 /**
@@ -109,6 +143,13 @@ export async function moveTask(
   newColumnId: string,
   newPosition: number
 ) {
+  // Get old column for analytics
+  const { data: oldTask } = await supabase
+    .from('tasks')
+    .select('column_id')
+    .eq('id', taskId)
+    .single()
+
   const { data, error } = await supabase
     .from('tasks')
     .update({
@@ -120,6 +161,12 @@ export async function moveTask(
     .single()
 
   if (error) throw error
+
+  // Track analytics
+  if (oldTask && oldTask.column_id !== newColumnId) {
+    await trackTaskMoved(taskId, oldTask.column_id, newColumnId)
+  }
+
   return data as Task
 }
 
