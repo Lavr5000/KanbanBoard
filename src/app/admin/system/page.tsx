@@ -92,7 +92,7 @@ export default function SystemPage() {
   }
 
   const errorRate = parseFloat(data?.errors.rate || '0')
-  const hasErrors = errorRate > 5 || data?.errors.count > 0
+  const hasErrors = errorRate > 5 || (data?.errors.count ?? 0) > 0
 
   return (
     <div className="p-8 space-y-6">
