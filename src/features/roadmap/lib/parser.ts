@@ -45,14 +45,11 @@ export function cleanRoadmapContent(content: string): string {
  * - "1. Title: Description" (AI format without bold + colon)
  * - "1. Title - Description" (without bold + dash)
  * - "1) Title: Description" (with parentheses)
+ * - Multi-line tasks with description on following lines
  */
 export function parseRoadmapTasks(content: string): ParsedTask[] {
   const tasks: ParsedTask[] = []
   const lines = content.split('\n')
-
-  // logger.log('🔍 [PARSER] Starting to parse roadmap content')
-  // logger.log('📄 [PARSER] Total lines:', lines.length)
-  // logger.log('📝 [PARSER] Content preview:', content.substring(0, 200) + '...')
 
   // Try multiple regex patterns to match different formats
   const patterns = [
@@ -64,6 +61,10 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
     /^\d+[\.)]\s+(.+?):\s*(.+)$/,
     // Format: "1. Title - Description" (without bold + dash)
     /^\d+[\.)]\s+(.+?)\s+-\s+(.+)$/,
+    // Format: "1. **Title**" (just bold title, no description yet)
+    /^\d+[\.)]\s+\*\*(.+?)\*\*$/,
+    // Format: "1. Title" (just title, no description)
+    /^\d+[\.)]\s+(.+)$/,
   ]
 
   for (let i = 0; i < lines.length; i++) {
@@ -74,19 +75,40 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
       continue
     }
 
+    // Skip lines that look like sections (not tasks)
+    if (line.startsWith('**') && line.endsWith('**') && !line.match(/^\d+/)) {
+      continue
+    }
+
     // Try each pattern until we find a match
     for (let patternIndex = 0; patternIndex < patterns.length; patternIndex++) {
       const pattern = patterns[patternIndex]
       const match = line.match(pattern)
 
       if (match) {
-        const title = match[1].trim()
-        const description = match[2].trim()
-        const fullTitle = `${title} - ${description}`
+        let title = match[1].trim()
+        let description = match[2]?.trim() || ''
 
-        // logger.log(`✅ [PARSER] Line ${i + 1}: Found task with pattern ${patternIndex + 1}`)
-        // logger.log(`   Title: "${title}"`)
-        // logger.log(`   Description: "${description}"`)
+        // If no description on same line, look at next line(s)
+        if (!description && i + 1 < lines.length) {
+          // Collect following non-empty lines that aren't new tasks
+          const descLines: string[] = []
+          for (let j = i + 1; j < lines.length && j < i + 5; j++) {
+            const nextLine = lines[j].trim()
+            // Stop if empty, new task, or section
+            if (!nextLine || nextLine.match(/^\d+[\.)]/) || nextLine.startsWith('#') || nextLine.startsWith('**')) {
+              break
+            }
+            descLines.push(nextLine)
+          }
+          description = descLines.join(' ').trim()
+        }
+
+        // Clean up markdown formatting from title
+        title = title.replace(/\*\*/g, '').trim()
+
+        // Build full title
+        const fullTitle = description ? `${title} - ${description}` : title
 
         // Use sequential number
         tasks.push({ number: tasks.length + 1, title: fullTitle, lineNumber: i + 1 })
@@ -94,14 +116,6 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
       }
     }
   }
-
-  // logger.log(`🎯 [PARSER] Parsing complete. Found ${tasks.length} tasks`)
-  // if (tasks.length === 0) {
-  //   logger.log('⚠️  [PARSER] No tasks found! Sample lines:')
-  //   lines.slice(0, 10).forEach((line, i) => {
-  //     if (line.trim()) logger.log(`   Line ${i + 1}: "${line.trim()}"`)
-  //   })
-  // }
 
   return tasks
 }

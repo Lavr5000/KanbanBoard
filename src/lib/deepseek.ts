@@ -50,7 +50,7 @@ const SYSTEM_PROMPT = `Ты - AI-ассистент для Kanban доски. Т
  */
 export async function generateTaskSuggestions(
   request: AISuggestionRequest
-): Promise<AISuggestionResponse> {
+): Promise<AISuggestionResponse & { usage?: { inputTokens: number; outputTokens: number } }> {
   const apiKey = process.env.DEEPSEEK_API_KEY
 
   if (!apiKey) {
@@ -121,7 +121,15 @@ ${nearbyTasksText || '(пока нет соседних задач)'}
       throw new Error('Invalid response structure from DeepSeek API')
     }
 
-    return parsed
+    // Extract token usage
+    const usage = data.usage
+      ? {
+          inputTokens: data.usage.prompt_tokens || 0,
+          outputTokens: data.usage.completion_tokens || 0,
+        }
+      : undefined
+
+    return { ...parsed, usage }
   } catch (error) {
     console.error('Error generating AI suggestions:', error)
     throw error
@@ -199,7 +207,7 @@ const ROADMAP_SYSTEM_PROMPT = `# Роль
  */
 export async function generateRoadmapChat(
   messages: RoadmapChatMessage[]
-): Promise<{ content: string }> {
+): Promise<{ content: string; usage?: { inputTokens: number; outputTokens: number } }> {
   const apiKey = process.env.DEEPSEEK_API_KEY
 
   if (!apiKey) {
@@ -237,5 +245,13 @@ export async function generateRoadmapChat(
     throw new Error('Empty response from DeepSeek API')
   }
 
-  return { content }
+  // Extract token usage
+  const usage = data.usage
+    ? {
+        inputTokens: data.usage.prompt_tokens || 0,
+        outputTokens: data.usage.completion_tokens || 0,
+      }
+    : undefined
+
+  return { content, usage }
 }

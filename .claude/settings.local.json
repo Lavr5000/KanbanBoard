@@ -57,7 +57,9 @@
       "Bash(gh workflow run \"Deploy to Cloudflare Workers\")",
       "Bash(Select-Object Id, ProcessName, Path)",
       "Bash(npm run clean:full:*)",
-      "Bash(set:*)"
+      "Bash(set:*)",
+      "Bash(Select-Object -First 30)",
+      "Bash(npm run restart:*)"
     ]
   }
 }
