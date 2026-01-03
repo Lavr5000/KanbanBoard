@@ -91,7 +91,7 @@ export function OnboardingTour({ run, onCallback, onStepChange, onCloseRoadmap }
       })),
       onHighlighted: (element, step, options) => {
         // Используем driverInstance для получения текущего индекса
-        const index = driverInstance.getActiveIndex()
+        const index = driverInstance.getActiveIndex() ?? 0
         currentStepRef.current = index
         // При переходе к шагу 2 (index: 2 - задачи) закрываем roadmap
         if (index === 2) {
