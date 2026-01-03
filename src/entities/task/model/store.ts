@@ -70,10 +70,10 @@ export const useBoardStore = create<BoardState>()(
       })),
 
       moveTask: (taskId, columnId) => {
-        console.log('📦 moveTask called:', { taskId, columnId });
+        // logger.log('📦 moveTask called:', { taskId, columnId });
         set((state) => {
           const updatedTasks = state.tasks.map((t) => (t.id === taskId ? { ...t, columnId } : t));
-          console.log('📦 Updated tasks:', updatedTasks.map(t => ({ id: t.id, columnId: t.columnId })));
+          // logger.log('📦 Updated tasks:', updatedTasks.map(t => ({ id: t.id, columnId: t.columnId })));
           return { tasks: updatedTasks };
         });
       },

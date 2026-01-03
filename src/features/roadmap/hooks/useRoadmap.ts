@@ -26,14 +26,14 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
   // Load roadmap on mount
   useEffect(() => {
     if (!boardId || !enabled) {
-      console.log('📋 Roadmap: skip load (boardId:', boardId, ', enabled:', enabled, ')')
+      // logger.log('📋 Roadmap: skip load (boardId:', boardId, ', enabled:', enabled, ')')
       setContent('')
       setHasContent(false)
       return
     }
 
     const fetchRoadmap = async () => {
-      console.log('📋 Roadmap: loading for boardId:', boardId)
+      // logger.log('📋 Roadmap: loading for boardId:', boardId)
       setLoading(true)
       setError(null)
 
@@ -43,16 +43,16 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
         .eq('board_id', boardId)
         .maybeSingle()
 
-      console.log('📋 Roadmap: load result:', { data, error })
+      // logger.log('📋 Roadmap: load result:', { data, error })
 
       if (error) {
-        console.error('❌ Roadmap: load error:', error)
+        // logger.error('❌ Roadmap: load error:', error)
         setError(error)
       } else {
         const roadmapContent = data?.content || ''
         setContent(roadmapContent)
         setHasContent(!!roadmapContent)
-        console.log('✅ Roadmap: loaded, content length:', roadmapContent.length)
+        // logger.log('✅ Roadmap: loaded, content length:', roadmapContent.length)
       }
 
       setLoading(false)
@@ -64,11 +64,11 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
   // Save roadmap with debounce
   const saveRoadmap = useCallback(async (newContent: string) => {
     if (!boardId) {
-      console.log('📋 Roadmap: skip save (no boardId)')
+      // logger.log('📋 Roadmap: skip save (no boardId)')
       return
     }
 
-    console.log('💾 Roadmap: saving for boardId:', boardId, 'content length:', newContent.length)
+    // logger.log('💾 Roadmap: saving for boardId:', boardId, 'content length:', newContent.length)
     setSaving(true)
     setError(null)
 
@@ -79,13 +79,13 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
         { onConflict: 'board_id' }
       )
 
-    console.log('📋 Roadmap: save result:', { error, data })
+    // logger.log('📋 Roadmap: save result:', { error, data })
 
     if (error) {
-      console.error('❌ Roadmap: save error:', error)
+      // logger.error('❌ Roadmap: save error:', error)
       setError(error)
     } else {
-      console.log('✅ Roadmap: saved successfully')
+      // logger.log('✅ Roadmap: saved successfully')
       setHasContent(!!newContent)
     }
 

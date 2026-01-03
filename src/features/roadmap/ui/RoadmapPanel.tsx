@@ -35,18 +35,18 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
 
   // Handle create tasks
   const handleCreateTasks = useCallback(async () => {
-    console.log('🚀 [ROADMAP] Create tasks button clicked')
-    console.log(`📋 [ROADMAP] Board ID: ${boardId}`)
-    console.log(`📊 [ROADMAP] Parsed tasks count: ${parsedTasks.length}`)
-    console.log(`📝 [ROADMAP] Content length: ${content.length}`)
+    // logger.log('🚀 [ROADMAP] Create tasks button clicked')
+    // logger.log(`📋 [ROADMAP] Board ID: ${boardId}`)
+    // logger.log(`📊 [ROADMAP] Parsed tasks count: ${parsedTasks.length}`)
+    // logger.log(`📝 [ROADMAP] Content length: ${content.length}`)
 
     if (isCreating) {
-      console.log('⚠️  [ROADMAP] Already creating, skipping')
+      // logger.log('⚠️  [ROADMAP] Already creating, skipping')
       return
     }
 
     if (!boardId) {
-      console.log('❌ [ROADMAP] No board ID selected')
+      // logger.log('❌ [ROADMAP] No board ID selected')
       setToast({
         type: 'error',
         message: '✗ Ошибка: Не выбрана доска'
@@ -55,7 +55,7 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
     }
 
     if (parsedTasks.length === 0) {
-      console.log('❌ [ROADMAP] No tasks found in content')
+      // logger.log('❌ [ROADMAP] No tasks found in content')
       setToast({
         type: 'error',
         message: '✗ Нет задач для создания. Добавьте задачи в roadmap'
@@ -63,16 +63,16 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
       return
     }
 
-    console.log('✅ [ROADMAP] Starting task creation...')
-    console.log(`📦 [ROADMAP] Tasks to create:`, parsedTasks.map(t => t.title))
+    // logger.log('✅ [ROADMAP] Starting task creation...')
+    // logger.log(`📦 [ROADMAP] Tasks to create:`, parsedTasks.map(t => t.title))
 
     setIsCreating(true)
     const result = await createTasksFromRoadmap(boardId, parsedTasks, 5)
 
-    console.log('📯 [ROADMAP] Task creation result:', result)
+    // logger.log('📯 [ROADMAP] Task creation result:', result)
 
     if (result.success) {
-      console.log(`✅ [ROADMAP] Successfully created ${result.created} tasks`)
+      // logger.log(`✅ [ROADMAP] Successfully created ${result.created} tasks`)
       setToast({
         type: 'success',
         message: `✓ Создано ${result.created} задач`
@@ -80,7 +80,7 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
       // Force page reload to show new tasks immediately
       setTimeout(() => window.location.reload(), 1000)
     } else {
-      console.log(`❌ [ROADMAP] Failed to create tasks. Errors:`, result.errors)
+      // logger.log(`❌ [ROADMAP] Failed to create tasks. Errors:`, result.errors)
       setToast({
         type: 'error',
         message: `✗ Ошибка: ${result.errors.join(', ')}`

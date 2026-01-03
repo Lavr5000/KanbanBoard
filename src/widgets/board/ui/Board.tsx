@@ -58,7 +58,7 @@ export const Board = () => {
 
   // Log tasks changes for debugging
   useEffect(() => {
-    console.log('📊 Tasks updated:', tasks.map(t => ({ id: t.id, content: t.content?.substring(0, 20) || 'No content', columnId: t.columnId })));
+    // logger.log('📊 Tasks updated:', tasks.map(t => ({ id: t.id, content: t.content?.substring(0, 20) || 'No content', columnId: t.columnId })));
   }, [tasks]);
 
   // Filter tasks based on search query and priority (memoized)
@@ -78,8 +78,8 @@ export const Board = () => {
     ), [tasks, searchQuery, priorityFilter]
   );
 
-  console.log('🔍 Filtered tasks:', filteredTasks.length, 'Total:', tasks.length, 'Priority:', priorityFilter);
-  console.log('📊 Board info:', { boardId: activeBoard?.id, boardName: activeBoard?.name, columnCount: columns.length });
+  // logger.log('🔍 Filtered tasks:', filteredTasks.length, 'Total:', tasks.length, 'Priority:', priorityFilter);
+  // logger.log('📊 Board info:', { boardId: activeBoard?.id, boardName: activeBoard?.name, columnCount: columns.length });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -114,18 +114,18 @@ export const Board = () => {
       const activeTaskObj = tasks.find((t) => t.id === activeId);
       const overTaskObj = tasks.find((t) => t.id === overId);
 
-      console.log('🎯 DragOver: Task over Task', {
-        activeTask: activeTaskObj?.content?.substring(0, 30),
-        fromColumn: activeTaskObj?.columnId,
-        toColumn: overTaskObj?.columnId
-      });
+      // logger.log('🎯 DragOver: Task over Task', {
+      //   activeTask: activeTaskObj?.content?.substring(0, 30),
+      //   fromColumn: activeTaskObj?.columnId,
+      //   toColumn: overTaskObj?.columnId
+      // });
 
       if (activeTaskObj && overTaskObj && activeTaskObj.columnId !== overTaskObj.columnId) {
         // Calculate position (place at end of target column)
         const targetColumnTasks = supabaseTasks.filter((t) => t.column_id === String(overTaskObj.columnId));
         const newPosition = targetColumnTasks.length;
 
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to', overTaskObj.columnId, 'at position', newPosition);
+        // logger.log('✅ Moving task from', activeTaskObj.columnId, 'to', overTaskObj.columnId, 'at position', newPosition);
         moveTask(String(activeId), String(overTaskObj.columnId), newPosition);
       }
     }
@@ -140,14 +140,14 @@ export const Board = () => {
         const targetColumnTasks = supabaseTasks.filter((t) => t.column_id === String(overColumnId));
         const newPosition = targetColumnTasks.length;
 
-        console.log('✅ Moving task from', activeTaskObj.columnId, 'to column', overColumnId, 'at position', newPosition);
+        // logger.log('✅ Moving task from', activeTaskObj.columnId, 'to column', overColumnId, 'at position', newPosition);
         moveTask(String(activeId), String(overColumnId), newPosition);
       }
     }
   };
 
   const onDragEnd = (event: DragEndEvent) => {
-    console.log('🏁 DragEnd:', { activeId: event.active.id, overId: event.over?.id });
+    // logger.log('🏁 DragEnd:', { activeId: event.active.id, overId: event.over?.id });
     setActiveTask(null);
   };
 
@@ -164,7 +164,7 @@ export const Board = () => {
     const done = inProgressTasks.length;
     const percentage = Math.round((done / (total || 1)) * 100);
 
-    console.log('📊 Board.tsx: Progress stats calculated:', { total, done, percentage });
+    // logger.log('📊 Board.tsx: Progress stats calculated:', { total, done, percentage });
 
     return { total, done, percentage };
   }, [supabaseTasks, supabaseColumns]);
@@ -250,12 +250,12 @@ export const Board = () => {
 
       // Delete the column
       await deleteColumn(supabase, columnId);
-      console.log('Column deleted:', columnId);
+      // logger.log('Column deleted:', columnId);
 
       // Refetch columns to update UI
       await refetchColumns();
     } catch (error) {
-      console.error('Failed to delete column:', error);
+      // logger.error('Failed to delete column:', error);
     }
   };
 
@@ -359,7 +359,7 @@ export const Board = () => {
         <div className="flex gap-8">
           {columns.map((col, index) => {
             const columnTasks = filteredTasks.filter((t) => t.columnId === col.id);
-            console.log(`📋 Column "${col.title}":`, columnTasks.length, 'tasks');
+            // logger.log(`📋 Column "${col.title}":`, columnTasks.length, 'tasks');
             return (
               <Column
                 key={col.id}
