@@ -98,6 +98,10 @@ export function OnboardingTour({ run, onCallback, onStepChange, onCloseRoadmap }
           onCloseRoadmapRef.current?.()
         }
       },
+      onDestroyed: () => {
+        // Сохраняем статус завершения
+        onCallback?.({ action: 'destroy', step: currentStepRef.current })
+      },
     })
 
     driverObj.current = driverInstance
