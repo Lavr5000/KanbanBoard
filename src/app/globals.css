@@ -16,3 +16,61 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Onboarding Tour Styles */
+.onboarding-tooltip {
+  background: #1a1a20 !important;
+  border: 1px solid #3b82f6 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2) !important;
+  backdrop-filter: blur(8px);
+  max-width: 400px;
+}
+
+.onboarding-content h3 {
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.onboarding-content p {
+  margin-bottom: 4px;
+}
+
+/* Joyride buttons */
+.react-joyride__tooltip button[data-action="primary"] {
+  background: #3b82f6 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s;
+}
+
+.react-joyride__tooltip button[data-action="primary"]:hover {
+  background: #2563eb !important;
+}
+
+.react-joyride__tooltip button[data-action="secondary"] {
+  background: transparent !important;
+  border: 1px solid #4b5563 !important;
+  color: #9ca3af !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+}
+
+.react-joyride__tooltip button[data-action="skip"] {
+  background: transparent !important;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+}
+
+/* Overlay with blur */
+.react-joyride__overlay {
+  backdrop-filter: blur(2px);
+}
+
+/* Spotlight glow effect */
+.react-joyride__spotlight {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4) !important;
+  border-radius: 8px !important;
+}

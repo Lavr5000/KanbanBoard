@@ -92,6 +92,7 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
   return (
     <>
     <div
+      data-tour="roadmap-panel"
       className={`fixed bottom-0 left-0 right-0 ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
         isExpanded ? 'h-[70vh]' : 'h-10'
       }`}
@@ -112,6 +113,7 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
         </div>
         <div className="flex items-center gap-2">
           <button
+            data-tour="ai-generate-btn"
             onClick={(e) => {
               e.stopPropagation()
               setIsAIChatOpen(true)

@@ -18,9 +18,10 @@ interface Props {
   isFirst?: boolean;
   onColumnUpdate?: (columnId: string, newTitle: string) => void;
   onColumnDelete?: (columnId: string) => void;
+  forceShowAITask?: string; // Task ID to force show AI suggestions for onboarding
 }
 
-export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = false, onColumnUpdate, onColumnDelete }: Props) => {
+export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = false, onColumnUpdate, onColumnDelete, forceShowAITask }: Props) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const taskIds = tasks.map((t) => t.id);
   const { setNodeRef } = useDroppable({
@@ -35,6 +36,7 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
     <div className="flex flex-col w-[300px] min-h-[500px]">
       <div className="flex items-center gap-2 mb-4">
         <Plus
+          data-tour="add-task-btn"
           size={18}
           className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5 flex-shrink-0"
           onClick={() => setIsAddModalOpen(true)}
@@ -58,6 +60,7 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
               columnTitle={column.title}
               boardName={boardName}
               allTasks={tasks}
+              forceShowAI={forceShowAITask === String(task.id)}
             />
           ))}
         </SortableContext>

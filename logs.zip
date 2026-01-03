@@ -1,0 +1,283 @@
+﻿2025-12-31T11:49:07.4362425Z Current runner version: '2.330.0'
+2025-12-31T11:49:07.4541949Z ##[group]Runner Image Provisioner
+2025-12-31T11:49:07.4543271Z Hosted Compute Agent
+2025-12-31T11:49:07.4544228Z Version: 20251211.462
+2025-12-31T11:49:07.4545806Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+2025-12-31T11:49:07.4547103Z Build Date: 2025-12-11T16:28:49Z
+2025-12-31T11:49:07.4548334Z Worker ID: {2fcac3ce-4d1b-4d30-a99b-5f07f55ee877}
+2025-12-31T11:49:07.4549475Z ##[endgroup]
+2025-12-31T11:49:07.4623725Z ##[group]Operating System
+2025-12-31T11:49:07.4624873Z Ubuntu
+2025-12-31T11:49:07.4625725Z 24.04.3
+2025-12-31T11:49:07.4626600Z LTS
+2025-12-31T11:49:07.4627510Z ##[endgroup]
+2025-12-31T11:49:07.4628375Z ##[group]Runner Image
+2025-12-31T11:49:07.4629306Z Image: ubuntu-24.04
+2025-12-31T11:49:07.4630579Z Version: 20251215.174.1
+2025-12-31T11:49:07.4632480Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+2025-12-31T11:49:07.4635311Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+2025-12-31T11:49:07.4637086Z ##[endgroup]
+2025-12-31T11:49:07.4639343Z ##[group]GITHUB_TOKEN Permissions
+2025-12-31T11:49:07.4662551Z Contents: read
+2025-12-31T11:49:07.4663731Z Metadata: read
+2025-12-31T11:49:07.4664879Z Packages: read
+2025-12-31T11:49:07.4665812Z ##[endgroup]
+2025-12-31T11:49:07.4668912Z Secret source: Actions
+2025-12-31T11:49:07.4670899Z Prepare workflow directory
+2025-12-31T11:49:07.5429252Z Prepare all required actions
+2025-12-31T11:49:07.5486008Z Getting action download info
+2025-12-31T11:49:08.1219962Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2025-12-31T11:49:08.2561527Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2025-12-31T11:49:08.4202874Z Download action repository 'cloudflare/wrangler-action@v3' (SHA:da0e0dfe58b7a431659754fdf3f186c529afbe65)
+2025-12-31T11:49:09.3175824Z Complete job name: Deploy to Cloudflare Workers
+2025-12-31T11:49:09.3904089Z ##[group]Run actions/checkout@v4
+2025-12-31T11:49:09.3905671Z with:
+2025-12-31T11:49:09.3906615Z   repository: Lavr5000/0-KanBanDoska
+2025-12-31T11:49:09.3908078Z   token: ***
+2025-12-31T11:49:09.3909062Z   ssh-strict: true
+2025-12-31T11:49:09.3910040Z   ssh-user: git
+2025-12-31T11:49:09.3911306Z   persist-credentials: true
+2025-12-31T11:49:09.3912364Z   clean: true
+2025-12-31T11:49:09.3913307Z   sparse-checkout-cone-mode: true
+2025-12-31T11:49:09.3914374Z   fetch-depth: 1
+2025-12-31T11:49:09.3915281Z   fetch-tags: false
+2025-12-31T11:49:09.3916216Z   show-progress: true
+2025-12-31T11:49:09.3917161Z   lfs: false
+2025-12-31T11:49:09.3918070Z   submodules: false
+2025-12-31T11:49:09.3919056Z   set-safe-directory: true
+2025-12-31T11:49:09.3920742Z ##[endgroup]
+2025-12-31T11:49:09.5353587Z Syncing repository: Lavr5000/0-KanBanDoska
+2025-12-31T11:49:09.5356719Z ##[group]Getting Git version info
+2025-12-31T11:49:09.5358448Z Working directory is '/home/runner/work/0-KanBanDoska/0-KanBanDoska'
+2025-12-31T11:49:09.5363325Z [command]/usr/bin/git version
+2025-12-31T11:49:09.5518121Z git version 2.52.0
+2025-12-31T11:49:09.5569292Z ##[endgroup]
+2025-12-31T11:49:09.5588151Z Temporarily overriding HOME='/home/runner/work/_temp/534f3522-0b77-4b32-9a5d-4a163a48db0f' before making global git config changes
+2025-12-31T11:49:09.5591800Z Adding repository directory to the temporary git global config as a safe directory
+2025-12-31T11:49:09.5595938Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/0-KanBanDoska/0-KanBanDoska
+2025-12-31T11:49:09.5660677Z Deleting the contents of '/home/runner/work/0-KanBanDoska/0-KanBanDoska'
+2025-12-31T11:49:09.5666753Z ##[group]Initializing the repository
+2025-12-31T11:49:09.5671543Z [command]/usr/bin/git init /home/runner/work/0-KanBanDoska/0-KanBanDoska
+2025-12-31T11:49:09.5811307Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-12-31T11:49:09.5814139Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2025-12-31T11:49:09.5818393Z hint: to use in all of your new repositories, which will suppress this warning,
+2025-12-31T11:49:09.5820027Z hint: call:
+2025-12-31T11:49:09.5821237Z hint:
+2025-12-31T11:49:09.5822373Z hint: 	git config --global init.defaultBranch <name>
+2025-12-31T11:49:09.5827613Z hint:
+2025-12-31T11:49:09.5828882Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-12-31T11:49:09.5835147Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-12-31T11:49:09.5836618Z hint:
+2025-12-31T11:49:09.5837447Z hint: 	git branch -m <name>
+2025-12-31T11:49:09.5838393Z hint:
+2025-12-31T11:49:09.5839593Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-12-31T11:49:09.5841884Z Initialized empty Git repository in /home/runner/work/0-KanBanDoska/0-KanBanDoska/.git/
+2025-12-31T11:49:09.5845355Z [command]/usr/bin/git remote add origin https://github.com/Lavr5000/0-KanBanDoska
+2025-12-31T11:49:09.5875754Z ##[endgroup]
+2025-12-31T11:49:09.5877449Z ##[group]Disabling automatic garbage collection
+2025-12-31T11:49:09.5880410Z [command]/usr/bin/git config --local gc.auto 0
+2025-12-31T11:49:09.5914859Z ##[endgroup]
+2025-12-31T11:49:09.5916448Z ##[group]Setting up auth
+2025-12-31T11:49:09.5922026Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-12-31T11:49:09.5955985Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-12-31T11:49:09.6346941Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-12-31T11:49:09.6369340Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-12-31T11:49:09.6602914Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2025-12-31T11:49:09.6634717Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2025-12-31T11:49:09.6884343Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-12-31T11:49:09.6921600Z ##[endgroup]
+2025-12-31T11:49:09.6925909Z ##[group]Fetching the repository
+2025-12-31T11:49:09.6933486Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +9985304e25a954f4a52737990964e4b174074054:refs/remotes/origin/main
+2025-12-31T11:49:10.1543078Z From https://github.com/Lavr5000/0-KanBanDoska
+2025-12-31T11:49:10.1544940Z  * [new ref]         9985304e25a954f4a52737990964e4b174074054 -> origin/main
+2025-12-31T11:49:10.1576467Z ##[endgroup]
+2025-12-31T11:49:10.1578373Z ##[group]Determining the checkout info
+2025-12-31T11:49:10.1582643Z ##[endgroup]
+2025-12-31T11:49:10.1586173Z [command]/usr/bin/git sparse-checkout disable
+2025-12-31T11:49:10.1630357Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-12-31T11:49:10.1663986Z ##[group]Checking out the ref
+2025-12-31T11:49:10.1667532Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-12-31T11:49:10.1802982Z Switched to a new branch 'main'
+2025-12-31T11:49:10.1808199Z branch 'main' set up to track 'origin/main'.
+2025-12-31T11:49:10.1817192Z ##[endgroup]
+2025-12-31T11:49:10.1851782Z [command]/usr/bin/git log -1 --format=%H
+2025-12-31T11:49:10.1876440Z 9985304e25a954f4a52737990964e4b174074054
+2025-12-31T11:49:10.2201533Z ##[group]Run actions/setup-node@v4
+2025-12-31T11:49:10.2202670Z with:
+2025-12-31T11:49:10.2203461Z   node-version: 20
+2025-12-31T11:49:10.2204313Z   cache: npm
+2025-12-31T11:49:10.2205146Z   always-auth: false
+2025-12-31T11:49:10.2206062Z   check-latest: false
+2025-12-31T11:49:10.2207242Z   token: ***
+2025-12-31T11:49:10.2208022Z ##[endgroup]
+2025-12-31T11:49:10.4339664Z Found in cache @ /opt/hostedtoolcache/node/20.19.6/x64
+2025-12-31T11:49:10.4344897Z ##[group]Environment details
+2025-12-31T11:49:14.5011583Z node: v20.19.6
+2025-12-31T11:49:14.5015342Z npm: 10.8.2
+2025-12-31T11:49:14.5015770Z yarn: 1.22.22
+2025-12-31T11:49:14.5016806Z ##[endgroup]
+2025-12-31T11:49:14.5042983Z [command]/opt/hostedtoolcache/node/20.19.6/x64/bin/npm config get cache
+2025-12-31T11:49:14.8043871Z /home/runner/.npm
+2025-12-31T11:49:15.1669695Z npm cache is not found
+2025-12-31T11:49:15.1897371Z ##[group]Run npm ci
+2025-12-31T11:49:15.1897676Z [36;1mnpm ci[0m
+2025-12-31T11:49:15.1943232Z shell: /usr/bin/bash -e {0}
+2025-12-31T11:49:15.1943516Z ##[endgroup]
+2025-12-31T11:49:22.0348030Z npm warn deprecated path-match@1.2.4: This package is archived and no longer maintained. For support, visit https://github.com/expressjs/express/discussions
+2025-12-31T11:49:23.5057569Z npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+2025-12-31T11:49:32.5127860Z npm warn deprecated @cloudflare/next-on-pages@1.13.16: Please use the OpenNext adapter instead: https://opennext.js.org/cloudflare
+2025-12-31T11:49:49.9566885Z 
+2025-12-31T11:49:49.9568124Z added 1394 packages, and audited 1395 packages in 35s
+2025-12-31T11:49:49.9568949Z 
+2025-12-31T11:49:49.9569485Z 216 packages are looking for funding
+2025-12-31T11:49:49.9570682Z   run `npm fund` for details
+2025-12-31T11:49:49.9988028Z 
+2025-12-31T11:49:49.9989410Z 12 vulnerabilities (1 low, 7 moderate, 4 high)
+2025-12-31T11:49:49.9990313Z 
+2025-12-31T11:49:49.9991043Z Some issues need review, and may require choosing
+2025-12-31T11:49:49.9991957Z a different dependency.
+2025-12-31T11:49:49.9992483Z 
+2025-12-31T11:49:50.0020692Z Run `npm audit` for details.
+2025-12-31T11:49:50.0614827Z ##[group]Run npm run build:cloudflare
+2025-12-31T11:49:50.0615199Z [36;1mnpm run build:cloudflare[0m
+2025-12-31T11:49:50.0648544Z shell: /usr/bin/bash -e {0}
+2025-12-31T11:49:50.0648837Z env:
+2025-12-31T11:49:50.0649211Z   DEEPSEEK_API_KEY: ***
+2025-12-31T11:49:50.0649591Z   NEXT_PUBLIC_SUPABASE_URL: ***
+2025-12-31T11:49:50.0649979Z   NEXT_PUBLIC_SUPABASE_ANON_KEY: ***
+2025-12-31T11:49:50.0651657Z   SUPABASE_SERVICE_ROLE_KEY: ***
+2025-12-31T11:49:50.0651899Z ##[endgroup]
+2025-12-31T11:49:50.1852210Z 
+2025-12-31T11:49:50.1854495Z > kanban-board@2.0.0 prebuild:cloudflare
+2025-12-31T11:49:50.1859277Z > npm run clean
+2025-12-31T11:49:50.1859536Z 
+2025-12-31T11:49:50.3220767Z 
+2025-12-31T11:49:50.3221745Z > kanban-board@2.0.0 clean
+2025-12-31T11:49:50.3223657Z > node -e "const fs=require('fs'); ['.next', '.open-next'].forEach(d=>fs.existsSync(d)&&fs.rmSync(d,{recursive:true,force:true})); console.log('Cleaned build folders')"
+2025-12-31T11:49:50.3224801Z 
+2025-12-31T11:49:50.3620616Z Cleaned build folders
+2025-12-31T11:49:50.3756184Z 
+2025-12-31T11:49:50.3761022Z > kanban-board@2.0.0 build:cloudflare
+2025-12-31T11:49:50.3763349Z > npx @opennextjs/cloudflare build --skipWranglerConfigCheck
+2025-12-31T11:49:50.3765180Z 
+2025-12-31T11:49:52.9165764Z 
+2025-12-31T11:49:52.9168612Z ┌─────────────────────────────┐
+2025-12-31T11:49:52.9184606Z │ OpenNext — Cloudflare build │
+2025-12-31T11:49:52.9185321Z └─────────────────────────────┘
+2025-12-31T11:49:52.9185622Z 
+2025-12-31T11:49:53.0106028Z App directory: /home/runner/work/0-KanBanDoska/0-KanBanDoska
+2025-12-31T11:49:53.0111027Z Next.js version : 15.4.10
+2025-12-31T11:49:53.0115650Z @opennextjs/cloudflare version: 1.14.7
+2025-12-31T11:49:53.0118775Z @opennextjs/aws version: 3.9.7
+2025-12-31T11:49:53.0137415Z 
+2025-12-31T11:49:53.0139480Z ┌─────────────────────────────────┐
+2025-12-31T11:49:53.0142362Z │ OpenNext — Building Next.js app │
+2025-12-31T11:49:53.0143174Z └─────────────────────────────────┘
+2025-12-31T11:49:53.0143462Z 
+2025-12-31T11:49:53.1287762Z 
+2025-12-31T11:49:53.1288625Z > kanban-board@2.0.0 prebuild
+2025-12-31T11:49:53.1289562Z > npm run clean
+2025-12-31T11:49:53.1291300Z 
+2025-12-31T11:49:53.2427741Z 
+2025-12-31T11:49:53.2432748Z > kanban-board@2.0.0 clean
+2025-12-31T11:49:53.2437789Z > node -e "const fs=require('fs'); ['.next', '.open-next'].forEach(d=>fs.existsSync(d)&&fs.rmSync(d,{recursive:true,force:true})); console.log('Cleaned build folders')"
+2025-12-31T11:49:53.2447158Z 
+2025-12-31T11:49:53.2704805Z Cleaned build folders
+2025-12-31T11:49:53.2795978Z 
+2025-12-31T11:49:53.2797355Z > kanban-board@2.0.0 build
+2025-12-31T11:49:53.2798465Z > next build
+2025-12-31T11:49:53.2807051Z 
+2025-12-31T11:49:53.8337541Z ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+2025-12-31T11:49:53.8488161Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
+2025-12-31T11:49:53.8491169Z This information is used to shape Next.js' roadmap and prioritize features.
+2025-12-31T11:49:53.8506432Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2025-12-31T11:49:53.8507484Z https://nextjs.org/telemetry
+2025-12-31T11:49:53.8507916Z 
+2025-12-31T11:49:53.9124616Z    ▲ Next.js 15.4.10
+2025-12-31T11:49:53.9129244Z    - Experiments (use with caution):
+2025-12-31T11:49:53.9133733Z      · serverActions
+2025-12-31T11:49:53.9136318Z 
+2025-12-31T11:49:53.9768138Z    Creating an optimized production build ...
+2025-12-31T11:50:07.5528806Z  ✓ Compiled successfully in 10.0s
+2025-12-31T11:50:07.5579892Z    Linting and checking validity of types ...
+2025-12-31T11:50:12.7982499Z    Collecting page data ...
+2025-12-31T11:50:14.8934858Z    Generating static pages (0/7) ...
+2025-12-31T11:50:15.6254718Z    Generating static pages (1/7) 
+2025-12-31T11:50:15.8552612Z    Generating static pages (3/7) 
+2025-12-31T11:50:15.8560294Z    Generating static pages (5/7) 
+2025-12-31T11:50:15.8564423Z  ✓ Generating static pages (7/7)
+2025-12-31T11:50:16.8511451Z    Finalizing page optimization ...
+2025-12-31T11:50:16.8513356Z    Collecting build traces ...
+2025-12-31T11:50:35.8583608Z 
+2025-12-31T11:50:35.8612623Z Route (app)                                 Size  First Load JS
+2025-12-31T11:50:35.8614153Z ┌ ○ /                                    32.1 kB         184 kB
+2025-12-31T11:50:35.8615378Z ├ ○ /_not-found                            989 B         101 kB
+2025-12-31T11:50:35.8616619Z ├ ƒ /api/ai/suggestions                    126 B        99.8 kB
+2025-12-31T11:50:35.8617898Z ├ ○ /login                               1.84 kB         158 kB
+2025-12-31T11:50:35.8619043Z ├ ○ /signup                               2.1 kB         158 kB
+2025-12-31T11:50:35.8620755Z └ ƒ /test                                  126 B        99.8 kB
+2025-12-31T11:50:35.8622712Z + First Load JS shared by all            99.7 kB
+2025-12-31T11:50:35.8623543Z   ├ chunks/4bd1b696-cf72ae8a39fa05aa.js  54.1 kB
+2025-12-31T11:50:35.8624409Z   ├ chunks/964-b440f7af22c41ca5.js       43.6 kB
+2025-12-31T11:50:35.8625151Z   └ other shared chunks (total)          1.92 kB
+2025-12-31T11:50:35.8625507Z 
+2025-12-31T11:50:35.8625517Z 
+2025-12-31T11:50:35.8625904Z ○  (Static)   prerendered as static content
+2025-12-31T11:50:35.8626562Z ƒ  (Dynamic)  server-rendered on demand
+2025-12-31T11:50:35.8626869Z 
+2025-12-31T11:50:35.9107273Z 
+2025-12-31T11:50:35.9108767Z ┌──────────────────────────────┐
+2025-12-31T11:50:35.9109414Z │ OpenNext — Generating bundle │
+2025-12-31T11:50:35.9112998Z └──────────────────────────────┘
+2025-12-31T11:50:35.9117245Z 
+2025-12-31T11:50:35.9741480Z Bundling middleware function...
+2025-12-31T11:50:35.9777206Z opennextjs-cloudflare build
+2025-12-31T11:50:35.9777765Z 
+2025-12-31T11:50:35.9778279Z Build an OpenNext Cloudflare worker
+2025-12-31T11:50:35.9778717Z 
+2025-12-31T11:50:35.9778986Z Options:
+2025-12-31T11:50:35.9779605Z       --help                        Show help                          [boolean]
+2025-12-31T11:50:35.9780676Z       --version                     Show version number                [boolean]
+2025-12-31T11:50:35.9781567Z   -c, --config                      Path to Wrangler configuration file [string]
+2025-12-31T11:50:35.9782374Z       --configPath                  Path to Wrangler configuration file
+2025-12-31T11:50:35.9783396Z                                                            [deprecated] [string]
+2025-12-31T11:50:35.9784110Z   -e, --env                         Wrangler environment to use for operations
+2025-12-31T11:50:35.9784809Z                                                                         [string]
+2025-12-31T11:50:35.9785519Z   -s, --skipNextBuild, --skipBuild  Skip building the Next.js app
+2025-12-31T11:50:35.9786264Z                                                       [boolean] [default: false]
+2025-12-31T11:50:35.9786965Z       --noMinify                    Disable worker minification
+2025-12-31T11:50:35.9787713Z                                                       [boolean] [default: false]
+2025-12-31T11:50:35.9788531Z       --skipWranglerConfigCheck     Skip checking for a Wrangler config
+2025-12-31T11:50:35.9789432Z                                                       [boolean] [default: false]
+2025-12-31T11:50:35.9790447Z       --openNextConfigPath          Path to the OpenNext configuration file
+2025-12-31T11:50:35.9791458Z                                                                         [string]
+2025-12-31T11:50:35.9791965Z 
+2025-12-31T11:50:35.9793774Z Error: ENOENT: no such file or directory, copyfile '/home/runner/work/0-KanBanDoska/0-KanBanDoska/.open-next/.build/open-next.config.edge.mjs' -> '/home/runner/work/0-KanBanDoska/0-KanBanDoska/.open-next/middleware/open-next.config.mjs'
+2025-12-31T11:50:35.9795526Z     at Object.copyFileSync (node:fs:3035:11)
+2025-12-31T11:50:35.9796822Z     at Module.copyOpenNextConfig (file:///home/runner/work/0-KanBanDoska/0-KanBanDoska/node_modules/@opennextjs/aws/dist/build/helper.js:267:8)
+2025-12-31T11:50:35.9799125Z     at createMiddleware (file:///home/runner/work/0-KanBanDoska/0-KanBanDoska/node_modules/@opennextjs/aws/dist/build/createMiddleware.js:37:21)
+2025-12-31T11:50:35.9811321Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-31T11:50:35.9812941Z     at async build (file:///home/runner/work/0-KanBanDoska/0-KanBanDoska/node_modules/@opennextjs/cloudflare/dist/cli/build/build.js:62:5)
+2025-12-31T11:50:35.9814830Z     at async buildCommand (file:///home/runner/work/0-KanBanDoska/0-KanBanDoska/node_modules/@opennextjs/cloudflare/dist/cli/commands/build.js:21:5) {
+2025-12-31T11:50:35.9816353Z   errno: -2,
+2025-12-31T11:50:35.9816924Z   code: 'ENOENT',
+2025-12-31T11:50:35.9817353Z   syscall: 'copyfile',
+2025-12-31T11:50:35.9818681Z   path: '/home/runner/work/0-KanBanDoska/0-KanBanDoska/.open-next/.build/open-next.config.edge.mjs',
+2025-12-31T11:50:35.9820496Z   dest: '/home/runner/work/0-KanBanDoska/0-KanBanDoska/.open-next/middleware/open-next.config.mjs'
+2025-12-31T11:50:35.9821863Z }
+2025-12-31T11:50:36.0222314Z ##[error]Process completed with exit code 1.
+2025-12-31T11:50:36.0324415Z Post job cleanup.
+2025-12-31T11:50:36.1330315Z [command]/usr/bin/git version
+2025-12-31T11:50:36.1384308Z git version 2.52.0
+2025-12-31T11:50:36.1428882Z Temporarily overriding HOME='/home/runner/work/_temp/80de2928-76ce-4f0f-8970-cf2bd85e2207' before making global git config changes
+2025-12-31T11:50:36.1432144Z Adding repository directory to the temporary git global config as a safe directory
+2025-12-31T11:50:36.1436804Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/0-KanBanDoska/0-KanBanDoska
+2025-12-31T11:50:36.1479143Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-12-31T11:50:36.1514613Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-12-31T11:50:36.1756589Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-12-31T11:50:36.1780614Z http.https://github.com/.extraheader
+2025-12-31T11:50:36.1794933Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-12-31T11:50:36.1828504Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-12-31T11:50:36.2063322Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2025-12-31T11:50:36.2097587Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2025-12-31T11:50:36.2507181Z Cleaning up orphan processes
