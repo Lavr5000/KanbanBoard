@@ -50,9 +50,9 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
   const tasks: ParsedTask[] = []
   const lines = content.split('\n')
 
-  console.log('🔍 [PARSER] Starting to parse roadmap content')
-  console.log('📄 [PARSER] Total lines:', lines.length)
-  console.log('📝 [PARSER] Content preview:', content.substring(0, 200) + '...')
+  // logger.log('🔍 [PARSER] Starting to parse roadmap content')
+  // logger.log('📄 [PARSER] Total lines:', lines.length)
+  // logger.log('📝 [PARSER] Content preview:', content.substring(0, 200) + '...')
 
   // Try multiple regex patterns to match different formats
   const patterns = [
@@ -84,9 +84,9 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
         const description = match[2].trim()
         const fullTitle = `${title} - ${description}`
 
-        console.log(`✅ [PARSER] Line ${i + 1}: Found task with pattern ${patternIndex + 1}`)
-        console.log(`   Title: "${title}"`)
-        console.log(`   Description: "${description}"`)
+        // logger.log(`✅ [PARSER] Line ${i + 1}: Found task with pattern ${patternIndex + 1}`)
+        // logger.log(`   Title: "${title}"`)
+        // logger.log(`   Description: "${description}"`)
 
         // Use sequential number
         tasks.push({ number: tasks.length + 1, title: fullTitle, lineNumber: i + 1 })
@@ -95,13 +95,13 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
     }
   }
 
-  console.log(`🎯 [PARSER] Parsing complete. Found ${tasks.length} tasks`)
-  if (tasks.length === 0) {
-    console.log('⚠️  [PARSER] No tasks found! Sample lines:')
-    lines.slice(0, 10).forEach((line, i) => {
-      if (line.trim()) console.log(`   Line ${i + 1}: "${line.trim()}"`)
-    })
-  }
+  // logger.log(`🎯 [PARSER] Parsing complete. Found ${tasks.length} tasks`)
+  // if (tasks.length === 0) {
+  //   logger.log('⚠️  [PARSER] No tasks found! Sample lines:')
+  //   lines.slice(0, 10).forEach((line, i) => {
+  //     if (line.trim()) logger.log(`   Line ${i + 1}: "${line.trim()}"`)
+  //   })
+  // }
 
   return tasks
 }

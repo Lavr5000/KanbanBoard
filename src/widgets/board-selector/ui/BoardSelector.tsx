@@ -15,7 +15,7 @@ export function BoardSelector() {
 
   // Debug logging
   useEffect(() => {
-    console.log('📋 BoardSelector state:', { loading, boardsCount: boards.length, activeBoard: activeBoard?.name })
+    // logger.log('📋 BoardSelector state:', { loading, boardsCount: boards.length, activeBoard: activeBoard?.name })
   }, [loading, boards, activeBoard])
 
   const handleBoardChange = () => {

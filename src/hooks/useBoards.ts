@@ -91,7 +91,7 @@ export function useBoards(): UseBoardsReturn {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Board change:', payload)
+          // logger.log('Board change:', payload)
 
           if (payload.eventType === 'INSERT') {
             setBoards((prev) => [...prev, payload.new as Board])

@@ -17,10 +17,10 @@ export async function createTasksFromRoadmap(
   tasks: Array<{ title: string }>,
   maxTasks: number = 5
 ): Promise<TaskCreationResult> {
-  console.log('🚀 [TASK-CREATOR] Starting task creation')
-  console.log(`📋 [TASK-CREATOR] Board ID: ${boardId}`)
-  console.log(`📊 [TASK-CREATOR] Total tasks received: ${tasks.length}`)
-  console.log(`🎯 [TASK-CREATOR] Max tasks to create: ${maxTasks}`)
+  // logger.log('🚀 [TASK-CREATOR] Starting task creation')
+  // logger.log(`📋 [TASK-CREATOR] Board ID: ${boardId}`)
+  // logger.log(`📊 [TASK-CREATOR] Total tasks received: ${tasks.length}`)
+  // logger.log(`🎯 [TASK-CREATOR] Max tasks to create: ${maxTasks}`)
 
   const result: TaskCreationResult = {
     success: false,
@@ -29,14 +29,14 @@ export async function createTasksFromRoadmap(
   }
 
   if (tasks.length === 0) {
-    console.log('❌ [TASK-CREATOR] No tasks to create')
+    // logger.log('❌ [TASK-CREATOR] No tasks to create')
     result.errors.push('Нет задач для создания')
     return result
   }
 
   try {
     // 1. Find columns
-    console.log('🔍 [TASK-CREATOR] Fetching columns...')
+    // logger.log('🔍 [TASK-CREATOR] Fetching columns...')
     const { data: columns, error: columnsError } = await supabase
       .from('columns')
       .select('id, title, position')
@@ -45,25 +45,25 @@ export async function createTasksFromRoadmap(
 
     if (columnsError) throw columnsError
 
-    console.log(`📊 [TASK-CREATOR] Found ${columns?.length || 0} columns`)
-    if (columns && columns.length > 0) {
-      columns.forEach((col, i) => console.log(`   Column ${i + 1}: "${col.title}" (ID: ${col.id})`))
-    }
+    // logger.log(`📊 [TASK-CREATOR] Found ${columns?.length || 0} columns`)
+    // if (columns && columns.length > 0) {
+    //   columns.forEach((col, i) => logger.log(`   Column ${i + 1}: "${col.title}" (ID: ${col.id})`))
+    // }
 
     // 2. Always use first column (leftmost)
     const targetColumn = columns && columns.length > 0 ? columns[0] : null
 
     if (!targetColumn) {
-      console.log('❌ [TASK-CREATOR] No target column found')
+      // logger.log('❌ [TASK-CREATOR] No target column found')
       result.errors.push('Не найдена колонка для создания задач')
       return result
     }
 
-    console.log(`✅ [TASK-CREATOR] Target column: "${targetColumn.title}" (ID: ${targetColumn.id})`)
+    // logger.log(`✅ [TASK-CREATOR] Target column: "${targetColumn.title}" (ID: ${targetColumn.id})`)
 
     // 3. Create tasks (max maxTasks)
     const tasksToCreate = tasks.slice(0, maxTasks)
-    console.log(`📦 [TASK-CREATOR] Creating ${tasksToCreate.length} tasks...`)
+    // logger.log(`📦 [TASK-CREATOR] Creating ${tasksToCreate.length} tasks...`)
 
     for (const task of tasksToCreate) {
       // Truncate title to max 255 characters (VARCHAR limit)
@@ -79,26 +79,26 @@ export async function createTasksFromRoadmap(
         priority: 'medium' as const,
         position: await getNextPosition(targetColumn.id),
       }
-      console.log('📝 [TASK-CREATOR] Creating task:', taskData)
+      // logger.log('📝 [TASK-CREATOR] Creating task:', taskData)
 
       const { error: taskError } = await supabase
         .from('tasks')
         .insert(taskData)
 
       if (taskError) {
-        console.error('❌ [TASK-CREATOR] Task creation error:', taskError)
+        // logger.error('❌ [TASK-CREATOR] Task creation error:', taskError)
         result.errors.push(`Ошибка создания задачи "${task.title}": ${taskError.message}`)
       } else {
-        console.log('✅ [TASK-CREATOR] Task created successfully')
+        // logger.log('✅ [TASK-CREATOR] Task created successfully')
         result.created++
       }
     }
 
     result.success = result.created > 0
-    console.log(`🎯 [TASK-CREATOR] Creation complete. Created: ${result.created}/${tasksToCreate.length}`)
+    // logger.log(`🎯 [TASK-CREATOR] Creation complete. Created: ${result.created}/${tasksToCreate.length}`)
 
   } catch (error) {
-    console.error('💥 [TASK-CREATOR] Exception:', error)
+    // logger.error('💥 [TASK-CREATOR] Exception:', error)
     result.errors.push(error instanceof Error ? error.message : 'Unknown error')
   }
 

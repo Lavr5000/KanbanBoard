@@ -26,22 +26,22 @@ export const AddColumnButton = ({
 
   const handleAddColumn = async () => {
     if (isLimitReached || isAdding || !boardId) {
-      console.log("Cannot add column:", { isLimitReached, isAdding, boardId });
+      // logger.log("Cannot add column:", { isLimitReached, isAdding, boardId });
       return;
     }
 
     setIsAdding(true);
     try {
-      console.log("Creating column:", { boardId, position: currentColumnCount });
+      // logger.log("Creating column:", { boardId, position: currentColumnCount });
       await createColumn(supabase, {
         board_id: boardId,
         title: "New column",
         position: currentColumnCount,
       });
-      console.log("Column created successfully");
+      // logger.log("Column created successfully");
       onColumnAdded?.();
     } catch (error) {
-      console.error("Failed to create column:", error);
+      // logger.error("Failed to create column:", error);
       alert("Failed to create column: " + (error as Error).message);
     } finally {
       setIsAdding(false);
