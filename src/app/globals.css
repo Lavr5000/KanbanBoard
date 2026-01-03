@@ -17,40 +17,48 @@ body {
   scrollbar-width: none;
 }
 
-/* Onboarding Tour Styles */
-.onboarding-tooltip {
+
+/* Driver.js Onboarding Styles */
+.onboarding-driver-popover {
   background: #1a1a20 !important;
   border: 1px solid #3b82f6 !important;
   border-radius: 12px !important;
   box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2) !important;
-  backdrop-filter: blur(8px);
-  max-width: 400px;
+  color: #ffffff !important;
+  max-width: 400px !important;
 }
 
-.onboarding-content h3 {
-  color: #ffffff;
-  margin-bottom: 8px;
+.driver-popover-title {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
 }
 
-.onboarding-content p {
-  margin-bottom: 4px;
+.driver-popover-description {
+  color: #d1d5db !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
 }
 
-/* Joyride buttons */
-.react-joyride__tooltip button[data-action="primary"] {
+.driver-popover-footer {
+  border-top: 1px solid #374151 !important;
+  padding-top: 12px !important;
+}
+
+.driver-popover-next-btn {
   background: #3b82f6 !important;
   color: white !important;
   border-radius: 8px !important;
   padding: 8px 16px !important;
   font-weight: 500 !important;
-  transition: all 0.2s;
+  transition: all 0.2s !important;
 }
 
-.react-joyride__tooltip button[data-action="primary"]:hover {
+.driver-popover-next-btn:hover {
   background: #2563eb !important;
 }
 
-.react-joyride__tooltip button[data-action="secondary"] {
+.driver-popover-prev-btn {
   background: transparent !important;
   border: 1px solid #4b5563 !important;
   color: #9ca3af !important;
@@ -58,19 +66,16 @@ body {
   padding: 8px 16px !important;
 }
 
-.react-joyride__tooltip button[data-action="skip"] {
-  background: transparent !important;
+.driver-popover-close-btn {
   color: #6b7280 !important;
   font-size: 14px !important;
 }
 
-/* Overlay with blur */
-.react-joyride__overlay {
-  backdrop-filter: blur(2px);
+.driver-active-element {
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4), 0 0 0 8px rgba(59, 130, 246, 0.2) !important;
 }
 
-/* Spotlight glow effect */
-.react-joyride__spotlight {
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4) !important;
-  border-radius: 8px !important;
+.driver-overlay {
+  background: rgba(0, 0, 0, 0.1) !important;
 }

@@ -9,14 +9,16 @@ import { createTasksFromRoadmap } from '../lib/task-creator'
 
 interface RoadmapPanelProps {
   boardId: string | null
+  closeTimestamp?: number
 }
 
 /**
  * Collapsible panel at bottom of screen for project roadmap
  */
-export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
+export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isAIChatOpen, setIsAIChatOpen] = useState(false)
+  const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const { content, updateContent, immediateSave, loading, saving, error, hasContent } = useRoadmap({ boardId })
@@ -32,6 +34,15 @@ export function RoadmapPanel({ boardId }: RoadmapPanelProps) {
       return () => clearTimeout(timer)
     }
   }, [toast])
+
+  // Handle force close (for onboarding)
+  useEffect(() => {
+    if (closeTimestamp && closeTimestamp > lastCloseTimestamp) {
+      setIsExpanded(false)
+      setIsAIChatOpen(false)
+      setLastCloseTimestamp(closeTimestamp)
+    }
+  }, [closeTimestamp, lastCloseTimestamp])
 
   // Handle create tasks
   const handleCreateTasks = useCallback(async () => {

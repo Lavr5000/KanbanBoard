@@ -7,5 +7,3 @@ export {
   getOnboardingProgress,
   clearOnboardingProgress,
 } from './lib/storage'
-export { tourSteps } from './lib/tour-steps'
-export { joyrideStyles } from './lib/joyride-styles'

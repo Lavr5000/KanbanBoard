@@ -13,7 +13,6 @@ import {
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import { createPortal } from "react-dom";
-import { STATUS } from "react-joyride";
 
 import { useUIStore } from "@/entities/ui/model/store";
 import { useBoardData } from "@/hooks/useBoardData";
@@ -44,6 +43,7 @@ export const Board = () => {
   const [runTour, setRunTour] = useState(false);
   const [demoTaskAI, setDemoTaskAI] = useState(false);
   const [forceShowAITaskId, setForceShowAITaskId] = useState<string | null>(null);
+  const [closeRoadmapTimestamp, setCloseRoadmapTimestamp] = useState<number>(0);
 
   const {
     columns: supabaseColumns,
@@ -196,32 +196,36 @@ export const Board = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [runTour]);
 
-  // Joyride events handler
-  const handleJoyrideCallback = (data: { index?: number; action?: string; status: string }) => {
-    const { index, action, status } = data;
+  // Tour events handler
+  const handleTourCallback = (data: { action: string; step: number }) => {
+    const { action, step } = data;
 
-    // Open AI panel on step 5 (index 4)
-    if (index === 4 && action === 'next' && tasks.length > 0) {
-      setDemoTaskAI(true);
-      // Force show AI for first task
+    // Tour completed or closed
+    if (action === 'destroy' || action === 'close') {
+      setDemoTaskAI(false);
+      setForceShowAITaskId(null);
+      setTourCompleted();
+      setRunTour(false);
+    }
+  };
+
+  // Close roadmap panel handler for onboarding
+  const handleCloseRoadmap = () => {
+    setCloseRoadmapTimestamp(Date.now());
+  };
+
+  // Step change handler for AI panel
+  const handleStepChange = (stepNumber: number) => {
+    // Step 4 (0-indexed: 3) - открываем AI для первой задачи
+    if (stepNumber === 4 && tasks.length > 0) {
       const firstTask = tasks[0];
       if (firstTask) {
         setForceShowAITaskId(String(firstTask.id));
       }
     }
-
-    // Close AI panel after step 6 (index 5)
-    if (index === 5 && action === 'next') {
-      setDemoTaskAI(false);
+    // Закрываем после шага 5
+    if (stepNumber === 6) {
       setForceShowAITaskId(null);
-    }
-
-    // Tour finished or skipped
-    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
-      setDemoTaskAI(false);
-      setForceShowAITaskId(null);
-      setTourCompleted();
-      setRunTour(false);
     }
   };
 
@@ -317,7 +321,7 @@ export const Board = () => {
 
   return (
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
-      <OnboardingTour run={runTour} onCallback={handleJoyrideCallback} />
+      <OnboardingTour run={runTour} onCallback={handleTourCallback} onStepChange={handleStepChange} onCloseRoadmap={handleCloseRoadmap} />
       <div className="flex-grow flex flex-col">
         {/* Top Header */}
         <header className="h-20 border-b border-gray-800 flex items-center justify-between px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
@@ -465,7 +469,7 @@ export const Board = () => {
       />
       </div>
 
-      <RoadmapPanel boardId={activeBoard?.id || null} />
+      <RoadmapPanel boardId={activeBoard?.id || null} closeTimestamp={closeRoadmapTimestamp} />
       </div>
     </BoardContext.Provider>
   );
