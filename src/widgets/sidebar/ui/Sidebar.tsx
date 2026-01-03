@@ -4,6 +4,7 @@ import { Play, Download, LogOut } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { BoardSelector } from "@/widgets/board-selector";
 import { FeedbackButton, FeedbackModal } from "@/features/feedback";
+import { DonationButton, DonationModal } from "@/features/donation";
 
 export const Sidebar = () => {
   const { user, signOut } = useAuth();
@@ -28,6 +29,7 @@ export const Sidebar = () => {
 
       {/* Bottom Actions */}
       <div className="p-4 space-y-3 border-t border-gray-800">
+        <DonationButton />
         <button
           onClick={() => alert("Экспорт данных будет доступен позже")}
           className="w-full flex items-center gap-3 px-4 py-2 text-xs text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
@@ -63,6 +65,7 @@ export const Sidebar = () => {
       </div>
 
       <FeedbackModal />
+      <DonationModal />
     </aside>
   );
 };
