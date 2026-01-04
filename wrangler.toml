@@ -10,13 +10,9 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 compatibility_flags = ["nodejs_compat"]
 
 # Environment variables
-# IMPORTANT: Set these as secrets in Cloudflare Dashboard
-# Go to: Workers & Pages → lavr-ai-kanban-doska → Settings → Variables and Secrets
+# TODO: Move to secrets for production
 [vars]
-# Public variables (safe to commit)
+DEEPSEEK_API_KEY = "sk-5b24ee34458047a09ee8936c930bf625"
 NEXT_PUBLIC_SUPABASE_URL = "https://ygxnblhpjdhqjgcmcxgu.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneG5ibGhwamRocWpnY21jeGd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4MDM2ODksImV4cCI6MjA1MTM3OTY4OX0.wJFpVxQSvS8eYpFzqQ2xKLJRzmhfJiYPKF5NqFqwJpE"
-
-# Secret variables (DO NOT commit - use Cloudflare Secrets):
-# DEEPSEEK_API_KEY - Set in Cloudflare Dashboard
-# SUPABASE_SERVICE_ROLE_KEY - Set in Cloudflare Dashboard
+SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneG5ibGhwamRocWpnY21jeGd1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgwMzY4OSwiZXhwIjoyMDUxMzc5Njg5fQ.p8GJvLQMq7bCJ3K_KNFJOLBaGkzfRSlE5bYHbqlMV-E"
