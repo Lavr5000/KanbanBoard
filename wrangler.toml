@@ -15,8 +15,8 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 # Public variables (safe to commit)
 NEXT_PUBLIC_SUPABASE_URL = "https://ygxnblhpjdhqjgcmcxgu.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneG5ibGhwamRocWpnY21jeGd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4MDM2ODksImV4cCI6MjA1MTM3OTY4OX0.wJFpVxQSvS8eYpFzqQ2xKLJRzmhfJiYPKF5NqFqwJpE"
 
 # Secret variables (DO NOT commit - use Cloudflare Secrets):
 # DEEPSEEK_API_KEY - Set in Cloudflare Dashboard
 # SUPABASE_SERVICE_ROLE_KEY - Set in Cloudflare Dashboard
-# NEXT_PUBLIC_SUPABASE_ANON_KEY - Set in Cloudflare Dashboard
