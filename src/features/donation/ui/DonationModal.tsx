@@ -9,7 +9,7 @@ import { Copy, Check, Heart } from "lucide-react";
 
 export const DonationModal = () => {
   const { isOpen, close } = useDonationModal();
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("sbp");
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("tinkoff");
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [copied, setCopied] = useState(false);
