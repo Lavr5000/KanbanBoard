@@ -1,0 +1,13 @@
+# Environment variables for local development
+# Copy this file to .dev.vars and fill in your actual values
+# IMPORTANT: .dev.vars is NOT committed to git (see .gitignore)
+
+# DeepSeek API key
+# Get your key at: https://platform.deepseek.com/
+DEEPSEEK_API_KEY=sk-your-deepseek-api-key-here
+
+# Supabase credentials
+# Get these from: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ-your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=eyJ-your-service-role-key-here
