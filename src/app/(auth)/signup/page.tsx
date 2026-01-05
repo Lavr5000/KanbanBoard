@@ -56,9 +56,9 @@ export default function SignupPage() {
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Создать аккаунт
+            No-code AI Kanban
           </h1>
-          <p className="text-gray-600">Присоединяйтесь к Lavr Kanban AI</p>
+          <p className="text-gray-600">Управляйте проектами с помощью AI</p>
         </div>
 
         {/* Region notice */}
@@ -154,25 +154,28 @@ export default function SignupPage() {
 
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-500">
-            ✨ Создано с помощью AI{' '}
+          <p className="text-xs text-gray-500 mb-2">
+            ✨ Создано с помощью AI •{' '}
             <a
-              href="https://github.com/Lavr5000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
-            >
-              Lavrov Denis
-            </a>
-            {' '}&bull;{' '}
-            <a
-              href="https://t.me/Lavr5000"
+              href="https://t.me/ai_vibes_coding_ru"
               target="_blank"
               rel="noopener noreferrer"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
             >
               Telegram
             </a>
+            {' '}&bull;{' '}
+            <a
+              href="https://youtube.com/@NoCodeAIFounder"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              YouTube
+            </a>
+          </p>
+          <p className="text-xs text-gray-400">
+            No-code AI Founder • Build in Public
           </p>
         </div>
       </div>
