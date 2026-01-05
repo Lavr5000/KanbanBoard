@@ -14,6 +14,22 @@ interface UseRoadmapAIOptions {
 
 const STORAGE_KEY = 'roadmap_ai_chat'
 
+/**
+ * Clean Markdown formatting from AI response
+ * Removes bold (**), headers (#), but preserves structure
+ */
+function cleanMarkdown(text: string): string {
+  return text
+    // Remove bold markdown: **text** or __text__
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    // Remove headers: ## or ### but keep the text
+    .replace(/^#{1,6}\s+/gm, '')
+    // Clean up extra whitespace
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 // SECURITY NOTE: AI chat messages are stored in localStorage.
 // This is acceptable for non-sensitive roadmap content, but be aware:
 // - localStorage is accessible via XSS attacks
@@ -105,8 +121,9 @@ export function useRoadmapAI({ boardId }: UseRoadmapAIOptions = {}) {
           .filter((s: string) => s.length > 0 && s.length < 100) // Filter out empty or too long
       }
 
-      // Clean content from options metadata
-      const cleanContent = aiContent.replace(/ВАРИАНТЫ:\s*\[[\s\S]+?\]/, '').trim()
+      // Clean content from options metadata and Markdown formatting
+      let cleanContent = aiContent.replace(/ВАРИАНТЫ:\s*\[[\s\S]+?\]/, '').trim()
+      cleanContent = cleanMarkdown(cleanContent)
 
       setMessages([
         ...newMessages,
