@@ -2,6 +2,9 @@
 echo Pushing to GitHub...
 cd /d "c:\Users\user\.claude\0 ProEKTi\kanban-board2.0"
 
+REM Configure git to use GitHub CLI for credentials (works automatically)
+git config --local credential.helper ""
+
 echo Checking current branch...
 git checkout claude/setup-supabase-TUKCP
 
