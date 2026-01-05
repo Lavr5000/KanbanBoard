@@ -166,7 +166,7 @@ export default function SignupPage() {
             </a>
             {' '}&bull;{' '}
             <a
-              href="https://youtube.com/@NoCodeAIFounder"
+              href="https://www.youtube.com/channel/UCO8VXzaB7PnshrT6x0MhWqw"
               target="_blank"
               rel="noopener noreferrer"
               className="text-indigo-600 hover:text-indigo-700 font-medium"
