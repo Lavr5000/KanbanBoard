@@ -419,7 +419,7 @@ export const Board = () => {
         >
         <div className="flex gap-8">
           {columns.map((col, index) => {
-            const columnTasks = filteredTasks
+            const columnTasks = [...filteredTasks]
               .filter((t) => t.columnId === col.id)
               .sort((a, b) => {
                 // Priority order: high > medium > low
