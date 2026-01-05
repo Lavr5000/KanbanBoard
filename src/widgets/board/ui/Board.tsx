@@ -419,7 +419,21 @@ export const Board = () => {
         >
         <div className="flex gap-8">
           {columns.map((col, index) => {
-            const columnTasks = filteredTasks.filter((t) => t.columnId === col.id);
+            const columnTasks = filteredTasks
+              .filter((t) => t.columnId === col.id)
+              .sort((a, b) => {
+                // Priority order: high > medium > low
+                const priorityOrder = { high: 0, medium: 1, low: 2 };
+                const priorityA = priorityOrder[a.priority] ?? 1;
+                const priorityB = priorityOrder[b.priority] ?? 1;
+
+                if (priorityA !== priorityB) {
+                  return priorityA - priorityB;
+                }
+
+                // If same priority, sort by creation date (newest first)
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+              });
             // logger.log(`📋 Column "${col.title}":`, columnTasks.length, 'tasks');
             return (
               <Column
