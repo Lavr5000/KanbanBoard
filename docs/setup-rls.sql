@@ -3,6 +3,13 @@
 -- Run this in Supabase SQL Editor
 -- https://supabase.com/dashboard/project/sqhtukwjmlaxuvemkydn/sql
 -- =====================================================
+--
+-- IMPORTANT: boards.user_id references auth.users(id) NOT public.users(id)
+-- This avoids race condition where board creation fails because
+-- handle_new_user() trigger hasn't created public.users record yet.
+-- See: supabase/migrations/20250106_fix_boards_user_fk.sql
+--
+-- =====================================================
 
 -- Enable RLS on all tables
 ALTER TABLE boards ENABLE ROW LEVEL SECURITY;
