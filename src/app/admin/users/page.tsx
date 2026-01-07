@@ -20,6 +20,7 @@ interface UsersData {
   users: Array<{
     userId: string
     email: string
+    fullName: string | null
     lastActivity: string
     actionsCount: number
     status: 'active' | 'at-risk' | 'inactive'
@@ -91,6 +92,7 @@ export default function UsersPage() {
 
   const atRiskCount = data?.users.filter(u => u.status === 'at-risk').length || 0
   const activeCount = data?.users.filter(u => u.status === 'active').length || 0
+  const newUsersWithoutActivity = data?.users.filter(u => u.actionsCount === 0).length || 0
 
   return (
     <div className="p-8 space-y-6">
@@ -126,16 +128,27 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Risk Alert */}
-      {atRiskCount > 0 && (
-        <div className="flex items-center gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-          <AlertTriangle size={20} className="text-yellow-500" />
-          <div>
-            <p className="text-yellow-500 font-medium">{atRiskCount} пользователей в зоне риска</p>
-            <p className="text-gray-400 text-sm">Нет активности более 7 дней</p>
+      {/* Alerts */}
+      <div className="space-y-3">
+        {newUsersWithoutActivity > 0 && (
+          <div className="flex items-center gap-3 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+            <UserPlus size={20} className="text-blue-500" />
+            <div>
+              <p className="text-blue-500 font-medium">{newUsersWithoutActivity} новых пользователей</p>
+              <p className="text-gray-400 text-sm">Зарегистрировались, но ещё не начали работу</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+        {atRiskCount > 0 && (
+          <div className="flex items-center gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+            <AlertTriangle size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-yellow-500 font-medium">{atRiskCount} пользователей в зоне риска</p>
+              <p className="text-gray-400 text-sm">Нет активности более 7 дней</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -197,21 +210,46 @@ export default function UsersPage() {
                 data.users.map((user, index) => {
                   const lastActive = new Date(user.lastActivity)
                   const daysSinceActive = Math.floor((Date.now() - lastActive.getTime()) / (1000 * 60 * 60 * 24))
+                  const hasActivity = user.actionsCount > 0
+
+                  // Format last activity display
+                  const lastActivityDisplay = hasActivity
+                    ? (daysSinceActive === 0 ? 'Сегодня' : daysSinceActive === 1 ? 'Вчера' : `${daysSinceActive} дн. назад`)
+                    : 'Нет активности'
+
+                  // Determine status display
+                  const getStatusDisplay = () => {
+                    if (!hasActivity) {
+                      return { label: 'Новый', className: 'bg-blue-500/20 text-blue-400' }
+                    }
+                    switch (user.status) {
+                      case 'active':
+                        return { label: 'Активен', className: 'bg-green-500/20 text-green-400' }
+                      case 'at-risk':
+                        return { label: 'Риск', className: 'bg-yellow-500/20 text-yellow-400' }
+                      default:
+                        return { label: 'Неактивен', className: 'bg-red-500/20 text-red-400' }
+                    }
+                  }
+                  const statusDisplay = getStatusDisplay()
 
                   return (
-                    <tr key={index} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                      <td className="py-3 px-4 text-white font-medium">{user.email}</td>
+                    <tr key={user.userId} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                      <td className="py-3 px-4">
+                        <div>
+                          <div className="text-white font-medium">{user.email}</div>
+                          {user.fullName && (
+                            <div className="text-gray-500 text-sm">{user.fullName}</div>
+                          )}
+                        </div>
+                      </td>
                       <td className="py-3 px-4 text-gray-400">
-                        {daysSinceActive === 0 ? 'Сегодня' : daysSinceActive === 1 ? 'Вчера' : `${daysSinceActive} дн. назад`}
+                        {lastActivityDisplay}
                       </td>
                       <td className="py-3 px-4 text-gray-400">{user.actionsCount}</td>
                       <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          user.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                          user.status === 'at-risk' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-red-500/20 text-red-400'
-                        }`}>
-                          {user.status === 'active' ? 'Активен' : user.status === 'at-risk' ? 'Риск' : 'Неактивен'}
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${statusDisplay.className}`}>
+                          {statusDisplay.label}
                         </span>
                       </td>
                     </tr>
