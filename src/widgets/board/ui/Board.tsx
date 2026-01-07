@@ -250,13 +250,12 @@ export const Board = () => {
     );
   }
 
-  // Handle refresh for mobile
-  const handleRefresh = async () => {
-    await refetchColumns();
-  };
-
   // Mobile rendering
   if (isMobile) {
+    const handleRefresh = async () => {
+      await refetchColumns();
+    };
+
     return (
       <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
         <MobileBoard
@@ -344,6 +343,32 @@ export const Board = () => {
       // logger.error('Failed to delete column:', error);
     }
   };
+
+  // Handle refresh for mobile
+  const handleRefresh = async () => {
+    await refetchColumns();
+  };
+
+  // Force mobile mode for testing
+  const forceMobile = true;
+
+  // Mobile rendering
+  if (isMobile || forceMobile) {
+    return (
+      <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
+        <MobileBoard
+          columns={columns}
+          tasks={tasks}
+          boardId={activeBoard?.id || null}
+          boardName={boardName}
+          progressStats={progressStats}
+          onMoveTask={moveTask}
+          onRefresh={handleRefresh}
+          loading={loading}
+        />
+      </BoardContext.Provider>
+    );
+  }
 
   return (
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
