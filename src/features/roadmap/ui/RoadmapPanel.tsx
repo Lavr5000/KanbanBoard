@@ -10,13 +10,14 @@ import { createTasksFromRoadmap } from '../lib/task-creator'
 interface RoadmapPanelProps {
   boardId: string | null
   closeTimestamp?: number
+  isMobile?: boolean
 }
 
 /**
  * Collapsible panel at bottom of screen for project roadmap
  */
-export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function RoadmapPanel({ boardId, closeTimestamp, isMobile = false }: RoadmapPanelProps) {
+  const [isExpanded, setIsExpanded] = useState(isMobile) // Start expanded on mobile
   const [isAIChatOpen, setIsAIChatOpen] = useState(false)
   const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
@@ -104,8 +105,8 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
     <>
     <div
       data-tour="roadmap-panel"
-      className={`fixed bottom-0 left-0 right-0 ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
-        isExpanded ? 'h-[70vh]' : 'h-10'
+      className={`${isMobile ? 'relative h-full' : 'fixed bottom-0 left-0 right-0 ml-64'} bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
+        !isMobile && (isExpanded ? 'h-[70vh]' : 'h-10')
       }`}
     >
       {/* Header / Collapsed State */}
@@ -150,7 +151,7 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="flex flex-col h-[calc(70vh-40px)]">
+        <div className={`flex flex-col ${isMobile ? 'h-[calc(100%-40px)]' : 'h-[calc(70vh-40px)]'}`}>
           {error && (
             <div className="px-4 py-2 bg-red-500/10 border-l-2 border-red-500 text-red-400 text-sm">
               Ошибка: {error.message}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -30,6 +30,8 @@ import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { deleteColumn } from "@/lib/supabase/queries/columns";
+import { useIsMobile } from "@/shared/hooks";
+import { MobileBoard } from "@/mobile/components";
 
 export const Board = () => {
   const { searchQuery, priorityFilter, setSearchQuery, setPriorityFilter } = useUIStore();
@@ -37,6 +39,7 @@ export const Board = () => {
   const { activeBoard } = useBoards();
   const boardName = activeBoard?.name || 'Проект';
   const supabase = createClient();
+  const isMobile = useIsMobile();
 
   // Onboarding state
   const { shouldRunTour, setTourCompleted } = useOnboarding();
@@ -244,6 +247,29 @@ export const Board = () => {
       <div className="flex w-full items-center justify-center min-h-screen bg-[#121218]">
         <div className="text-red-500 text-lg">Error loading board: {error.message}</div>
       </div>
+    );
+  }
+
+  // Handle refresh for mobile
+  const handleRefresh = async () => {
+    await refetchColumns();
+  };
+
+  // Mobile rendering
+  if (isMobile) {
+    return (
+      <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
+        <MobileBoard
+          columns={columns}
+          tasks={tasks}
+          boardId={activeBoard?.id || null}
+          boardName={boardName}
+          progressStats={progressStats}
+          onMoveTask={moveTask}
+          onRefresh={handleRefresh}
+          loading={loading}
+        />
+      </BoardContext.Provider>
     );
   }
 
