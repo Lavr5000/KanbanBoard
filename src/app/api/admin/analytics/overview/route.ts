@@ -35,11 +35,8 @@ export async function GET(request: Request) {
       aiCostResult,
       activityDataResult
     ] = await Promise.all([
-      // Active users count
-      supabase
-        .from('analytics_events')
-        .select('user_id', { count: 'exact', head: true })
-        .gte('created_at', startDateIso),
+      // Active users count (unique users, not events!)
+      supabase.rpc('get_unique_active_users_count', { p_start_date: startDateIso }),
 
       // Total tasks created
       supabase
@@ -117,7 +114,7 @@ export async function GET(request: Request) {
       .slice(0, 5)
 
     return NextResponse.json({
-      activeUsers: activeUsersResult.count || 0,
+      activeUsers: activeUsersResult.data || 0,
       totalTasks: totalTasksResult.count || 0,
       aiRequestsToday: aiRequestsResult.count || 0,
       aiCostMonth: aiCost.toFixed(2),
