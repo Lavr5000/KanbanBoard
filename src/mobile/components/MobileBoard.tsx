@@ -7,6 +7,10 @@ import { MobileTaskCard } from './MobileTaskCard';
 import { BottomNavigation } from './BottomNavigation';
 import { MobileHeader } from './MobileHeader';
 import { TaskDetailSheet } from './TaskDetailSheet';
+import { LeftHandle } from './LeftHandle';
+import { RightHandle } from './RightHandle';
+import { LeftDrawer } from './LeftDrawer';
+import { RightDrawer } from './RightDrawer';
 import { Modal } from '@/shared/ui/Modal';
 import { AddTaskModal } from '@/features/task-operations/ui/AddTaskModal';
 import { RoadmapPanel } from '@/features/roadmap/ui/RoadmapPanel';
@@ -40,6 +44,8 @@ export function MobileBoard({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLeftDrawerOpen, setIsLeftDrawerOpen] = useState(false);
+  const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
 
   // Get current column
   const currentColumn = columns[activeColumnIndex];
@@ -226,6 +232,20 @@ export function MobileBoard({
         task={selectedTask}
         onClose={() => setSelectedTask(null)}
       />
+
+      {/* Side Handles - visible only on board tab */}
+      <AnimatePresence>
+        {activeTab === 'board' && (
+          <>
+            <LeftHandle onClick={() => setIsLeftDrawerOpen(true)} />
+            <RightHandle onClick={() => setIsRightDrawerOpen(true)} />
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Drawers */}
+      <LeftDrawer isOpen={isLeftDrawerOpen} onClose={() => setIsLeftDrawerOpen(false)} />
+      <RightDrawer isOpen={isRightDrawerOpen} onClose={() => setIsRightDrawerOpen(false)} boardId={boardId} />
     </div>
   );
 }

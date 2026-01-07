@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Task, Column, Board } from '@/lib/supabase/types'
 import { useAuth } from '@/providers/AuthProvider'
+import { trackTaskCreated, trackTaskMoved, trackTaskDeleted, trackTaskUpdated } from '@/lib/analytics/tracker'
 
 interface UseBoardDataReturn {
   board: Board | null
@@ -272,6 +273,9 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         throw error
       }
 
+      // Track analytics event
+      await trackTaskCreated(data.id, columnId, board.id)
+
       // Optimistic update - update UI immediately
       setTasks((prev) => [...prev, data])
     } catch (err) {
@@ -298,6 +302,10 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         .eq('id', taskId)
 
       if (error) throw error
+
+      // Track analytics event
+      const updatedFields = Object.keys(updates)
+      await trackTaskUpdated(taskId, updatedFields)
     } catch (err) {
       console.error('Error updating task:', err)
       // Rollback optimistic update
@@ -310,6 +318,9 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     // Save current state for rollback
     const previousTasks = tasks
 
+    // Get task data before deleting for analytics
+    const taskToDelete = tasks.find(t => t.id === taskId)
+
     // Optimistic update - remove from UI immediately
     setTasks((prev) => prev.filter((t) => t.id !== taskId))
 
@@ -320,6 +331,11 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
         .eq('id', taskId)
 
       if (error) throw error
+
+      // Track analytics event
+      if (taskToDelete) {
+        await trackTaskDeleted(taskId, taskToDelete.column_id)
+      }
     } catch (err) {
       console.error('Error deleting task:', err)
       // Rollback optimistic update
@@ -335,6 +351,10 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
   ) => {
     // Save current state for rollback
     const previousTasks = tasks
+
+    // Get old column_id for analytics
+    const taskToMove = tasks.find(t => t.id === taskId)
+    const oldColumnId = taskToMove?.column_id
 
     // Optimistic update - update UI immediately
     setTasks((prev) => {
@@ -358,6 +378,11 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
 
       if (error) {
         throw error
+      }
+
+      // Track analytics event
+      if (oldColumnId && oldColumnId !== newColumnId) {
+        await trackTaskMoved(taskId, oldColumnId, newColumnId)
       }
 
       // Manually update state with confirmed data from Supabase

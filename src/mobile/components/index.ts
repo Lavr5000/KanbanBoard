@@ -3,3 +3,7 @@ export { MobileTaskCard } from './MobileTaskCard';
 export { MobileHeader } from './MobileHeader';
 export { BottomNavigation } from './BottomNavigation';
 export { TaskDetailSheet } from './TaskDetailSheet';
+export { LeftHandle } from './LeftHandle';
+export { RightHandle } from './RightHandle';
+export { LeftDrawer } from './LeftDrawer';
+export { RightDrawer } from './RightDrawer';

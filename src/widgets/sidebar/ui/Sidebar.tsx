@@ -10,7 +10,7 @@ export const Sidebar = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <aside className="w-64 border-r border-gray-800 flex flex-col h-screen sticky top-0 bg-[#121218]">
+    <aside className="hidden md:flex w-64 border-r border-gray-800 flex-col h-screen sticky top-0 bg-[#121218]">
       {/* Logo */}
       <div className="p-6 mb-4 flex items-center gap-2">
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg p-1.5">
