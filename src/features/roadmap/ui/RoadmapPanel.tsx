@@ -22,7 +22,7 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
   const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const { content, updateContent, immediateSave, loading, saving, error, hasContent } = useRoadmap({ boardId })
+  const { content, updateContent, immediateSave, loading, saving, error, hasContent, showSavedStatus } = useRoadmap({ boardId })
 
   // Parse tasks from content
   const parsedTasks = parseRoadmapTasks(content)
@@ -120,7 +120,7 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
-          <Map size={16} className="text-purple-400" />
+          <Map size={18} className="text-purple-400" />
           <span className="text-sm font-medium text-gray-300">
             {hasContent ? '📍 Дорожная карта' : '📍 Дорожная карта'}
           </span>
@@ -135,29 +135,32 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
               e.stopPropagation()
               setIsAIChatOpen(true)
             }}
-            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30"
+            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 flex items-center gap-1.5"
             title="Сгенерировать с AI"
           >
-            <Sparkles size={14} className="text-white" />
+            <Sparkles size={18} className="text-white" />
+            <span className="text-xs font-medium text-white pr-0.5">AI</span>
           </button>
 
-          {/* Save status indicator */}
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-[#121218] rounded-md">
-            {saving && (
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs font-medium text-gray-400">Сохранение...</span>
-              </div>
-            )}
-            {!saving && hasContent && (
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
-                  <span className="text-white text-[8px] font-bold">✓</span>
+          {/* Save status indicator - only show when saving or just saved */}
+          {(saving || showSavedStatus) && (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-[#121218] rounded-md">
+              {saving && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-medium text-gray-400">Сохранение...</span>
                 </div>
-                <span className="text-xs font-medium text-green-400">Сохранено</span>
-              </div>
-            )}
-          </div>
+              )}
+              {!saving && showSavedStatus && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
+                    <span className="text-white text-[8px] font-bold">✓</span>
+                  </div>
+                  <span className="text-xs font-medium text-green-400">Сохранено</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {isExpanded ? (
             <ChevronDown size={16} className="text-gray-400" />
