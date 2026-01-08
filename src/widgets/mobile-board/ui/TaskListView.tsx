@@ -3,8 +3,6 @@
 import { Task, Column as UIColumn } from '@/entities/task/model/types';
 import { MobileTaskCard } from './MobileTaskCard';
 import { useUIStore } from '@/entities/ui/model/store';
-import { Edit2, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 
 interface TaskListViewProps {
   tasks: Task[];
@@ -12,6 +10,9 @@ interface TaskListViewProps {
   onMoveTask: (taskId: string, newColumnId: string, position: number) => Promise<void>;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDeleteTask: (taskId: string) => Promise<void>;
+  onEditTask?: (task: Task) => void;
+  boardName: string;
+  allTasks: Task[];
 }
 
 export function TaskListView({
@@ -20,9 +21,11 @@ export function TaskListView({
   onMoveTask,
   onUpdateTask,
   onDeleteTask,
+  onEditTask,
+  boardName,
+  allTasks,
 }: TaskListViewProps) {
   const { searchQuery } = useUIStore();
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   // Find adjacent columns for swipe
   const getAdjacentColumns = (currentColumnId: string) => {
@@ -59,7 +62,15 @@ export function TaskListView({
     );
   });
 
-  if (filteredTasks.length === 0) {
+  // Sort by priority (high -> medium -> low)
+  const priorityOrder = { high: 0, medium: 1, low: 2, none: 3 };
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    const priorityA = priorityOrder[a.priority || 'none'] ?? 3;
+    const priorityB = priorityOrder[b.priority || 'none'] ?? 3;
+    return priorityA - priorityB;
+  });
+
+  if (sortedTasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-gray-500">
         <p className="text-sm">Нет задач</p>
@@ -72,8 +83,9 @@ export function TaskListView({
 
   return (
     <div className="space-y-0" data-mobile-tour="task-list">
-      {filteredTasks.map((task) => {
+      {sortedTasks.map((task) => {
         const { prevColumn, nextColumn } = getAdjacentColumns(String(task.columnId));
+        const currentColumn = columns.find((c) => String(c.id) === String(task.columnId));
 
         return (
           <div key={task.id} className="relative group">
@@ -81,33 +93,14 @@ export function TaskListView({
               task={task}
               onSwipeLeft={() => handleSwipeLeft(task)}
               onSwipeRight={() => handleSwipeRight(task)}
+              onEdit={() => onEditTask && onEditTask(task)}
+              onDelete={() => onDeleteTask(String(task.id))}
               previousColumnTitle={prevColumn?.title || ''}
               nextColumnTitle={nextColumn?.title || ''}
+              columnTitle={currentColumn?.title || ''}
+              boardName={boardName}
+              allTasks={allTasks}
             />
-
-            {/* Action buttons (shown on long press or select) */}
-            {selectedTaskId === task.id && (
-              <div className="absolute top-2 right-2 flex gap-2 bg-[#1c1c24] rounded-lg p-1 shadow-lg">
-                <button
-                  onClick={() => {
-                    // Open edit modal
-                    setSelectedTaskId(null);
-                  }}
-                  className="p-2 text-blue-400 hover:bg-blue-500/10 rounded"
-                >
-                  <Edit2 size={16} />
-                </button>
-                <button
-                  onClick={() => {
-                    onDeleteTask(String(task.id));
-                    setSelectedTaskId(null);
-                  }}
-                  className="p-2 text-red-400 hover:bg-red-500/10 rounded"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            )}
           </div>
         );
       })}

@@ -7,6 +7,7 @@ export interface UseSwipeGesturesProps {
   onSwipeRight?: () => void;
   onSwipeUp?: () => void;
   onSwipeDown?: () => void;
+  onSwipeMove?: (deltaX: number, deltaY: number) => void; // For visual feedback
   threshold?: number; // Minimum distance in pixels to trigger swipe (default: 60)
   preventDefaultOnSwipe?: boolean; // Prevent default behavior on swipe
 }
@@ -27,6 +28,7 @@ export function useSwipeGestures({
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
+  onSwipeMove,
   threshold = 60,
   preventDefaultOnSwipe = true,
 }: UseSwipeGesturesProps) {
@@ -49,12 +51,24 @@ export function useSwipeGestures({
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.changedTouches[0];
+    const newEndX = touch.screenX;
+    const newEndY = touch.screenY;
+
+    // Calculate current delta for visual feedback
+    const deltaX = newEndX - touchCoords.current.startX;
+    const deltaY = newEndY - touchCoords.current.startY;
+
+    // Call onSwipeMove callback for visual feedback
+    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+      onSwipeMove?.(deltaX, deltaY);
+    }
+
     touchCoords.current = {
       ...touchCoords.current,
-      endX: touch.screenX,
-      endY: touch.screenY,
+      endX: newEndX,
+      endY: newEndY,
     };
-  }, []);
+  }, [onSwipeMove]);
 
   const onTouchEnd = useCallback((e: React.TouchEvent) => {
     const { startX, startY, endX, endY } = touchCoords.current;

@@ -1,11 +1,15 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Task, Column as UIColumn } from '@/entities/task/model/types';
 import { ColumnFilter } from './ColumnFilter';
 import { TaskListView } from './TaskListView';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
 import { useUIStore } from '@/entities/ui/model/store';
+import { AddTaskModal } from '@/features/task-operations/ui/AddTaskModal';
+import { EditTaskModal } from '@/features/task-operations/ui/EditTaskModal';
+import { Modal } from '@/shared/ui/Modal';
+import { RoadmapPanel } from '@/features/roadmap/ui/RoadmapPanel';
 
 interface MobileBoardProps {
   columns: UIColumn[];
@@ -13,7 +17,10 @@ interface MobileBoardProps {
   onMoveTask: (taskId: string, newColumnId: string, position: number) => Promise<void>;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDeleteTask: (taskId: string) => Promise<void>;
+  onTasksRefetch?: () => Promise<void>;
   boardName: string;
+  boardId?: string | null;
+  closeRoadmapTimestamp?: number;
   loading?: boolean;
   error?: Error | null;
 }
@@ -24,11 +31,16 @@ export function MobileBoard({
   onMoveTask,
   onUpdateTask,
   onDeleteTask,
+  onTasksRefetch,
   boardName,
+  boardId,
+  closeRoadmapTimestamp,
   loading,
   error,
 }: MobileBoardProps) {
-  const [selectedColumnId, setSelectedColumnId] = useState<string>('all');
+  const [selectedColumnId, setSelectedColumnId] = useState<string>(() => String(columns[0]?.id || ''));
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { searchQuery, setSearchQuery } = useUIStore();
 
   // Calculate task count per column
@@ -42,11 +54,24 @@ export function MobileBoard({
 
   // Filter tasks by column
   const filteredTasks = useMemo(() => {
-    if (selectedColumnId === 'all') {
-      return tasks;
-    }
     return tasks.filter((t) => t.columnId === selectedColumnId);
   }, [tasks, selectedColumnId]);
+
+  // Determine which column to add task to
+  const getTargetColumnId = () => {
+    return selectedColumnId || String(columns[0]?.id || '');
+  };
+
+  // Open add task modal
+  const handleOpenAddTaskModal = () => {
+    setEditingTask(null); // Clear editing task
+    setIsAddTaskModalOpen(true);
+  };
+
+  // Find task by ID
+  const findTaskById = (taskId: string) => {
+    return tasks.find((t) => String(t.id) === taskId);
+  };
 
   if (loading) {
     return (
@@ -65,7 +90,7 @@ export function MobileBoard({
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-20">
+    <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-16">
       {/* Header */}
       <header className="sticky top-0 bg-[#121218]/90 backdrop-blur-sm z-20 border-b border-gray-800">
         <div className="px-4 py-3">
@@ -106,6 +131,13 @@ export function MobileBoard({
           onMoveTask={onMoveTask}
           onUpdateTask={onUpdateTask}
           onDeleteTask={onDeleteTask}
+          onEditTask={(task) => {
+            // Open edit modal
+            setEditingTask(task);
+            setIsAddTaskModalOpen(true);
+          }}
+          boardName={boardName}
+          allTasks={tasks}
         />
       </div>
 
@@ -113,14 +145,43 @@ export function MobileBoard({
       <button
         data-mobile-tour="add-task-mobile"
         className="fixed bottom-20 right-4 w-14 h-14 bg-blue-500 rounded-full shadow-lg flex items-center justify-center text-white hover:bg-blue-600 transition-colors z-40 active:scale-95"
-        onClick={() => {
-          // Open add task modal
-          const event = new CustomEvent('open-add-task-modal');
-          window.dispatchEvent(event);
-        }}
+        onClick={handleOpenAddTaskModal}
       >
         <Plus size={24} strokeWidth={2.5} />
       </button>
+
+      {/* Add/Edit Task Modal */}
+      <Modal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => {
+          setIsAddTaskModalOpen(false);
+          setEditingTask(null);
+        }}
+        title={editingTask ? "Редактировать задачу" : "Новая задача"}
+      >
+        {editingTask ? (
+          <EditTaskModal
+            task={editingTask}
+            isOpen={isAddTaskModalOpen}
+            onClose={() => {
+              setIsAddTaskModalOpen(false);
+              setEditingTask(null);
+            }}
+          />
+        ) : (
+          <AddTaskModal
+            columnId={getTargetColumnId()}
+            onClose={() => setIsAddTaskModalOpen(false)}
+          />
+        )}
+      </Modal>
+
+      {/* Roadmap Panel */}
+      <RoadmapPanel
+        boardId={boardId || null}
+        closeTimestamp={closeRoadmapTimestamp}
+        onTasksCreated={onTasksRefetch}
+      />
     </div>
   );
 }
