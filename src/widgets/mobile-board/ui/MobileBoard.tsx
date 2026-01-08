@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { Task, Column as UIColumn } from '@/entities/task/model/types';
 import { ColumnFilter } from './ColumnFilter';
 import { TaskListView } from './TaskListView';
-import { Plus, Search, X, Heart, MessageSquare } from 'lucide-react';
+import { MobileProjectSelector } from './MobileProjectSelector';
+import { Plus, Search, X, Heart, MessageSquare, ChevronDown } from 'lucide-react';
 import { useUIStore } from '@/entities/ui/model/store';
 import { AddTaskModal } from '@/features/task-operations/ui/AddTaskModal';
 import { EditTaskModal } from '@/features/task-operations/ui/EditTaskModal';
@@ -43,6 +44,7 @@ export function MobileBoard({
   const [selectedColumnId, setSelectedColumnId] = useState<string>(() => String(columns[0]?.id || ''));
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
   const { searchQuery, setSearchQuery } = useUIStore();
   const { isOpen: isDonationOpen, open: openDonation, close: closeDonation } = useDonationModal();
   const { isOpen: isFeedbackOpen, open: openFeedback, close: closeFeedback } = useFeedbackModal();
@@ -72,6 +74,11 @@ export function MobileBoard({
     setIsAddTaskModalOpen(true);
   };
 
+  // Handle board change - reload to fetch new board data
+  const handleBoardChange = () => {
+    window.location.reload();
+  };
+
   // Find task by ID
   const findTaskById = (taskId: string) => {
     return tasks.find((t) => String(t.id) === taskId);
@@ -98,7 +105,13 @@ export function MobileBoard({
       {/* Header */}
       <header className="sticky top-0 bg-[#121218]/90 backdrop-blur-sm z-20 border-b border-gray-800">
         <div className="px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">{boardName}</h1>
+          <button
+            onClick={() => setIsProjectSelectorOpen(true)}
+            className="flex items-center gap-2 hover:bg-gray-800/50 -ml-2 px-2 py-1 rounded-lg transition-colors"
+          >
+            <h1 className="text-xl font-bold text-white">{boardName}</h1>
+            <ChevronDown size={18} className="text-gray-400" />
+          </button>
 
           {/* Action buttons */}
           <div className="flex items-center gap-2">
@@ -206,6 +219,13 @@ export function MobileBoard({
         boardId={boardId || null}
         closeTimestamp={closeRoadmapTimestamp}
         onTasksCreated={onTasksRefetch}
+      />
+
+      {/* Project Selector Modal */}
+      <MobileProjectSelector
+        isOpen={isProjectSelectorOpen}
+        onClose={() => setIsProjectSelectorOpen(false)}
+        onBoardChange={handleBoardChange}
       />
 
       {/* Donation Modal */}

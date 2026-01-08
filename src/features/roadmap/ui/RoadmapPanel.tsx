@@ -140,12 +140,25 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
           >
             <Sparkles size={14} className="text-white" />
           </button>
-          {saving && (
-            <span className="text-xs text-gray-500">Сохранение...</span>
-          )}
-          {!saving && hasContent && (
-            <span className="text-xs text-green-500">Сохранено ✓</span>
-          )}
+
+          {/* Save status indicator */}
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-[#121218] rounded-md">
+            {saving && (
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs font-medium text-gray-400">Сохранение...</span>
+              </div>
+            )}
+            {!saving && hasContent && (
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
+                  <span className="text-white text-[8px] font-bold">✓</span>
+                </div>
+                <span className="text-xs font-medium text-green-400">Сохранено</span>
+              </div>
+            )}
+          </div>
+
           {isExpanded ? (
             <ChevronDown size={16} className="text-gray-400" />
           ) : (
