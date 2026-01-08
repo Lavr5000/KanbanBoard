@@ -5,14 +5,15 @@ import { Task, Column as UIColumn } from '@/entities/task/model/types';
 import { ColumnFilter } from './ColumnFilter';
 import { TaskListView } from './TaskListView';
 import { MobileProjectSelector } from './MobileProjectSelector';
-import { Plus, Search, X, Heart, MessageSquare, ChevronDown } from 'lucide-react';
+import { Plus, Search, X, ChevronDown, Menu } from 'lucide-react';
 import { useUIStore } from '@/entities/ui/model/store';
+import { useMobileUIStore } from '@/entities/ui/model/mobileStore';
 import { AddTaskModal } from '@/features/task-operations/ui/AddTaskModal';
 import { EditTaskModal } from '@/features/task-operations/ui/EditTaskModal';
 import { Modal } from '@/shared/ui/Modal';
-import { RoadmapPanel } from '@/features/roadmap/ui/RoadmapPanel';
 import { DonationModal, useDonationModal } from '@/features/donation';
 import { FeedbackModal, useFeedbackModal } from '@/features/feedback';
+import { MobileFAB, MobileLeftDrawer, MobileRightDrawer } from '@/widgets/mobile';
 
 interface MobileBoardProps {
   columns: UIColumn[];
@@ -46,6 +47,7 @@ export function MobileBoard({
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isProjectSelectorOpen, setIsProjectSelectorOpen] = useState(false);
   const { searchQuery, setSearchQuery } = useUIStore();
+  const { openLeftDrawer, openRightDrawer } = useMobileUIStore();
   const { isOpen: isDonationOpen, open: openDonation, close: closeDonation } = useDonationModal();
   const { isOpen: isFeedbackOpen, open: openFeedback, close: closeFeedback } = useFeedbackModal();
 
@@ -114,25 +116,13 @@ export function MobileBoard({
           </button>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-2">
-            {/* Feedback button */}
-            <button
-              onClick={openFeedback}
-              className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors active:scale-95"
-              title="Предложения и жалобы"
-            >
-              <MessageSquare size={18} className="text-gray-400" />
-            </button>
-
-            {/* Donation button */}
-            <button
-              onClick={openDonation}
-              className="p-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg hover:from-pink-700 hover:to-purple-700 transition-colors active:scale-95"
-              title="Поддержать проект"
-            >
-              <Heart size={18} className="text-white" fill="currentColor" />
-            </button>
-          </div>
+          <button
+            onClick={openLeftDrawer}
+            className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors active:scale-95"
+            title="Меню"
+          >
+            <Menu size={20} className="text-gray-400" />
+          </button>
         </div>
 
         {/* Search */}
@@ -179,14 +169,11 @@ export function MobileBoard({
         />
       </div>
 
-      {/* Floating Add Button */}
-      <button
-        data-mobile-tour="add-task-mobile"
-        className="fixed bottom-20 right-4 w-14 h-14 bg-blue-500 rounded-full shadow-lg flex items-center justify-center text-white hover:bg-blue-600 transition-colors z-40 active:scale-95"
-        onClick={handleOpenAddTaskModal}
-      >
-        <Plus size={24} strokeWidth={2.5} />
-      </button>
+      {/* FAB Buttons */}
+      <MobileFAB
+        onAddTask={handleOpenAddTaskModal}
+        onOpenRoadmap={openRightDrawer}
+      />
 
       {/* Add/Edit Task Modal */}
       <Modal
@@ -214,12 +201,9 @@ export function MobileBoard({
         )}
       </Modal>
 
-      {/* Roadmap Panel */}
-      <RoadmapPanel
-        boardId={boardId || null}
-        closeTimestamp={closeRoadmapTimestamp}
-        onTasksCreated={onTasksRefetch}
-      />
+      {/* Mobile Drawers */}
+      <MobileLeftDrawer />
+      <MobileRightDrawer boardId={boardId || null} />
 
       {/* Project Selector Modal */}
       <MobileProjectSelector
