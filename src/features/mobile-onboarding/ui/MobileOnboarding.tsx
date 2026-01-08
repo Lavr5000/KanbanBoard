@@ -14,6 +14,12 @@ interface MobileOnboardingProps {
 
 export function MobileOnboarding({ run, onCallback }: MobileOnboardingProps) {
   const driverObj = useRef<ReturnType<typeof driver> | null>(null);
+  const onCallbackRef = useRef(onCallback);
+
+  // Keep callback ref updated
+  useEffect(() => {
+    onCallbackRef.current = onCallback;
+  }, [onCallback]);
 
   useEffect(() => {
     if (!run) return;
@@ -43,20 +49,20 @@ export function MobileOnboarding({ run, onCallback }: MobileOnboardingProps) {
         // Save progress
         const activeStep = driverObj.current?.getActiveStep();
         const currentStep = (typeof activeStep === 'number' ? activeStep : 0) || 0;
-        onCallback?.({ action: 'next', step: currentStep });
+        onCallbackRef.current?.({ action: 'next', step: currentStep });
       },
       onPrevClick: () => {
         const activeStep = driverObj.current?.getActiveStep();
         const currentStep = (typeof activeStep === 'number' ? activeStep : 0) || 0;
-        onCallback?.({ action: 'prev', step: currentStep });
+        onCallbackRef.current?.({ action: 'prev', step: currentStep });
       },
       onCloseClick: () => {
         setMobileOnboardingCompleted(true);
-        onCallback?.({ action: 'close', step: 0 });
+        onCallbackRef.current?.({ action: 'close', step: 0 });
       },
       onDestroyed: () => {
         setMobileOnboardingCompleted(true);
-        onCallback?.({ action: 'destroy', step: 0 });
+        onCallbackRef.current?.({ action: 'destroy', step: 0 });
       },
     });
 
@@ -70,7 +76,7 @@ export function MobileOnboarding({ run, onCallback }: MobileOnboardingProps) {
       clearTimeout(timer);
       driverInstance.destroy();
     };
-  }, [run, onCallback]);
+  }, [run]);
 
   return null;
 }
