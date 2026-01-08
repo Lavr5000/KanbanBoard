@@ -26,10 +26,13 @@ import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmM
 import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
 import { RoadmapPanel } from "@/features/roadmap/ui/RoadmapPanel";
 import { OnboardingTour, useOnboarding } from "@/features/onboarding";
+import { MobileOnboarding, useMobileOnboarding } from "@/features/mobile-onboarding";
+import { MobileBoard } from "@/widgets/mobile-board";
 import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { deleteColumn } from "@/lib/supabase/queries/columns";
+import { useIsMobile } from "@/shared/lib/useMediaQuery";
 
 export const Board = () => {
   const { searchQuery, priorityFilter, setSearchQuery, setPriorityFilter } = useUIStore();
@@ -38,12 +41,18 @@ export const Board = () => {
   const boardName = activeBoard?.name || 'Проект';
   const supabase = createClient();
 
-  // Onboarding state
+  // Mobile detection
+  const isMobile = useIsMobile();
+
+  // Desktop onboarding state
   const { shouldRunTour, setTourCompleted } = useOnboarding();
   const [runTour, setRunTour] = useState(false);
   const [demoTaskAI, setDemoTaskAI] = useState(false);
   const [forceShowAITaskId, setForceShowAITaskId] = useState<string | null>(null);
   const [closeRoadmapTimestamp, setCloseRoadmapTimestamp] = useState<number>(0);
+
+  // Mobile onboarding state
+  const { shouldRunMobileTour, setMobileTourCompleted } = useMobileOnboarding();
 
   const {
     columns: supabaseColumns,
@@ -209,6 +218,16 @@ export const Board = () => {
     }
   };
 
+  // Mobile tour events handler
+  const handleMobileTourCallback = (data: { action: string; step: number }) => {
+    const { action } = data;
+
+    // Tour completed or closed
+    if (action === 'destroy' || action === 'close') {
+      setMobileTourCompleted();
+    }
+  };
+
   // Close roadmap panel handler for onboarding
   const handleCloseRoadmap = () => {
     setCloseRoadmapTimestamp(Date.now());
@@ -321,7 +340,31 @@ export const Board = () => {
 
   return (
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
-      <OnboardingTour run={runTour} onCallback={handleTourCallback} onStepChange={handleStepChange} onCloseRoadmap={handleCloseRoadmap} />
+      {isMobile ? (
+        <>
+          <MobileOnboarding run={shouldRunMobileTour} onCallback={handleMobileTourCallback} />
+          <MobileBoard
+            columns={columns}
+            tasks={tasks}
+            onMoveTask={moveTask}
+            onUpdateTask={async (taskId, updates) => {
+              // Convert UI Task to Supabase Task format
+              const supabaseUpdates = {
+                title: updates.content,
+                priority: updates.priority,
+              };
+              await updateTask(taskId, supabaseUpdates as any);
+            }}
+            onDeleteTask={deleteTask}
+            boardName={boardName}
+            loading={loading}
+            error={error}
+          />
+          <RoadmapPanel boardId={activeBoard?.id || null} closeTimestamp={closeRoadmapTimestamp} />
+        </>
+      ) : (
+        <>
+          <OnboardingTour run={runTour} onCallback={handleTourCallback} onStepChange={handleStepChange} onCloseRoadmap={handleCloseRoadmap} />
       <div className="flex-grow flex flex-col">
         {/* Top Header */}
         <header className="h-20 border-b border-gray-800 flex items-center justify-between px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
@@ -485,6 +528,8 @@ export const Board = () => {
 
       <RoadmapPanel boardId={activeBoard?.id || null} closeTimestamp={closeRoadmapTimestamp} />
       </div>
+        </>
+      )}
     </BoardContext.Provider>
   );
 };

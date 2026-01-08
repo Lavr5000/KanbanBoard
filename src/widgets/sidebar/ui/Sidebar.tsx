@@ -6,11 +6,11 @@ import { BoardSelector } from "@/widgets/board-selector";
 import { FeedbackButton, FeedbackModal } from "@/features/feedback";
 import { DonationButton, DonationModal } from "@/features/donation";
 
-export const Sidebar = () => {
+export const Sidebar = ({ className = '' }: { className?: string }) => {
   const { user, signOut } = useAuth();
 
   return (
-    <aside className="w-64 border-r border-gray-800 flex flex-col h-screen sticky top-0 bg-[#121218]">
+    <aside className={`w-64 border-r border-gray-800 flex flex-col h-screen sticky top-0 bg-[#121218] ${className}`}>
       {/* Logo */}
       <div className="p-6 mb-4 flex items-center gap-2">
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg p-1.5">
