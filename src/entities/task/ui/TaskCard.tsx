@@ -19,6 +19,7 @@ interface Props {
   boardName?: string;
   allTasks?: Task[];
   forceShowAI?: boolean; // For onboarding tour - force show AI suggestions
+  isMobile?: boolean; // Mobile mode
 }
 
 export const TaskCard = ({
@@ -29,6 +30,7 @@ export const TaskCard = ({
   boardName,
   allTasks = [],
   forceShowAI = false,
+  isMobile = false,
 }: Props) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -95,6 +97,13 @@ export const TaskCard = ({
     );
   }
 
+  // Handle tap on mobile
+  const handleTap = () => {
+    if (isMobile) {
+      setIsEditModalOpen(true)
+    }
+  }
+
   return (
     <>
       <div
@@ -102,8 +111,14 @@ export const TaskCard = ({
         style={style}
         {...attributes}
         {...listeners}
-        onDoubleClick={() => setIsEditModalOpen(true)}
-        className="bg-[#1c1c24] p-4 rounded-xl shadow-lg border border-transparent hover:border-gray-700 group cursor-grab active:cursor-grabbing"
+        onClick={isMobile ? handleTap : undefined}
+        onDoubleClick={!isMobile ? () => setIsEditModalOpen(true) : undefined}
+        className={clsx(
+          "bg-[#1c1c24] rounded-xl shadow-lg border border-transparent group transition-all",
+          isMobile
+            ? "p-4 active:scale-[0.98] active:bg-[#252530]"
+            : "p-4 hover:border-gray-700 cursor-grab active:cursor-grabbing"
+        )}
       >
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2">
@@ -119,10 +134,19 @@ export const TaskCard = ({
             >
               {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
             </span>
-            {/* AI Icon (shown when suggestions exist but hidden) */}
-            {!visible && displaySuggestions && <AISuggestionIcon onRestore={restoreSuggestions} />}
+            {/* AI Icon (shown when suggestions exist but hidden) - with glow effect */}
+            {!visible && displaySuggestions && (
+              <div className="relative">
+                <div className="absolute inset-0 bg-purple-500/30 rounded-full blur-md animate-pulse" />
+                <AISuggestionIcon onRestore={restoreSuggestions} />
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className={clsx(
+            "flex items-center gap-1 transition-opacity",
+            isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}>
+            {/* AI Button with enhanced visibility */}
             <button
               data-tour="task-ai-icon"
               onClick={(e) => {
@@ -139,30 +163,49 @@ export const TaskCard = ({
                   generateSuggestions(task.content, columnTitle, boardName, nearbyTasks.map(t => ({ content: t.content })))
                 }
               }}
-              className="text-gray-500 hover:text-purple-400 transition-colors p-1"
+              className={clsx(
+                "relative p-1.5 rounded-lg transition-all",
+                isMobile
+                  ? "bg-gradient-to-br from-purple-500/20 to-indigo-500/20 text-purple-400 border border-purple-500/30"
+                  : "text-gray-500 hover:text-purple-400 hover:bg-purple-500/10"
+              )}
               title="Get AI suggestions"
             >
-              <Sparkles size={14} />
+              {/* Glow effect for mobile */}
+              {isMobile && (
+                <div className="absolute inset-0 bg-purple-500/20 rounded-lg blur-sm" />
+              )}
+              <Sparkles size={isMobile ? 18 : 14} className="relative z-10" />
             </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onDeleteTrigger?.(task.id);
               }}
-              className="text-gray-500 hover:text-red-500 transition-colors p-1"
+              className={clsx(
+                "transition-colors p-1.5 rounded-lg",
+                isMobile
+                  ? "text-gray-500 active:text-red-500 active:bg-red-500/10"
+                  : "text-gray-500 hover:text-red-500"
+              )}
             >
-              <Trash2 size={14} />
+              <Trash2 size={isMobile ? 18 : 14} />
             </button>
-            <button
-              className="text-gray-500 hover:text-white pointer-events-none"
-              onPointerDownCapture={(e) => e.stopPropagation()}
-            >
-              <MoreVertical size={16} />
-            </button>
+            {!isMobile && (
+              <button
+                className="text-gray-500 hover:text-white pointer-events-none"
+                onPointerDownCapture={(e) => e.stopPropagation()}
+              >
+                <MoreVertical size={16} />
+              </button>
+            )}
           </div>
         </div>
 
-        <p className="text-gray-400 text-xs mb-2 line-clamp-3 leading-relaxed">
+        <p className={clsx(
+          "text-gray-400 mb-2 leading-relaxed",
+          isMobile ? "text-sm line-clamp-4" : "text-xs line-clamp-3"
+        )}>
           {task.content}
         </p>
 
@@ -174,22 +217,32 @@ export const TaskCard = ({
         )}
 
         {loading && (
-          <div className="mt-3 pt-3 border-t border-gray-700/50 animate-pulse">
-            <div className="text-xs text-purple-400">💡 Загрузка AI-предложений...</div>
+          <div className="mt-3 pt-3 border-t border-gray-700/50">
+            <div className="flex items-center gap-2 text-purple-400">
+              <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs">AI анализирует...</span>
+            </div>
           </div>
         )}
 
         {displaySuggestions && visible && (
-          <div data-tour="task-ai-suggestions">
-            <TaskAISuggestions
-              data={displaySuggestions}
-              onHide={hideSuggestions}
-              isSaved={!!savedSuggestions}
-            />
+          <div data-tour="task-ai-suggestions" className="relative">
+            {/* Subtle glow border for AI suggestions */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 rounded-xl blur-sm" />
+            <div className="relative">
+              <TaskAISuggestions
+                data={displaySuggestions}
+                onHide={hideSuggestions}
+                isSaved={!!savedSuggestions}
+              />
+            </div>
           </div>
         )}
 
-        <div className="flex items-center text-gray-500 gap-1.5 border-t border-gray-800 pt-3">
+        <div className={clsx(
+          "flex items-center text-gray-500 gap-1.5 border-t border-gray-800 pt-3",
+          isMobile && "mt-2"
+        )}>
           <Calendar size={12} />
           <span className="text-[10px]">
             {new Date(task.createdAt).toLocaleDateString()}

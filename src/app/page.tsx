@@ -2,9 +2,11 @@
 
 import { Sidebar } from "@/widgets/sidebar/ui/Sidebar";
 import { Board } from "@/widgets/board/ui/Board";
+import { MobileBoard } from "@/widgets/board/ui/MobileBoard";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 // Force dynamic rendering - don't prerender at build time
 export const dynamic = 'force-dynamic';
@@ -12,6 +14,7 @@ export const dynamic = 'force-dynamic';
 export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   // Redirect to login if not authenticated (only after loading completes)
   useEffect(() => {
@@ -32,6 +35,12 @@ export default function Home() {
     );
   }
 
+  // Mobile layout
+  if (isMobile) {
+    return <MobileBoard />;
+  }
+
+  // Desktop layout
   return (
     <main className="flex min-h-screen bg-[#121218]">
       <Sidebar />
