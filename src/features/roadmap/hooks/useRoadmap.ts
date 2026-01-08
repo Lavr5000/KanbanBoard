@@ -20,8 +20,10 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [hasContent, setHasContent] = useState(false)
+  const [showSavedStatus, setShowSavedStatus] = useState(false)
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const savedStatusTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load roadmap on mount
   useEffect(() => {
@@ -87,6 +89,15 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     } else {
       // logger.log('✅ Roadmap: saved successfully')
       setHasContent(!!newContent)
+
+      // Show saved status for 2 seconds
+      setShowSavedStatus(true)
+      if (savedStatusTimeoutRef.current) {
+        clearTimeout(savedStatusTimeoutRef.current)
+      }
+      savedStatusTimeoutRef.current = setTimeout(() => {
+        setShowSavedStatus(false)
+      }, 2000)
     }
 
     setSaving(false)
@@ -122,6 +133,9 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current)
       }
+      if (savedStatusTimeoutRef.current) {
+        clearTimeout(savedStatusTimeoutRef.current)
+      }
     }
   }, [])
 
@@ -133,5 +147,6 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     saving,
     error,
     hasContent,
+    showSavedStatus,
   }
 }
