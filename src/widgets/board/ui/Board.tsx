@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -219,14 +219,14 @@ export const Board = () => {
   };
 
   // Mobile tour events handler
-  const handleMobileTourCallback = (data: { action: string; step: number }) => {
+  const handleMobileTourCallback = useCallback((data: { action: string; step: number }) => {
     const { action } = data;
 
     // Tour completed or closed
     if (action === 'destroy' || action === 'close') {
       setMobileTourCompleted();
     }
-  };
+  }, [setMobileTourCompleted]);
 
   // Close roadmap panel handler for onboarding
   const handleCloseRoadmap = () => {

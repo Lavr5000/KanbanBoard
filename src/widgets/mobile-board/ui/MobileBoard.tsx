@@ -4,12 +4,14 @@ import { useState, useMemo, useEffect } from 'react';
 import { Task, Column as UIColumn } from '@/entities/task/model/types';
 import { ColumnFilter } from './ColumnFilter';
 import { TaskListView } from './TaskListView';
-import { Plus, Search, X } from 'lucide-react';
+import { Plus, Search, X, Heart, MessageSquare } from 'lucide-react';
 import { useUIStore } from '@/entities/ui/model/store';
 import { AddTaskModal } from '@/features/task-operations/ui/AddTaskModal';
 import { EditTaskModal } from '@/features/task-operations/ui/EditTaskModal';
 import { Modal } from '@/shared/ui/Modal';
 import { RoadmapPanel } from '@/features/roadmap/ui/RoadmapPanel';
+import { DonationModal, useDonationModal } from '@/features/donation';
+import { FeedbackModal, useFeedbackModal } from '@/features/feedback';
 
 interface MobileBoardProps {
   columns: UIColumn[];
@@ -42,6 +44,8 @@ export function MobileBoard({
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { searchQuery, setSearchQuery } = useUIStore();
+  const { isOpen: isDonationOpen, open: openDonation, close: closeDonation } = useDonationModal();
+  const { isOpen: isFeedbackOpen, open: openFeedback, close: closeFeedback } = useFeedbackModal();
 
   // Calculate task count per column
   const tasksCount = useMemo(() => {
@@ -93,8 +97,29 @@ export function MobileBoard({
     <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-16">
       {/* Header */}
       <header className="sticky top-0 bg-[#121218]/90 backdrop-blur-sm z-20 border-b border-gray-800">
-        <div className="px-4 py-3">
+        <div className="px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">{boardName}</h1>
+
+          {/* Action buttons */}
+          <div className="flex items-center gap-2">
+            {/* Feedback button */}
+            <button
+              onClick={openFeedback}
+              className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors active:scale-95"
+              title="Предложения и жалобы"
+            >
+              <MessageSquare size={18} className="text-gray-400" />
+            </button>
+
+            {/* Donation button */}
+            <button
+              onClick={openDonation}
+              className="p-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg hover:from-pink-700 hover:to-purple-700 transition-colors active:scale-95"
+              title="Поддержать проект"
+            >
+              <Heart size={18} className="text-white" fill="currentColor" />
+            </button>
+          </div>
         </div>
 
         {/* Search */}
@@ -182,6 +207,12 @@ export function MobileBoard({
         closeTimestamp={closeRoadmapTimestamp}
         onTasksCreated={onTasksRefetch}
       />
+
+      {/* Donation Modal */}
+      <DonationModal />
+
+      {/* Feedback Modal */}
+      <FeedbackModal />
     </div>
   );
 }
