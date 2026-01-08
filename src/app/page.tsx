@@ -2,7 +2,6 @@
 
 import { Sidebar } from "@/widgets/sidebar/ui/Sidebar";
 import { Board } from "@/widgets/board/ui/Board";
-import { BottomNavigation } from "@/widgets/bottom-navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -37,7 +36,6 @@ export default function Home() {
     <main className="flex min-h-screen bg-[#121218]">
       <Sidebar className="hidden md:block" />
       <Board />
-      <BottomNavigation />
     </main>
   );
 }

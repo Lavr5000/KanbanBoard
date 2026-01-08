@@ -34,8 +34,9 @@ export const navigationItems: NavigationItem[] = [
     label: 'Профиль',
     icon: User,
     action: () => {
-      // Open profile modal - will be implemented later
-      console.log('Open profile');
+      // Open profile modal
+      const event = new CustomEvent('open-profile-modal');
+      window.dispatchEvent(event);
     },
   },
 ];

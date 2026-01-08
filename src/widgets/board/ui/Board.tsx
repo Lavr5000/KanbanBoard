@@ -356,11 +356,13 @@ export const Board = () => {
               await updateTask(taskId, supabaseUpdates as any);
             }}
             onDeleteTask={deleteTask}
+            onTasksRefetch={refetchColumns}
             boardName={boardName}
+            boardId={activeBoard?.id || null}
+            closeRoadmapTimestamp={closeRoadmapTimestamp}
             loading={loading}
             error={error}
           />
-          <RoadmapPanel boardId={activeBoard?.id || null} closeTimestamp={closeRoadmapTimestamp} />
         </>
       ) : (
         <>

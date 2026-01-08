@@ -10,12 +10,13 @@ import { createTasksFromRoadmap } from '../lib/task-creator'
 interface RoadmapPanelProps {
   boardId: string | null
   closeTimestamp?: number
+  onTasksCreated?: () => void
 }
 
 /**
  * Collapsible panel at bottom of screen for project roadmap
  */
-export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
+export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: RoadmapPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isAIChatOpen, setIsAIChatOpen] = useState(false)
   const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
@@ -88,8 +89,13 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
         type: 'success',
         message: `✓ Создано ${result.created} задач`
       })
-      // Force page reload to show new tasks immediately
-      setTimeout(() => window.location.reload(), 1000)
+      setIsCreating(false)
+      setIsExpanded(false)
+      // Notify parent component to refresh data
+      onTasksCreated?.()
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
     } else {
       // logger.log(`❌ [ROADMAP] Failed to create tasks. Errors:`, result.errors)
       setToast({
@@ -104,7 +110,7 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
     <>
     <div
       data-tour="roadmap-panel"
-      className={`fixed bottom-0 left-0 right-0 ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
+      className={`fixed bottom-0 left-0 right-0 md:ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
         isExpanded ? 'h-[70vh]' : 'h-10'
       }`}
     >

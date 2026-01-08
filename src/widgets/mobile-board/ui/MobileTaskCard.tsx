@@ -2,25 +2,37 @@
 
 import { Task } from '@/entities/task/model/types';
 import { SwipeableTaskCard } from '@/features/swipe-handler';
-import { ChevronLeft, ChevronRight, Flag } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Flag, Sparkles, Edit2, Trash2 } from 'lucide-react';
+import { useTaskAI, TaskAISuggestions, AISuggestionIcon } from '@/features/task-ai-suggestions';
 
 interface MobileTaskCardProps {
   task: Task;
-  onSwipeLeft: () => void;
-  onSwipeRight: () => void;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   previousColumnTitle: string;
   nextColumnTitle: string;
+  columnTitle: string;
+  boardName: string;
+  allTasks: Task[];
 }
 
 export function MobileTaskCard({
   task,
   onSwipeLeft,
   onSwipeRight,
+  onEdit,
+  onDelete,
   previousColumnTitle,
   nextColumnTitle,
+  columnTitle,
+  boardName,
+  allTasks,
 }: MobileTaskCardProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions } = useTaskAI({
+    taskId: String(task.id),
+  });
 
   const getPriorityStyles = () => {
     switch (task.priority) {
@@ -57,22 +69,67 @@ export function MobileTaskCard({
 
   const priorityStyles = getPriorityStyles();
 
+  // Open AI panel for this task
+  const handleAIClick = () => {
+    generateSuggestions(
+      task.content,
+      columnTitle,
+      boardName,
+      allTasks.map(t => ({ content: t.content }))
+    );
+  };
+
   return (
     <SwipeableTaskCard
-      onSwipeLeft={onSwipeLeft}
-      onSwipeRight={onSwipeRight}
+      onSwipeLeft={previousColumnTitle ? onSwipeLeft : undefined}
+      onSwipeRight={nextColumnTitle ? onSwipeRight : undefined}
       className="mb-3"
     >
       <div
         data-mobile-tour="swipe-task"
-        className={`
-          bg-[#1c1c24] p-4 rounded-xl border border-gray-800
-          ${isDragging ? 'scale-[0.98]' : 'scale-100'}
-          transition-transform
-        `}
+        className="bg-[#1c1c24] p-4 rounded-xl border border-gray-800 relative"
       >
+        {/* Action buttons - top right */}
+        <div className="absolute top-3 right-3 flex gap-2">
+          {/* AI button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAIClick();
+            }}
+            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+            title="AI подсказки"
+          >
+            <Sparkles size={12} className="text-white" />
+          </button>
+
+          {/* Edit button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.();
+            }}
+            className="p-1.5 bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors active:scale-95"
+            title="Редактировать"
+          >
+            <Edit2 size={12} className="text-white" />
+          </button>
+
+          {/* Delete button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.();
+            }}
+            className="p-1.5 bg-red-500 rounded-lg hover:bg-red-600 transition-colors active:scale-95"
+            title="Удалить"
+          >
+            <Trash2 size={12} className="text-white" />
+          </button>
+        </div>
+
         {/* Priority badge */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 pr-20">
           <span
             className={`
               px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1
@@ -106,6 +163,14 @@ export function MobileTaskCard({
           )}
         </div>
       </div>
+
+      {/* AI Suggestions Panel */}
+      {visible && suggestions && (
+        <TaskAISuggestions
+          data={suggestions}
+          onHide={hideSuggestions}
+        />
+      )}
     </SwipeableTaskCard>
   );
 }
