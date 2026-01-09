@@ -26,7 +26,6 @@ import { DeleteConfirmModal } from "@/features/task-operations/ui/DeleteConfirmM
 import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
 import { RoadmapPanel } from "@/features/roadmap/ui/RoadmapPanel";
 import { OnboardingTour, useOnboarding } from "@/features/onboarding";
-import { MobileOnboarding, useMobileOnboarding } from "@/features/mobile-onboarding";
 import { MobileBoard } from "@/widgets/mobile-board";
 import { Bell, Search, LogOut, Filter } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
@@ -50,9 +49,6 @@ export const Board = () => {
   const [demoTaskAI, setDemoTaskAI] = useState(false);
   const [forceShowAITaskId, setForceShowAITaskId] = useState<string | null>(null);
   const [closeRoadmapTimestamp, setCloseRoadmapTimestamp] = useState<number>(0);
-
-  // Mobile onboarding state
-  const { shouldRunMobileTour, setMobileTourCompleted } = useMobileOnboarding();
 
   const {
     columns: supabaseColumns,
@@ -218,16 +214,6 @@ export const Board = () => {
     }
   };
 
-  // Mobile tour events handler
-  const handleMobileTourCallback = useCallback((data: { action: string; step: number }) => {
-    const { action } = data;
-
-    // Tour completed or closed
-    if (action === 'destroy' || action === 'close') {
-      setMobileTourCompleted();
-    }
-  }, [setMobileTourCompleted]);
-
   // Close roadmap panel handler for onboarding
   const handleCloseRoadmap = () => {
     setCloseRoadmapTimestamp(Date.now());
@@ -342,7 +328,6 @@ export const Board = () => {
     <BoardContext.Provider value={{ addTask, updateTask, deleteTask, moveTask, progressStats }}>
       {isMobile ? (
         <>
-          <MobileOnboarding run={shouldRunMobileTour} onCallback={handleMobileTourCallback} />
           <MobileBoard
             columns={columns}
             tasks={tasks}

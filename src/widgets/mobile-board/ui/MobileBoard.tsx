@@ -14,7 +14,6 @@ import { Modal } from '@/shared/ui/Modal';
 import { DonationModal, useDonationModal } from '@/features/donation';
 import { FeedbackModal, useFeedbackModal } from '@/features/feedback';
 import { MobileFAB, MobileLeftDrawer, MobileRightDrawer } from '@/widgets/mobile';
-import { useMobileOnboarding } from '@/features/mobile-onboarding';
 
 interface MobileBoardProps {
   columns: UIColumn[];
@@ -51,7 +50,6 @@ export function MobileBoard({
   const { openLeftDrawer, openRightDrawer } = useMobileUIStore();
   const { isOpen: isDonationOpen, open: openDonation, close: closeDonation } = useDonationModal();
   const { isOpen: isFeedbackOpen, open: openFeedback, close: closeFeedback } = useFeedbackModal();
-  const { startTour } = useMobileOnboarding();
 
   // Calculate task count per column
   const tasksCount = useMemo(() => {
@@ -204,7 +202,7 @@ export function MobileBoard({
       </Modal>
 
       {/* Mobile Drawers */}
-      <MobileLeftDrawer onStartOnboarding={startTour} />
+      <MobileLeftDrawer />
       <MobileRightDrawer boardId={boardId || null} />
 
       {/* Project Selector Modal */}
