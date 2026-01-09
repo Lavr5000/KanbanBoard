@@ -4,6 +4,7 @@ import { Task } from '@/entities/task/model/types';
 import { SwipeableTaskCard } from '@/features/swipe-handler';
 import { ChevronLeft, ChevronRight, Flag, Sparkles, Edit2, Trash2 } from 'lucide-react';
 import { useTaskAI, TaskAISuggestions, AISuggestionIcon } from '@/features/task-ai-suggestions';
+import { useAISuggestions } from '@/features/ai-suggestions/hooks/useAISuggestions';
 
 interface MobileTaskCardProps {
   task: Task;
@@ -30,9 +31,15 @@ export function MobileTaskCard({
   boardName,
   allTasks,
 }: MobileTaskCardProps) {
-  const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions } = useTaskAI({
+  const { suggestions, loading, error, visible, generateSuggestions, hideSuggestions, restoreSuggestions } = useTaskAI({
     taskId: String(task.id),
   });
+
+  // Load saved AI suggestions from database
+  const { suggestions: savedSuggestions } = useAISuggestions({ taskId: String(task.id) });
+
+  // Use saved suggestions if available, otherwise use current suggestions
+  const displaySuggestions = savedSuggestions || suggestions;
 
   const getPriorityStyles = () => {
     switch (task.priority) {
@@ -71,6 +78,13 @@ export function MobileTaskCard({
 
   // Open AI panel for this task
   const handleAIClick = () => {
+    // If we have saved suggestions, restore them instead of generating new ones
+    if (savedSuggestions) {
+      restoreSuggestions();
+      return;
+    }
+
+    // Otherwise generate new suggestions
     generateSuggestions(
       task.content,
       columnTitle,
@@ -91,17 +105,24 @@ export function MobileTaskCard({
       >
         {/* Action buttons - top right */}
         <div className="absolute top-3 right-3 flex gap-2">
-          {/* AI button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAIClick();
-            }}
-            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 active:scale-95"
-            title="AI подсказки"
-          >
-            <Sparkles size={12} className="text-white" />
-          </button>
+          {/* AI button or icon */}
+          {!visible && displaySuggestions ? (
+            // Show icon when there are hidden suggestions
+            <AISuggestionIcon onRestore={restoreSuggestions} className="text-xs" />
+          ) : (
+            // Show generate button when no suggestions
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAIClick();
+              }}
+              disabled={loading}
+              className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="AI подсказки"
+            >
+              <Sparkles size={12} className="text-white" />
+            </button>
+          )}
 
           {/* Edit button */}
           <button
@@ -146,6 +167,20 @@ export function MobileTaskCard({
           {task.content}
         </p>
 
+        {/* AI Loading indicator */}
+        {loading && (
+          <div className="mb-3 pt-3 border-t border-gray-700/50 animate-pulse">
+            <div className="text-xs text-purple-400">💡 Загрузка AI-предложений...</div>
+          </div>
+        )}
+
+        {/* AI Error */}
+        {error && (
+          <div className="mb-3 text-xs text-red-400">
+            {error}
+          </div>
+        )}
+
         {/* Swipe hints */}
         <div className="flex justify-between text-xs text-gray-500">
           {previousColumnTitle && (
@@ -165,10 +200,11 @@ export function MobileTaskCard({
       </div>
 
       {/* AI Suggestions Panel */}
-      {visible && suggestions && (
+      {visible && displaySuggestions && (
         <TaskAISuggestions
-          data={suggestions}
+          data={displaySuggestions}
           onHide={hideSuggestions}
+          isSaved={!!savedSuggestions}
         />
       )}
     </SwipeableTaskCard>
