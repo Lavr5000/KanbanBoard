@@ -118,7 +118,7 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     }, 2000)
   }, [saveRoadmap])
 
-  // Immediate save
+  // Immediate save (saves current content from state)
   const immediateSave = useCallback(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
@@ -126,6 +126,19 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     }
     saveRoadmap(content)
   }, [content, saveRoadmap])
+
+  // Save specific content immediately (for AI apply)
+  const saveContent = useCallback((newContent: string) => {
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+      saveTimeoutRef.current = null
+    }
+    // Update state immediately
+    setContent(newContent)
+    // Save immediately
+    saveRoadmap(newContent)
+  }, [saveRoadmap])
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -143,6 +156,7 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     content,
     updateContent,
     immediateSave,
+    saveContent,
     loading,
     saving,
     error,

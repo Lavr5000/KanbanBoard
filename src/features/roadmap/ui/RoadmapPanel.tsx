@@ -22,7 +22,7 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
   const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const { content, updateContent, immediateSave, loading, saving, error, hasContent, showSavedStatus } = useRoadmap({ boardId })
+  const { content, updateContent, immediateSave, saveContent, loading, saving, error, hasContent, showSavedStatus } = useRoadmap({ boardId })
 
   // Parse tasks from content
   const parsedTasks = parseRoadmapTasks(content)
@@ -240,10 +240,7 @@ export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: Roadma
     {isAIChatOpen && (
       <RoadmapAIChat
         boardId={boardId}
-        onApply={(content) => {
-          updateContent(content)
-          immediateSave()
-        }}
+        onApply={saveContent}
         onClose={() => setIsAIChatOpen(false)}
       />
     )}
