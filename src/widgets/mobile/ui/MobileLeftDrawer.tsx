@@ -7,7 +7,6 @@ import {
   Play,
   Heart,
   MessageCircle,
-  Download,
   LogOut,
   Settings,
   HelpCircle,
@@ -20,6 +19,9 @@ import { useMobileUIStore } from '@/entities/ui/model/mobileStore'
 import { BoardSelector } from '@/widgets/board-selector'
 import { useDonationModal } from '@/features/donation/model/useDonationModal'
 import { useFeedbackModal } from '@/features/feedback/model/useFeedbackModal'
+import { ExportButtonsGroup } from '@/features/export-data'
+import { useBoards } from '@/hooks/useBoards'
+import { useBoardData } from '@/hooks/useBoardData'
 import { useSwipe } from '@/hooks/useSwipe'
 import { lockBodyScroll, unlockBodyScroll, hapticFeedback } from '@/shared/lib/mobile'
 
@@ -32,6 +34,8 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
   const { isLeftDrawerOpen, closeLeftDrawer, openRightDrawer, startMobileOnboarding } = useMobileUIStore()
   const { open: openDonationModal } = useDonationModal()
   const { open: openFeedbackModal } = useFeedbackModal()
+  const { activeBoardId } = useBoards()
+  const { board, columns, tasks } = useBoardData(activeBoardId || undefined)
 
   // Swipe to close
   const { swipeHandlers, swipeState } = useSwipe({
@@ -211,16 +215,14 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
               </button>
 
               {/* Export */}
-              <button
-                onClick={() => alert('Экспорт данных будет доступен позже')}
-                className="w-full flex items-center gap-3 px-3 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 rounded-xl transition-all group"
-              >
-                <div className="p-2 bg-green-500/10 rounded-lg group-hover:bg-green-500/20 transition-colors">
-                  <Download size={16} className="text-green-500" />
-                </div>
-                <span className="flex-1 text-left">Экспортировать данные</span>
-                <ChevronRight size={16} className="text-gray-600 group-hover:text-gray-400 transition-colors" />
-              </button>
+              <div className="px-3">
+                <ExportButtonsGroup
+                  boardId={activeBoardId || undefined}
+                  tasks={tasks}
+                  columns={columns}
+                  board={board}
+                />
+              </div>
 
               {/* Help */}
               <button
