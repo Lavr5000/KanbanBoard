@@ -106,22 +106,28 @@ export function MobileTaskCard({
         {/* Action buttons - top right */}
         <div className="absolute top-3 right-3 flex gap-2">
           {/* AI button or icon */}
-          {!visible && displaySuggestions ? (
-            // Show icon when there are hidden suggestions
-            <AISuggestionIcon onRestore={restoreSuggestions} className="text-xs" />
+          {savedSuggestions ? (
+            // Has saved suggestions - show icon only when hidden, never show generate button
+            !visible ? (
+              <AISuggestionIcon onRestore={restoreSuggestions} className="text-xs" />
+            ) : null
           ) : (
-            // Show generate button when no suggestions
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAIClick();
-              }}
-              disabled={loading}
-              className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="AI подсказки"
-            >
-              <Sparkles size={12} className="text-white" />
-            </button>
+            // No saved suggestions - show temporary icon or generate button
+            !visible && displaySuggestions ? (
+              <AISuggestionIcon onRestore={restoreSuggestions} className="text-xs" />
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAIClick();
+                }}
+                disabled={loading}
+                className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="AI подсказки"
+              >
+                <Sparkles size={12} className="text-white" />
+              </button>
+            )
           )}
 
           {/* Edit button */}

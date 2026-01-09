@@ -124,37 +124,45 @@ export const TaskCard = ({
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {/* Show AI icon or button based on saved suggestions */}
-            {!visible && displaySuggestions ? (
-              <AISuggestionIcon onRestore={restoreSuggestions} />
+            {savedSuggestions ? (
+              // Has saved suggestions - show icon only when hidden, never show generate button
+              !visible ? (
+                <AISuggestionIcon onRestore={restoreSuggestions} />
+              ) : null
             ) : (
-              <button
-                data-tour="task-ai-icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // If we have saved suggestions, restore them instead of generating new ones
-                  if (savedSuggestions) {
-                    restoreSuggestions();
-                    return;
-                  }
-                  // Otherwise generate new suggestions
-                  if (columnTitle && boardName) {
-                    const taskIndex = allTasks.findIndex(t => t.id === task.id)
-                    const nearbyTasks: Task[] = []
-                    for (let i = Math.max(0, taskIndex - 2); i < taskIndex; i++) {
-                      nearbyTasks.push(allTasks[i])
+              // No saved suggestions - show temporary icon or generate button
+              !visible && displaySuggestions ? (
+                <AISuggestionIcon onRestore={restoreSuggestions} />
+              ) : (
+                <button
+                  data-tour="task-ai-icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // If we have saved suggestions, restore them instead of generating new ones
+                    if (savedSuggestions) {
+                      restoreSuggestions();
+                      return;
                     }
-                    for (let i = taskIndex + 1; i < Math.min(allTasks.length, taskIndex + 3); i++) {
-                      nearbyTasks.push(allTasks[i])
+                    // Otherwise generate new suggestions
+                    if (columnTitle && boardName) {
+                      const taskIndex = allTasks.findIndex(t => t.id === task.id)
+                      const nearbyTasks: Task[] = []
+                      for (let i = Math.max(0, taskIndex - 2); i < taskIndex; i++) {
+                        nearbyTasks.push(allTasks[i])
+                      }
+                      for (let i = taskIndex + 1; i < Math.min(allTasks.length, taskIndex + 3); i++) {
+                        nearbyTasks.push(allTasks[i])
+                      }
+                      generateSuggestions(task.content, columnTitle, boardName, nearbyTasks.map(t => ({ content: t.content })))
                     }
-                    generateSuggestions(task.content, columnTitle, boardName, nearbyTasks.map(t => ({ content: t.content })))
-                  }
-                }}
-                disabled={loading}
-                className="text-gray-500 hover:text-purple-400 transition-colors p-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Get AI suggestions"
-              >
-                <Sparkles size={14} />
-              </button>
+                  }}
+                  disabled={loading}
+                  className="text-gray-500 hover:text-purple-400 transition-colors p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Get AI suggestions"
+                >
+                  <Sparkles size={14} />
+                </button>
+              )
             )}
             <button
               onClick={(e) => {
