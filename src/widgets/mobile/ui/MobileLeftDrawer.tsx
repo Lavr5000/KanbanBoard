@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   X,
@@ -20,6 +20,7 @@ import { useMobileUIStore } from '@/entities/ui/model/mobileStore'
 import { BoardSelector } from '@/widgets/board-selector'
 import { useDonationModal } from '@/features/donation/model/useDonationModal'
 import { useFeedbackModal } from '@/features/feedback/model/useFeedbackModal'
+import { AIHelpModal } from '@/features/ai-help'
 import { useSwipe } from '@/hooks/useSwipe'
 import { lockBodyScroll, unlockBodyScroll, hapticFeedback } from '@/shared/lib/mobile'
 
@@ -32,6 +33,7 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
   const { isLeftDrawerOpen, closeLeftDrawer, openRightDrawer } = useMobileUIStore()
   const { open: openDonationModal } = useDonationModal()
   const { open: openFeedbackModal } = useFeedbackModal()
+  const [isAIHelpOpen, setIsAIHelpOpen] = useState(false)
 
   // Swipe to close
   const { swipeHandlers, swipeState } = useSwipe({
@@ -81,7 +83,7 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
 
   const handleHelp = () => {
     closeLeftDrawer()
-    setTimeout(() => openRightDrawer(), 300)
+    setTimeout(() => setIsAIHelpOpen(true), 300)
   }
 
   // Calculate transform based on swipe
@@ -92,6 +94,7 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
   }
 
   const drawerContent = (
+    <>
     <div
       className={`fixed inset-0 z-[100] ${isLeftDrawerOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       role="dialog"
@@ -254,6 +257,10 @@ export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
         </div>
       </div>
     </div>
+
+    {/* AI Help Modal */}
+    <AIHelpModal isOpen={isAIHelpOpen} onClose={() => setIsAIHelpOpen(false)} />
+    </>
   )
 
   return createPortal(drawerContent, document.body)
