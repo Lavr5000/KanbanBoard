@@ -1,9 +1,11 @@
-import html2pdf from 'html2pdf.js';
 import { formatTasksForExport, sanitizeFileName } from '../formatters/taskFormatter';
 import { ExportParams } from '../../model/types';
 
 export async function exportToPDF({ board, columns, tasks }: ExportParams) {
   try {
+    // Dynamic import to avoid SSR issues with html2pdf.js
+    const html2pdf = (await import('html2pdf.js')).default;
+
     const data = formatTasksForExport(board, columns, tasks);
 
     // Create HTML content with styling
