@@ -230,7 +230,7 @@ export async function exportToPDF({ board, columns, tasks }: ExportParams) {
     const opt = {
       margin: 0, // Remove margins to prevent blank first page
       filename: `${sanitizeFileName(board.name)}-${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 1 },
+      image: { type: 'jpeg' as const, quality: 1 },
       html2canvas: {
         scale: 4, // High resolution for print quality
         useCORS: true,
@@ -239,12 +239,12 @@ export async function exportToPDF({ board, columns, tasks }: ExportParams) {
         dpi: 300, // Print quality DPI
       },
       jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait',
+        unit: 'mm' as const,
+        format: 'a4' as const,
+        orientation: 'portrait' as const,
         compress: false, // Better quality
       },
-      pagebreak: { mode: 'css', avoid: '.column' }, // Better page break handling
+      pagebreak: { mode: 'css' as const, avoid: '.column' }, // Better page break handling
     };
 
     // Generate and download PDF
