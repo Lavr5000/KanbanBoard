@@ -13,6 +13,7 @@ import { EditTaskModal } from '@/features/task-operations/ui/EditTaskModal';
 import { Modal } from '@/shared/ui/Modal';
 import { DonationModal, useDonationModal } from '@/features/donation';
 import { FeedbackModal, useFeedbackModal } from '@/features/feedback';
+import { MobileOnboarding } from '@/features/mobile-onboarding';
 import { MobileFAB, MobileLeftDrawer, MobileRightDrawer } from '@/widgets/mobile';
 
 interface MobileBoardProps {
@@ -103,7 +104,11 @@ export function MobileBoard({
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-16">
+    <>
+      {/* Mobile Onboarding */}
+      <MobileOnboarding />
+
+      <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-16">
       {/* Header */}
       <header className="sticky top-0 bg-[#121218]/90 backdrop-blur-sm z-20 border-b border-gray-800">
         <div className="px-4 py-3 flex items-center justify-between">
@@ -218,5 +223,6 @@ export function MobileBoard({
       {/* Feedback Modal */}
       <FeedbackModal />
     </div>
+    </>
   );
 }
