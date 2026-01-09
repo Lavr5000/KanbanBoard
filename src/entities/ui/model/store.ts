@@ -26,6 +26,10 @@ interface UIState {
     columnId: string | null
   }
   setDragPreview: (taskId: string | null, columnId: string | null) => void
+
+  // Mobile specific state
+  selectedColumnFilter: string // 'all' or columnId
+  setSelectedColumnFilter: (columnId: string) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -52,4 +56,8 @@ export const useUIStore = create<UIState>((set) => ({
   },
   setDragPreview: (taskId, columnId) =>
     set({ dragPreview: { taskId, columnId } }),
+
+  // Mobile specific state
+  selectedColumnFilter: 'all',
+  setSelectedColumnFilter: (columnId) => set({ selectedColumnFilter: columnId }),
 }))

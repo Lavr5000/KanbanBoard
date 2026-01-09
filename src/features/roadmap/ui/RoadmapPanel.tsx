@@ -10,18 +10,19 @@ import { createTasksFromRoadmap } from '../lib/task-creator'
 interface RoadmapPanelProps {
   boardId: string | null
   closeTimestamp?: number
+  onTasksCreated?: () => void
 }
 
 /**
  * Collapsible panel at bottom of screen for project roadmap
  */
-export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
+export function RoadmapPanel({ boardId, closeTimestamp, onTasksCreated }: RoadmapPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isAIChatOpen, setIsAIChatOpen] = useState(false)
   const [lastCloseTimestamp, setLastCloseTimestamp] = useState(0)
   const [toast, setToast] = useState<{ type: 'success' | 'error', message: string } | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const { content, updateContent, immediateSave, loading, saving, error, hasContent } = useRoadmap({ boardId })
+  const { content, updateContent, immediateSave, loading, saving, error, hasContent, showSavedStatus } = useRoadmap({ boardId })
 
   // Parse tasks from content
   const parsedTasks = parseRoadmapTasks(content)
@@ -88,8 +89,13 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
         type: 'success',
         message: `✓ Создано ${result.created} задач`
       })
-      // Force page reload to show new tasks immediately
-      setTimeout(() => window.location.reload(), 1000)
+      setIsCreating(false)
+      setIsExpanded(false)
+      // Notify parent component to refresh data
+      onTasksCreated?.()
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
     } else {
       // logger.log(`❌ [ROADMAP] Failed to create tasks. Errors:`, result.errors)
       setToast({
@@ -104,7 +110,7 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
     <>
     <div
       data-tour="roadmap-panel"
-      className={`fixed bottom-0 left-0 right-0 ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
+      className={`fixed bottom-0 left-0 right-0 md:ml-64 bg-[#1a1a20] border-t border-gray-700/50 transition-all duration-300 z-50 ${
         isExpanded ? 'h-[70vh]' : 'h-10'
       }`}
     >
@@ -114,7 +120,7 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
-          <Map size={16} className="text-purple-400" />
+          <Map size={18} className="text-purple-400" />
           <span className="text-sm font-medium text-gray-300">
             {hasContent ? '📍 Дорожная карта' : '📍 Дорожная карта'}
           </span>
@@ -129,17 +135,33 @@ export function RoadmapPanel({ boardId, closeTimestamp }: RoadmapPanelProps) {
               e.stopPropagation()
               setIsAIChatOpen(true)
             }}
-            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30"
+            className="p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md hover:scale-105 transition-transform shadow-lg hover:shadow-indigo-500/30 flex items-center gap-1.5"
             title="Сгенерировать с AI"
           >
-            <Sparkles size={14} className="text-white" />
+            <Sparkles size={18} className="text-white" />
+            <span className="text-xs font-medium text-white pr-0.5">AI</span>
           </button>
-          {saving && (
-            <span className="text-xs text-gray-500">Сохранение...</span>
+
+          {/* Save status indicator - only show when saving or just saved */}
+          {(saving || showSavedStatus) && (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-[#121218] rounded-md">
+              {saving && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs font-medium text-gray-400">Сохранение...</span>
+                </div>
+              )}
+              {!saving && showSavedStatus && (
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-green-500 flex items-center justify-center">
+                    <span className="text-white text-[8px] font-bold">✓</span>
+                  </div>
+                  <span className="text-xs font-medium text-green-400">Сохранено</span>
+                </div>
+              )}
+            </div>
           )}
-          {!saving && hasContent && (
-            <span className="text-xs text-green-500">Сохранено ✓</span>
-          )}
+
           {isExpanded ? (
             <ChevronDown size={16} className="text-gray-400" />
           ) : (

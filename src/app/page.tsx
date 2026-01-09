@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen bg-[#121218]">
-      <Sidebar />
+      <Sidebar className="hidden md:block" />
       <Board />
     </main>
   );
