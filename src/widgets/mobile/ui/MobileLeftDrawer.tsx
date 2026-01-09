@@ -24,12 +24,12 @@ import { useSwipe } from '@/hooks/useSwipe'
 import { lockBodyScroll, unlockBodyScroll, hapticFeedback } from '@/shared/lib/mobile'
 
 interface MobileLeftDrawerProps {
-  onStartOnboarding?: () => void
+  onOpenRoadmap?: () => void
 }
 
-export function MobileLeftDrawer({ onStartOnboarding }: MobileLeftDrawerProps) {
+export function MobileLeftDrawer({ onOpenRoadmap }: MobileLeftDrawerProps) {
   const { user, signOut } = useAuth()
-  const { isLeftDrawerOpen, closeLeftDrawer } = useMobileUIStore()
+  const { isLeftDrawerOpen, closeLeftDrawer, openRightDrawer } = useMobileUIStore()
   const { open: openDonationModal } = useDonationModal()
   const { open: openFeedbackModal } = useFeedbackModal()
 
@@ -81,7 +81,7 @@ export function MobileLeftDrawer({ onStartOnboarding }: MobileLeftDrawerProps) {
 
   const handleHelp = () => {
     closeLeftDrawer()
-    setTimeout(() => onStartOnboarding?.(), 300)
+    setTimeout(() => openRightDrawer(), 300)
   }
 
   // Calculate transform based on swipe
