@@ -35,9 +35,14 @@ export function useMobileOnboarding() {
     setShouldRunMobileTour(false);
   };
 
+  const startTour = () => {
+    setShouldRunMobileTour(true);
+  };
+
   return {
     shouldRunMobileTour,
     setMobileTourCompleted: completeTour,
+    startTour,
     isMobile,
   };
 }
