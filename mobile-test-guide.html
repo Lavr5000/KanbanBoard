@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мобильное тестирование Kanban Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .device-frame {
+            background: white;
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            margin: 20px 0;
+        }
+        .device-screen {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #333;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .checklist {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .checklist h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .checklist-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #ddd;
+            background: #f9f9f9;
+        }
+        .checklist-item.important {
+            border-left-color: #ff5722;
+            background: #fff3e0;
+        }
+        .device-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .device-btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .device-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 Мобильное тестирование Kanban Board</h1>
+
+    <div class="device-selector">
+        <button class="device-btn" onclick="resizeDevice(375, 812)">iPhone 12</button>
+        <button class="device-btn" onclick="resizeDevice(393, 851)">Pixel 5</button>
+        <button class="device-btn" onclick="resizeDevice(360, 640)">Moto G4</button>
+        <button class="device-btn" onclick="resizeDevice(414, 896)">iPhone XR</button>
+    </div>
+
+    <div class="device-frame">
+        <div class="device-screen">
+            <iframe id="mobile-frame" src="http://localhost:3000"></iframe>
+        </div>
+    </div>
+
+    <div class="checklist">
+        <h2>✅ Чек-лист тестирования</h2>
+
+        <div class="checklist-item important">
+            <strong>1. AI кнопка (✨) на задачах</strong>
+            <ul>
+                <li>Нажмите на AI кнопку</li>
+                <li>Что происходит? Открывается ли модальное окно?</li>
+                <li>Есть ли ошибки в консоли браузера (F12 → Console)?</li>
+                <li>Сделайте скриншот консоли если есть ошибки</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>2. Список задач (не колонки)</strong>
+            <ul>
+                <li>Отображаются ли задачи списком?</li>
+                <li>Видно ли название и описание задач?</li>
+                <li>Отображается ли приоритет?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>3. Фильтр колонок сверху</strong>
+            <ul>
+                <li>Виден ли фильтр сверху?</li>
+                <li>Работает ли переключение между колонками?</li>
+                <li>НЕТ кнопки "Все"?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>4. Кнопка + (внизу справа)</strong>
+            <ul>
+                <li>Видна ли кнопка?</li>
+                <li>Создаёт ли новую задачу?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>5. Кнопка редактирования (карандаш)</strong>
+            <ul>
+                <li>Открывает ли редактирование задачи?</li>
+                <li>Можно ли изменить текст?</li>
+                <li>Сохраняются ли изменения?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>6. Кнопка удаления (корзина)</strong>
+            <ul>
+                <li>Удаляет ли задачу?</li>
+                <li>Есть ли подтверждение удаления?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>7. Свайп задач влево/вправо</strong>
+            <ul>
+                <li>Перемещает ли задача между колонками?</li>
+                <li>Визуально видно анимацию свайпа?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>8. RoadmapPanel (снизу)</strong>
+            <ul>
+                <li>Открывается ли панель?</li>
+                <li>Видны ли задачи из roadmap?</li>
+            </ul>
+        </div>
+
+        <div class="checklist-item">
+            <strong>9. Создание задач из Roadmap</strong>
+            <ul>
+                <li>Создаёт ли задача из roadmap?</li>
+                <li>Появляется ли она в списке?</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function resizeDevice(width, height) {
+            const frame = document.getElementById('mobile-frame');
+            frame.style.width = width + 'px';
+            frame.style.height = height + 'px';
+            frame.style.transform = 'scale(1)';
+        }
+
+        // Автоматически открыть DevTools инструкцию
+        console.log('%c📱 Мобильное тестирование', 'font-size: 20px; font-weight: bold;');
+        console.log('%c1. Откройте localhost:3000 в браузере', 'color: blue;');
+        console.log('%c2. Нажмите F12', 'color: blue;');
+        console.log('%c3. Нажмите Ctrl+Shift+M (Device Toolbar)', 'color: blue;');
+        console.log('%c4. Выберите устройство из списка', 'color: blue;');
+        console.log('%c5. Проверьте все функции из чек-листа', 'color: blue;');
+        console.log('%c❗特别注意 AI кнопка (✨) - проверьте консоль на ошибки!', 'color: red; font-size: 14px;');
+    </script>
+</body>
+</html>
