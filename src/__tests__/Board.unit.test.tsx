@@ -47,12 +47,13 @@ vi.mock('@/lib/supabase/client', () => ({
   })),
 }))
 
-vi.mock('@/features/onboarding', () => ({
-  useOnboarding: () => ({
-    shouldRunTour: false,
-    setTourCompleted: vi.fn(),
-  }),
-}))
+vi.mock('@/features/onboarding', async () => {
+  const actual = await vi.importActual('@/features/onboarding')
+  return {
+    ...actual,
+    OnboardingTour: ({ run, onCallback }: any) => <div data-testid="onboarding-tour">Mock Tour</div>,
+  }
+})
 
 describe('Board Component', () => {
   beforeEach(() => {

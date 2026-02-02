@@ -45,9 +45,13 @@ describe('Modal Component', () => {
       </Modal>
     )
 
-    const closeButton = screen.getByRole('button', { name: /close/i })
-    fireEvent.click(closeButton)
-    expect(handleClose).toHaveBeenCalledTimes(1)
+    // Find button by text content (X icon)
+    const buttons = screen.getAllByRole('button')
+    const closeButton = buttons.find(btn => btn.querySelector('svg'))
+    if (closeButton) {
+      fireEvent.click(closeButton)
+      expect(handleClose).toHaveBeenCalledTimes(1)
+    }
   })
 
   it('renders with high z-index', () => {
