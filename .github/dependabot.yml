@@ -1,0 +1,46 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Lavr5000"  # Replace with actual reviewer
+    assignees:
+      - "Lavr5000"  # Replace with actual assignee
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    allow:
+      # Allow both direct and indirect dependencies
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Ignore major version updates for these packages (requires manual review)
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@dnd-kit/*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # Group testing dependencies
+      testing-dependencies:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@playwright/*"
+        exclude-patterns:
+          - "@dnd-kit/*"
+      # Group React-related dependencies
+      react-dependencies:
+        patterns:
+          - "react*"
+          - "next*"
