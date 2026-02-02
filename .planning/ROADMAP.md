@@ -40,11 +40,18 @@ The kanban board is functional with Supabase backend, Redux state, and @dnd-kit 
 ### Phase 02: Board Background Atmosphere
 **Goal:** Create atmospheric background with depth and life
 
+**Status:** 3 plans ready (2 waves)
+
 **Deliverables:**
 - Gradient mesh background
 - Animated glow orbs (purple/blue)
 - Noise texture overlay
 - Subtle parallax on mouse move
+
+**Plans:**
+- [ ] 02-01-PLAN.md — Gradient mesh and noise texture components
+- [ ] 02-02-PLAN.md — Glow orbs and mouse parallax with memory leak prevention
+- [ ] 02-03-PLAN.md — BoardBackground integration and visual verification
 
 ---
 
