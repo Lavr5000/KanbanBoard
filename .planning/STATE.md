@@ -12,7 +12,7 @@
 - **Backend:** Supabase
 - **Drag & Drop:** @dnd-kit/core
 - **Animations:** CSS (Framer Motion removed due to React 19 incompatibility)
-- **Testing:** Vitest 4.0.18, React Testing Library 16.3.2, jsdom 28.0.0
+- **Testing:** Vitest 4.0.18, React Testing Library 16.3.2, jsdom 28.0.0, Playwright 1.58.1
 
 ### Key Files
 
@@ -25,8 +25,10 @@
 | `src/shared/ui/background/` | Background components | AnimatedGradient, NoiseTexture, GlowOrb, MouseParallax, BoardBackground |
 | `tailwind.config.ts` | Tailwind config | Has keyframes for animations |
 | `vitest.config.ts` | Vitest configuration | jsdom environment, React plugin, coverage enabled |
+| `playwright.config.ts` | Playwright config | Multi-browser E2E testing, webServer auto-start |
 | `src/__tests__/mocks.ts` | Centralized test mocks | Supabase, DnD-kit, hooks all mocked |
 | `src/__tests__/setup.ts` | Test setup | jest-dom import, cleanup after each |
+| `e2e/` | E2E test suite | Critical flows, visual regression, React 19 compatibility |
 
 ### Decisions Made
 
@@ -43,6 +45,9 @@
 11. **Centralized test mocking** — All external dependencies mocked in src/__tests__/mocks.ts
 12. **No typecheck in pre-commit** — @testing-library/jest-dom types incompatible with tsconfig, use manual `npm run typecheck`
 13. **Vitest over Jest** — Native ESM support, better Next.js 15 compatibility, faster execution
+14. **Playwright for E2E** — Industry-standard E2E testing, visual regression, multi-browser support
+15. **data-testid for E2E** — Reliable selectors for E2E tests, added to all major UI components
+16. **ESLint exclude e2e** — Playwright fixtures trigger React hooks false positive, excluded from linting
 
 ### Current Issues
 
@@ -66,7 +71,7 @@
 | 02 - Board Background | ✅ Complete | 3/3 plans executed |
 | 03 - Task Card Animations | ⚠️ Partial | Animation components created, integration reverted |
 | 04 - Polish & Performance | Not Started | - |
-| 05 - Testing System Modernization | 🔄 In Progress | 1/5 plans executed (05-01 complete) |
+| 05 - Testing System Modernization | 🔄 In Progress | 2/5 plans executed (05-01, 05-02 complete) |
 
 ### Recent Activity
 
@@ -88,22 +93,24 @@
 | 2026-02-02 | Plans 05-01 through 05-05 created | 05 Planning |
 | 2026-02-02 | **Plan 05-01 COMPLETE** - Vitest foundation, 27 tests passing | 05 |
 | 2026-02-02 | Pre-commit hooks with ESLint configured | 05 |
+| 2026-02-02 | **Plan 05-02 COMPLETE** - Playwright E2E, visual regression for z-index bugs | 05 |
+| 2026-02-02 | data-testid attributes added to components for E2E | 05 |
+| 2026-02-02 | Modal z-index tests prevent Bug #1 regression | 05 |
+| 2026-02-02 | React 19 compatibility E2E validation added | 05 |
 
 ### Session Continuity
 
-**Last session:** 2026-02-02 18:13 UTC
-**Stopped at:** Completed Plan 05-01 - Foundation - Vitest + TypeScript Pre-commit
+**Last session:** 2026-02-02 19:55 UTC
+**Stopped at:** Completed Plan 05-02 - E2E Testing with Playwright
 **Resume file:** None - plan completed successfully
 
 **Commits in this session:**
-- 9460aac: feat(05-01): install Vitest and React Testing Library
-- 1eed393: feat(05-01): set up Husky and lint-staged for pre-commit checks
-- ca292b0: test(05-01): add Board component unit test and fix ESLint config
-- c435f60: test(05-01): add TaskCard component unit test
-- 96fab4f: test(05-01): add Modal component unit test
-- 24bc4ec: test(05-01): add Column component unit test
-- feefac8: test(05-01): add Zustand store integration test
-- 6cc57c1: fix(05-01): fix test failures and add proper mocks
-- 05761c6: feat(05-01): improve test infrastructure with global mocks and typecheck
+- 54770a8: feat(05-02): install and configure Playwright for E2E testing
+- b96897c: feat(05-02): create Playwright test fixtures
+- 05048df: feat(05-02): add data-testid attributes for E2E testing
+- 3fec338: feat(05-02): add card lifecycle E2E test
+- cc3ec59: feat(05-02): add modal z-index visual regression tests (Bug #1 prevention)
+- e0c8b36: feat(05-02): add drag-drop visual state tests
+- 19c87b5: feat(05-02): add React 19 compatibility E2E tests (Bug #3 prevention)
 
-**Next plan:** 05-02 - E2E Testing with Playwright (when ready)
+**Next plan:** 05-03 - Jest to Vitest Migration (when ready)
