@@ -8,13 +8,18 @@
 
 ## Executive Summary
 
-Phase 02 focuses on creating an atmospheric background system for the Kanban board. **GOOD NEWS:** All core components (`AnimatedGradient`, `GlowOrb`, `NoiseTexture`, `MouseParallax`) are **already implemented** in `src/shared/ui/background/`. The `BoardBackground` wrapper component is also complete and integrated into `Board.tsx`.
+Phase 02 focuses on **fixing bugs and optimizing existing** atmospheric background system for the Kanban board. **GOOD NEWS:** All core components (`AnimatedGradient`, `GlowOrb`, `NoiseTexture`, `MouseParallax`) are **already implemented** in `src/shared/ui/background/`. The `BoardBackground` wrapper component is also complete and integrated into `Board.tsx`.
 
 **Current Status:**
 - All background components exist and are functional
 - Components use Framer Motion (motion package v11.11.0)
-- GPU optimizations are in place
-- Only documentation and minor optimizations may be needed
+- **CRITICAL BUG:** Memory leak in MouseParallax (event listener never removed)
+- **LOW:** Missing GPU hints (will-change) on animated elements
+
+**Phase 02 Revised Focus:**
+- Fix MouseParallax memory leak (useEffect with cleanup)
+- Add GPU optimization hints (will-change)
+- Verify existing components continue working after fixes
 
 ---
 
@@ -640,31 +645,30 @@ useEffect(() => {
    - Could disable parallax on touch devices
    - Not critical (current performance is good)
 
-### Recommended Tasks for Phase 02
+### Recommended Tasks for Phase 02 (Revised)
 
-Since components are already implemented, Phase 02 should focus on:
+Since components are already implemented, Phase 02 **plans have been updated** to focus on:
 
-1. **Documentation** (if not already done)
-   - Document component usage
-   - Document performance characteristics
-   - Document customization options
+**Plan 02-01: Verify and Optimize Existing Background Components**
+- Confirm AnimatedGradient.tsx exists and works correctly
+- Confirm NoiseTexture.tsx exists and works correctly
+- Add `will-change: background-position` GPU hint to gradient
 
-2. **Bug fixes**
-   - Fix MouseParallax memory leak
+**Plan 02-02: Fix MouseParallax Memory Leak and Optimize GlowOrb**
+- **CRITICAL:** Fix memory leak in MouseParallax (useEffect with cleanup)
+- Add `will-change: transform, opacity` GPU hint to GlowOrb
+- Verify BoardBackground.tsx integration
 
-3. **Minor optimizations**
-   - Add `will-change` hints
-   - Add mobile-specific styles (optional)
+**Plan 02-03: Verify After Fixes**
+- Verify background continues working after bug fixes
+- Verify no memory leaks (check event listeners)
+- Verify drag-and-drop still functional
+- Visual verification in browser
 
-4. **Testing**
-   - Performance testing on various devices
-   - Browser compatibility testing
-   - Accessibility testing (prefers-reduced-motion)
-
-5. **Integration verification**
-   - Verify BoardBackground works correctly
-   - Verify no visual regressions
-   - Verify drag-and-drop still works
+**NOT in scope:**
+- Creating new components (they already exist)
+- Reimplementing existing functionality
+- Changing visual design (colors, animations, etc.)
 
 ### NOT in Scope for Phase 02
 
@@ -735,12 +739,17 @@ These are beyond the current phase scope:
 
 ## Conclusion
 
-**Phase 02 Research Status:** ✅ COMPLETE
+**Phase 02 Research Status:** ✅ COMPLETE (Revised)
 
 **Key Finding:** The Board Background Atmosphere system is **already fully implemented** and working. The components are well-architected, performant, and follow best practices.
 
-**Only Action Required:**
-1. Fix MouseParallax memory leak (simple useEffect wrapper)
-2. Consider minor optimizations (will-change hints, mobile tweaks)
+**Plans Revised to Address:**
+1. **Blocker 1:** Plans no longer describe "creating" components - they now verify existing ones
+2. **Blocker 2:** Plan 02-02 explicitly acknowledges it's FIXING a memory leak (not "creating" MouseParallax)
+3. **Warning:** Plan 02-03 reframed as "verify after fixes" not "verify newly created features"
 
-**Recommendation:** Phase 02 should be treated as a **documentation and verification phase**, not an implementation phase. The code exists and works well.
+**Action Required:**
+1. Fix MouseParallax memory leak (critical - useEffect wrapper)
+2. Add GPU hints (will-change) to animated elements (optimization)
+
+**Recommendation:** Phase 02 is now a **bug fix and optimization phase**, not an implementation phase. The code exists and works well, but has one critical bug that must be fixed.
