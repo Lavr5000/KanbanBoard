@@ -33,6 +33,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { deleteColumn } from "@/lib/supabase/queries/columns";
 import { useIsMobile } from "@/shared/lib/useMediaQuery";
+import { BoardBackground } from "./BoardBackground";
 
 // Drag preview with enhanced glass and glow effect
 const DragPreviewTaskCard = ({ task, isDragging = false }: { task: Task; isDragging?: boolean }) => (
@@ -408,7 +409,9 @@ export const Board = () => {
       ) : (
         <>
           <OnboardingTour run={runTour} onCallback={handleTourCallback} onStepChange={handleStepChange} onCloseRoadmap={handleCloseRoadmap} />
-      <div className="flex-grow flex flex-col">
+          {/* Atmospheric background layer */}
+          <BoardBackground />
+      <div className="flex-grow flex flex-col relative z-10">
         {/* Top Header */}
         <header className="h-20 border-b border-gray-800 flex items-center justify-between px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center gap-8">
