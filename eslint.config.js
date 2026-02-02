@@ -11,7 +11,7 @@ module.exports = [
   ...tseslint.configs.recommended,
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    ignores: ['.next/**', 'node_modules/**', 'dist/**', '.vitest/**'],
+    ignores: ['.next/**', 'node_modules/**', 'dist/**', '.vitest/**', 'e2e/**'],
   },
   {
     rules: {
