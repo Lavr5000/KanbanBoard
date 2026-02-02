@@ -5,6 +5,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragStartEvent,
@@ -126,10 +127,33 @@ export const Board = () => {
   // logger.log('🔍 Filtered tasks:', filteredTasks.length, 'Total:', tasks.length, 'Priority:', priorityFilter);
   // logger.log('📊 Board info:', { boardId: activeBoard?.id, boardName: activeBoard?.name, columnCount: columns.length });
 
+  // Spring physics drop animation
+  const dropAnimationConfig = useMemo(() => ({
+    duration: 300,
+    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' as const, // Bouncy spring effect
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: {
+        active: {
+          opacity: "0.5",
+          transform: 'scale(1.05)',
+        },
+      },
+    }),
+  }), []);
+
+  // Sensors optimized for both mouse and touch devices
   const sensors = useSensors(
+    // Mouse/pointer - slight delay before drag starts
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px movement before drag starts
+        distance: 8, // Increased from 5 to prevent accidental drags
+      },
+    }),
+    // Touch - long press activation for mobile
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // Long press on mobile before drag starts (ms)
+        tolerance: 8, // Allow 8px movement during delay
       },
     })
   );
@@ -521,17 +545,7 @@ export const Board = () => {
 
         {typeof document !== "undefined" &&
           createPortal(
-            <DragOverlay
-              dropAnimation={{
-                sideEffects: defaultDropAnimationSideEffects({
-                  styles: {
-                    active: {
-                      opacity: "0.5",
-                    },
-                  },
-                }),
-              }}
-            >
+            <DragOverlay dropAnimation={dropAnimationConfig}>
               {activeTask && <DragPreviewTaskCard task={activeTask} isDragging={true} />}
             </DragOverlay>,
             document.body
