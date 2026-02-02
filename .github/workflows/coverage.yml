@@ -1,0 +1,57 @@
+name: Coverage Report
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  coverage:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Add coverage PR comment
+        if: github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          lcov-file: ./coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check coverage thresholds
+        run: |
+          echo "Checking coverage thresholds..."
+
+          # Parse coverage from JSON output
+          COVERAGE=$(npm run test:coverage -- --json | jq -r '.coverage.total.lines.pct')
+
+          # Fail if coverage is below 50% (adjustable threshold)
+          if (( $(echo "$COVERAGE < 50" | bc -l) )); then
+            echo "Coverage $COVERAGE% is below 50% threshold"
+            exit 1
+          fi
+
+          echo "Coverage $COVERAGE% meets threshold!"
