@@ -103,18 +103,18 @@ export const TaskCard = ({
         {...attributes}
         {...listeners}
         onDoubleClick={() => setIsEditModalOpen(true)}
-        className="bg-[#1c1c24] p-4 rounded-xl shadow-lg border border-transparent hover:border-gray-700 group cursor-grab active:cursor-grabbing"
+        className="glass-card p-4 rounded-xl group cursor-grab active:cursor-grabbing glass-hover glass-optimized relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-2">
             <span
               className={clsx(
-                "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
+                "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm",
                 task.priority === "high"
-                  ? "bg-red-500/20 text-red-500 border border-red-500/30"
+                  ? "bg-red-500/30 text-red-400 border border-red-500/50 glow-red"
                   : task.priority === "medium"
-                  ? "bg-green-500/20 text-green-500 border border-green-500/30"
-                  : "bg-blue-500/20 text-blue-500 border border-blue-500/30"
+                  ? "bg-amber-500/30 text-amber-400 border border-amber-500/50"
+                  : "bg-blue-500/30 text-blue-400 border border-blue-500/50"
               )}
             >
               {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
@@ -182,7 +182,7 @@ export const TaskCard = ({
           </div>
         </div>
 
-        <p className="text-gray-400 text-xs mb-2 line-clamp-3 leading-relaxed">
+        <p className="text-white/80 text-sm mb-2 line-clamp-3 leading-relaxed font-light">
           {task.content}
         </p>
 

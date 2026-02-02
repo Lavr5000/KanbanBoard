@@ -27,11 +27,43 @@ import { AddColumnButton } from "@/features/add-column/ui/AddColumnButton";
 import { RoadmapPanel } from "@/features/roadmap/ui/RoadmapPanel";
 import { OnboardingTour, useOnboarding } from "@/features/onboarding";
 import { MobileBoard } from "@/widgets/mobile-board";
-import { Bell, Search, LogOut, Filter } from "lucide-react";
+import { Bell, Search, LogOut, Filter, Calendar } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { deleteColumn } from "@/lib/supabase/queries/columns";
 import { useIsMobile } from "@/shared/lib/useMediaQuery";
+
+// Drag preview with enhanced glass and glow effect
+const DragPreviewTaskCard = ({ task, isDragging = false }: { task: Task; isDragging?: boolean }) => (
+  <div className={`glass-card p-4 rounded-xl relative overflow-hidden border-2 border-purple-500/50 shadow-[0_0_40px_rgba(168,85,247,0.4),0_20px_60px_rgba(0,0,0,0.5)] scale-105 ${isDragging ? "opacity-90" : ""}`}>
+    {/* Inner glow effect */}
+    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10 pointer-events-none" />
+
+    {/* Priority badge */}
+    <div className="flex justify-between items-start mb-2 relative z-10">
+      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm ${
+        task.priority === "high"
+          ? "bg-red-500/30 text-red-400 border border-red-500/50 glow-red"
+          : task.priority === "medium"
+          ? "bg-amber-500/30 text-amber-400 border border-amber-500/50"
+          : "bg-blue-500/30 text-blue-400 border border-blue-500/50"
+      }`}>
+        {task.priority === "high" ? "Срочно" : task.priority === "medium" ? "Обычно" : "Низкий"}
+      </span>
+    </div>
+
+    <p className="text-white/90 text-sm mb-2 line-clamp-3 leading-relaxed font-light relative z-10">
+      {task.content}
+    </p>
+
+    <div className="flex items-center text-gray-500 gap-1.5 border-t border-gray-700/50 pt-3 relative z-10">
+      <Calendar size={12} />
+      <span className="text-[10px]">
+        {new Date(task.createdAt).toLocaleDateString()}
+      </span>
+    </div>
+  </div>
+);
 
 export const Board = () => {
   const { searchQuery, priorityFilter, setSearchQuery, setPriorityFilter } = useUIStore();
@@ -500,7 +532,7 @@ export const Board = () => {
                 }),
               }}
             >
-              {activeTask && <TaskCard task={activeTask} />}
+              {activeTask && <DragPreviewTaskCard task={activeTask} isDragging={true} />}
             </DragOverlay>,
             document.body
           )}

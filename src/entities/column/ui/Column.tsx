@@ -9,6 +9,7 @@ import { Plus } from "lucide-react";
 import { Modal } from "@/shared/ui/Modal";
 import { AddTaskModal } from "@/features/task-operations/ui/AddTaskModal";
 import { ColumnHeader } from "./ColumnHeader";
+import { clsx } from "clsx";
 
 interface Props {
   column: ColumnType;
@@ -24,7 +25,7 @@ interface Props {
 export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = false, onColumnUpdate, onColumnDelete, forceShowAITask }: Props) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const taskIds = tasks.map((t) => t.id);
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: column.id,
     data: {
       type: "Column",
@@ -38,7 +39,7 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
         <Plus
           data-tour="add-task-btn"
           size={18}
-          className="text-gray-500 cursor-pointer hover:text-white border border-gray-700 rounded p-0.5 flex-shrink-0"
+          className="text-white/50 cursor-pointer hover:text-white border border-white/10 rounded-lg p-1 flex-shrink-0 transition-all duration-300 hover:bg-white/10 hover:border-white/30"
           onClick={() => setIsAddModalOpen(true)}
         />
         <ColumnHeader
@@ -50,7 +51,17 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
         />
       </div>
 
-      <div ref={setNodeRef} className="flex-grow flex flex-col gap-4 bg-[#121218]/50 rounded-xl p-3 border-2 border-transparent transition-colors">
+      <div
+        ref={setNodeRef}
+        className={clsx(
+          "flex-grow flex flex-col gap-4 glass-dark rounded-xl p-4 border transition-all duration-300 glass-optimized relative",
+          isOver
+            ? "border-purple-500/50 drop-zone-active bg-purple-500/5"
+            : "border-white/10 hover:border-white/20"
+        )}
+      >
+        {/* Rim light effect */}
+        <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-purple-400/30 to-transparent"></div>
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
             <TaskCard

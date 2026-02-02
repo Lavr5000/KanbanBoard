@@ -110,7 +110,7 @@ export const ColumnHeader = ({ columnId, title, isFirst, onColumnUpdated, onColu
               onChange={(e) => setEditedTitle(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
-              className="bg-[#1e1e24] text-gray-200 text-sm font-semibold px-2 py-1 rounded border border-gray-700 focus:outline-none focus:border-blue-500 flex-1"
+              className="glass text-white text-sm font-semibold px-3 py-1.5 rounded-lg border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/10 flex-1 transition-all"
               maxLength={50}
             />
             <button
@@ -131,8 +131,8 @@ export const ColumnHeader = ({ columnId, title, isFirst, onColumnUpdated, onColu
         ) : (
           <h3
             onClick={handleStartEdit}
-            className="text-gray-200 font-semibold text-sm cursor-pointer hover:bg-[#1e1e24] px-2 py-1 rounded transition-colors flex-1"
-            title="Click to edit"
+            className="text-white font-semibold text-base cursor-pointer hover:bg-white/5 px-2 py-1.5 rounded-lg transition-all duration-300 flex-1"
+            title="Нажмите для редактирования"
           >
             {title}
           </h3>
