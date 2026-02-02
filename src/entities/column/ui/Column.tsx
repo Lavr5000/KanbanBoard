@@ -34,10 +34,11 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
   });
 
   return (
-    <div className="flex flex-col w-[300px] min-h-[500px]">
+    <div className="flex flex-col w-[300px] min-h-[500px]" data-testid="column" data-column-id={column.id}>
       <div className="flex items-center gap-2 mb-4">
         <Plus
           data-tour="add-task-btn"
+          data-testid="add-task-button"
           size={18}
           className="text-white/50 cursor-pointer hover:text-white border border-white/10 rounded-lg p-1 flex-shrink-0 transition-all duration-300 hover:bg-white/10 hover:border-white/30"
           onClick={() => setIsAddModalOpen(true)}

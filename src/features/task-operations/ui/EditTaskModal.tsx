@@ -38,6 +38,7 @@ export const EditTaskModal = ({
           Описание задачи
         </label>
         <textarea
+          data-testid="task-content-input"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Введите текст..."
@@ -66,6 +67,7 @@ export const EditTaskModal = ({
             return (
               <button
                 key={p}
+                data-testid={`priority-${p}`}
                 onClick={() => setPriority(p)}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase border transition-all ${colorStyles[p]}`}
               >
@@ -77,6 +79,7 @@ export const EditTaskModal = ({
       </div>
 
       <button
+        data-testid="save-task-button"
         onClick={handleSave}
         className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all mt-4"
       >

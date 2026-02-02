@@ -103,6 +103,8 @@ export const TaskCard = ({
         {...attributes}
         {...listeners}
         onDoubleClick={() => setIsEditModalOpen(true)}
+        data-testid="task-card"
+        data-task-id={task.id}
         className="glass-card p-4 rounded-xl group cursor-grab active:cursor-grabbing glass-hover glass-optimized relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-2">
@@ -165,6 +167,7 @@ export const TaskCard = ({
               )
             )}
             <button
+              data-testid="delete-task-button"
               onClick={(e) => {
                 e.stopPropagation();
                 onDeleteTrigger?.(task.id);

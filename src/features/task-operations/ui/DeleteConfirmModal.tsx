@@ -31,12 +31,14 @@ export const DeleteConfirmModal = ({
         </p>
         <div className="flex gap-3">
           <button
+            data-testid="cancel-delete-button"
             onClick={onClose}
             className="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-2 rounded-xl transition-all"
           >
             Отмена
           </button>
           <button
+            data-testid="confirm-delete-button"
             onClick={handleConfirm}
             className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-xl font-bold transition-all"
           >

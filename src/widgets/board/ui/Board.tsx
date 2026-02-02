@@ -499,7 +499,7 @@ export const Board = () => {
         </header>
 
         {/* Board Content */}
-        <div className="flex w-full overflow-x-auto overflow-y-hidden px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide">
+        <div className="flex w-full overflow-x-auto overflow-y-hidden px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide" data-testid="board-container">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}
