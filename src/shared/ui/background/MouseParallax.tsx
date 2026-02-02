@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { ReactNode } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 
 /**
  * Mouse parallax props configuration
@@ -17,61 +15,72 @@ interface MouseParallaxProps {
 }
 
 /**
- * MouseParallax - Mouse-tracking parallax wrapper using useMotionValue
+ * MouseParallax - Mouse-tracking parallax with CSS transform
  *
  * Purpose: Creates smooth mouse-tracking parallax effect for background
- * elements. Movement is throttled to ~60fps using framer-motion's useSpring.
+ * elements. Uses requestAnimationFrame for smooth 60fps updates.
  *
  * Performance notes:
- * - Uses useMotionValue for zero-cost tracking
- * - useSpring throttles updates to ~60fps
- * - useTransform creates derived values efficiently
- * - useEffect with cleanup prevents memory leaks
+ * - Uses requestAnimationFrame for smooth updates
+ * - CSS transform for GPU acceleration
+ * - Cleanup prevents memory leaks
  */
 export function MouseParallax({
   children,
   strength = 20,
   className = '',
 }: MouseParallaxProps) {
-  // Motion values for mouse position (normalized -1 to 1)
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState('translate(0px, 0px)');
 
-  // Spring config for smooth, responsive movement
-  const springConfig = { stiffness: 300, damping: 30, mass: 0.8 };
-  const springX = useSpring(x, springConfig);
-  const springY = useSpring(y, springConfig);
-
-  // Transform normalized mouse position to pixel offset
-  const translateX = useTransform(springX, [-0.5, 0.5], [-strength, strength]);
-  const translateY = useTransform(springY, [-0.5, 0.5], [-strength, strength]);
-
-  // Set up mouse move listener with proper cleanup
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const element = ref.current;
+    if (!element) return;
+
+    let rafId: number;
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
     const handleMouseMove = (e: MouseEvent) => {
       // Normalize mouse position: -0.5 to 0.5
-      const normalizedX = e.clientX / window.innerWidth - 0.5;
-      const normalizedY = e.clientY / window.innerHeight - 0.5;
-
-      x.set(normalizedX);
-      y.set(normalizedY);
+      targetX = (e.clientX / window.innerWidth - 0.5) * strength * -1;
+      targetY = (e.clientY / window.innerHeight - 0.5) * strength * -1;
     };
 
+    const animate = () => {
+      // Smooth interpolation (ease-out)
+      const factor = 0.1;
+      currentX += (targetX - currentX) * factor;
+      currentY += (targetY - currentY) * factor;
+
+      setTransform(`translate(${currentX.toFixed(1)}px, ${currentY.toFixed(1)}px)`);
+      rafId = requestAnimationFrame(animate);
+    };
+
+    // Start animation loop
+    rafId = requestAnimationFrame(animate);
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []); // Empty deps - motion values are stable refs
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
+  }, [strength]);
 
   return (
-    <motion.div
+    <div
+      ref={ref}
       className={className}
       style={{
-        x: translateX,
-        y: translateY,
+        transform,
+        transition: 'transform 0.1s ease-out',
       }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

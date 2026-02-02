@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 /**
  * Glow orb props configuration
  */
@@ -24,14 +22,14 @@ interface GlowOrbProps {
 
 const DEFAULTS = {
   size: 300,
-  color: 'rgba(168, 85, 247, 0.3)', // purple glow
+  color: 'rgba(168, 85, 247, 0.3)',
   top: '50%',
   left: '50%',
   delay: 0,
 } as const;
 
 /**
- * GlowOrb - Ambient lighting orb for atmospheric backgrounds
+ * GlowOrb - Ambient lighting orb with CSS animation
  *
  * Purpose: Provides large, soft, slowly floating colored orbs that create
  * ambient lighting. Multiple orbs with different colors/sizes blend into
@@ -51,7 +49,8 @@ export function GlowOrb({
     width: `${size}px`,
     height: `${size}px`,
     background: `radial-gradient(circle, ${color}, transparent)`,
-    willChange: 'transform, opacity', // GPU hint for entrance animation
+    animation: `glowOrbEntrance 1s ease-out ${delay}s forwards, glowOrbFloat 8s ease-in-out infinite`,
+    willChange: 'transform, opacity',
   };
 
   // Add positioning props if provided
@@ -66,16 +65,31 @@ export function GlowOrb({
   }
 
   return (
-    <motion.div
-      className="rounded-full blur-3xl pointer-events-none -z-10 fixed"
-      style={positionStyles}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        delay,
-        duration: 1,
-        ease: 'easeOut',
-      }}
-    />
+    <>
+      <style>{`
+        @keyframes glowOrbEntrance {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        @keyframes glowOrbFloat {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            transform: translate(-50%, calc(-50% - 20px)) scale(1.05);
+          }
+        }
+      `}</style>
+      <div
+        className="rounded-full blur-3xl pointer-events-none -z-10 fixed"
+        style={positionStyles}
+      />
+    </>
   );
 }

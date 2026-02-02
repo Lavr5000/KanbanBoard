@@ -81,6 +81,37 @@ The kanban board is functional with Supabase backend, Redux state, and @dnd-kit 
 
 ---
 
+### Phase 05: Testing System Modernization 📋 PLANNED
+**Goal:** Build robust test system to catch bugs before production
+
+**Trigger:** Multiple bugs found by user that tests failed to catch:
+- Modal z-index issues (Export button window behind columns)
+- TypeScript syntax errors passing through
+- React 19 + Framer Motion incompatibility
+
+**Research:** Complete - see `phases/05-testing-research/05-RESEARCH.md`
+
+**Plans Created:**
+- 05-01: Foundation - Vitest + TypeScript Pre-commit
+- 05-02: E2E Testing with Playwright
+- 05-03: CI/CD Integration & Coverage Reporting
+- 05-04: Component Testing for Critical Paths
+- 05-05: Test Documentation & Maintenance Guide
+
+**Planned Deliverables:**
+- Vitest setup with React 19 compatibility
+- Playwright E2E tests with visual regression
+- Pre-commit hooks (Husky + lint-staged)
+- TypeScript checking in CI
+- Component tests for critical paths
+
+**Expected Outcomes:**
+- 70-80% bug prevention rate
+- 15-20 hour investment
+- Catch z-index, syntax, and compatibility issues automatically
+
+---
+
 ## Success Criteria
 
 - [x] All drag operations have clear visual feedback
@@ -101,4 +132,4 @@ The kanban board is functional with Supabase backend, Redux state, and @dnd-kit 
 ---
 
 **Roadmap created:** 2026-02-01
-**Last updated:** 2026-02-02 (Phase 02 complete)
+**Last updated:** 2026-02-02 (Phase 05 plans created)

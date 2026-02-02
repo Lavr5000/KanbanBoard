@@ -19,12 +19,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Lavr Kanban AI",
   description: "Kanban Board AI powered by Lavr",
-  viewport: {
-    width: "device-width",
-    initialScale: 1.0,
-    maximumScale: 1.0,
-    userScalable: false,
-  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -34,6 +28,13 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/manifest.json",
+};
+
+export const viewport = {
+  width: "device-width" as const,
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  userScalable: false,
 };
 
 export default function RootLayout({
