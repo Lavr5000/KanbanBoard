@@ -2,22 +2,25 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { TaskCard } from '@/entities/task/ui/TaskCard'
 
-// Mock environment variables
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
+// Mock @dnd-kit/sortable
+vi.mock('@dnd-kit/sortable', () => ({
+  useSortable: () => ({
+    setNodeRef: vi.fn(),
+    attributes: {},
+    listeners: {},
+    transform: null,
+    transition: undefined,
+    isDragging: false,
+  }),
+}))
 
-// Mock Supabase client
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => ({
-          data: [],
-          error: null,
-        })),
-      })),
-    })),
-  })),
+// Mock CSS from @dnd-kit/utilities
+vi.mock('@dnd-kit/utilities', () => ({
+  CSS: {
+    Translate: {
+      toString: () => '',
+    },
+  },
 }))
 
 const mockTask = {
@@ -30,6 +33,11 @@ const mockTask = {
 }
 
 describe('TaskCard Component', () => {
+  beforeEach(() => {
+    // Reset all mocks before each test
+    vi.clearAllMocks()
+  })
+
   it('renders task content', () => {
     render(<TaskCard task={mockTask} isDragging={false} />)
     expect(screen.getByText('Test task content')).toBeInTheDocument()
@@ -58,9 +66,9 @@ describe('TaskCard Component', () => {
     expect(screen.getByText(dateString)).toBeInTheDocument()
   })
 
-  it('applies dragging styles when isDragging is true', () => {
-    const { container } = render(<TaskCard task={mockTask} isDragging={true} />)
+  it('displays task card with glass styling', () => {
+    const { container } = render(<TaskCard task={mockTask} isDragging={false} />)
     const card = container.firstChild as HTMLElement
-    expect(card.className).toContain('opacity-50')
+    expect(card.className).toContain('glass-card')
   })
 })

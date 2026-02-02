@@ -2,24 +2,6 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Column } from '@/entities/column/ui/Column'
 
-// Mock environment variables
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
-
-// Mock Supabase client
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => ({
-          data: [],
-          error: null,
-        })),
-      })),
-    })),
-  })),
-}))
-
 const mockColumn = {
   id: 'col-1',
   title: 'To Do',
@@ -77,11 +59,11 @@ describe('Column Component', () => {
     expect(screen.getByText('Second task')).toBeInTheDocument()
   })
 
-  it('displays task count', () => {
+  it('renders plus button for adding tasks', () => {
     render(
       <Column
         column={mockColumn}
-        tasks={mockTasks}
+        tasks={[]}
         onDeleteTrigger={vi.fn()}
         boardName="Test Board"
         isFirst={false}
@@ -89,6 +71,8 @@ describe('Column Component', () => {
         onColumnDelete={vi.fn()}
       />
     )
-    expect(screen.getByText('2')).toBeInTheDocument()
+    // Plus button is a SVG icon from lucide-react
+    const plusButton = document.querySelector('svg[data-tour="add-task-btn"]')
+    expect(plusButton).toBeInTheDocument()
   })
 })

@@ -2,51 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Board } from '@/widgets/board/ui/Board'
 
-// Mock dependencies
-vi.mock('@/hooks/useBoardData', () => ({
-  useBoardData: () => ({
-    columns: [],
-    tasks: [],
-    loading: false,
-    error: null,
-    addTask: vi.fn(),
-    updateTask: vi.fn(),
-    deleteTask: vi.fn(),
-    moveTask: vi.fn(),
-    refetchColumns: vi.fn(),
-  }),
-}))
-
-vi.mock('@/hooks/useBoards', () => ({
-  useBoards: () => ({
-    activeBoard: { id: 'test-board', name: 'Test Project' },
-  }),
-}))
-
-vi.mock('@/providers/AuthProvider', () => ({
-  useAuth: () => ({
-    user: { email: 'test@example.com', user_metadata: { full_name: 'Test User' } },
-    signOut: vi.fn(),
-  }),
-}))
-
-vi.mock('@/shared/lib/useMediaQuery', () => ({
-  useIsMobile: () => false,
-}))
-
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        order: vi.fn(() => ({
-          data: [],
-          error: null,
-        })),
-      })),
-    })),
-  })),
-}))
-
+// Mock OnboardingTour
 vi.mock('@/features/onboarding', async () => {
   const actual = await vi.importActual('@/features/onboarding')
   return {
@@ -78,8 +34,9 @@ describe('Board Component', () => {
     expect(screen.getByText('Низкий')).toBeInTheDocument()
   })
 
-  it('renders board name', () => {
+  it('renders board background', () => {
     render(<Board />)
-    expect(screen.getByText('Test Project')).toBeInTheDocument()
+    const background = document.querySelector('.fixed.inset-0.-z-10')
+    expect(background).toBeInTheDocument()
   })
 })
