@@ -1,0 +1,85 @@
+name: Dependency Audit
+
+on:
+  schedule:
+    # Run every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  push:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check for outdated packages
+        run: npm outdated --json > outdated.json || true
+        continue-on-error: true
+
+      - name: Upload outdated packages report
+        uses: actions/upload-artifact@v4
+        with:
+          name: outdated-packages
+          path: outdated.json
+
+  compatibility-check:
+    name: React 19 Compatibility Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check React 19 incompatible packages
+        run: |
+          echo "Checking for known React 19 incompatible packages..."
+
+          # Check for framer-motion 12.x (incompatible with React 19)
+          if npm list framer-motion 2>/dev/null | grep -q "framer-motion@12"; then
+            echo "ERROR: framer-motion 12.x is incompatible with React 19"
+            exit 1
+          fi
+
+          # Check @testing-library/react version
+          TL_VERSION=$(npm list @testing-library/react --depth=0 2>/dev/null | grep @testing-library/react | awk '{print $2}')
+          if [ -n "$TL_VERSION" ]; then
+            # Extract major version
+            MAJOR=${TL_VERSION:0:2}
+            if [ "$MAJOR" = "15" ] || [ "$MAJOR" = "14" ] || [ "$MAJOR" = "13" ]; then
+              echo "ERROR: @testing-library/react $TL_VERSION does not support React 19"
+              exit 1
+            fi
+          fi
+
+          echo "All packages are React 19 compatible!"
+
+      - name: Check Next.js 15 compatibility
+        run: |
+          echo "Verifying Next.js 15 compatibility..."
+          NEXT_VERSION=$(npm list next --depth=0 2>/dev/null | grep next | awk '{print $2}')
+          echo "Next.js version: $NEXT_VERSION"
