@@ -35,6 +35,7 @@
     "@types/html2pdf.js": "^0.10.0",
     "clsx": "^2.1.1",
     "driver.js": "^1.4.0",
+    "framer-motion": "^12.34.3",
     "html2pdf.js": "^0.13.0",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
