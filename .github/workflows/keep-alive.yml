@@ -2,23 +2,74 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 8 */5 * *'  # Every 5 days at 8:00 UTC
+    - cron: '0 8 */3 * *'  # Every 3 days at 8:00 UTC
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase
+      - name: Ping Supabase REST API
+        id: ping
+        continue-on-error: true
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          echo "=== Attempt 1 ==="
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
             "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/" \
-            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
-          echo "Supabase response: $STATUS"
-          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "Supabase is alive"
+            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+          EXIT_CODE=$?
+
+          if [ "$EXIT_CODE" -eq 0 ] && [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "Supabase is alive (HTTP $STATUS)"
+            exit 0
+          fi
+
+          echo "Attempt 1 failed (exit=$EXIT_CODE, http=$STATUS)"
+
+          # Diagnose failure
+          if [ "$EXIT_CODE" -eq 6 ]; then
+            echo "::warning::DNS resolution failed — project may be paused"
+          elif [ "$EXIT_CODE" -eq 28 ]; then
+            echo "::warning::Connection timeout"
           else
-            echo "WARNING: Supabase returned $STATUS"
+            echo "::warning::HTTP $STATUS or network error (exit code $EXIT_CODE)"
+          fi
+
+          echo "=== Retry in 30s ==="
+          sleep 30
+
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
+            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/" \
+            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+          EXIT_CODE=$?
+
+          if [ "$EXIT_CODE" -eq 0 ] && [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "Supabase is alive after retry (HTTP $STATUS)"
+            exit 0
+          fi
+
+          echo "::error::REST API ping failed after retry (exit=$EXIT_CODE, http=$STATUS)"
+          exit 1
+
+      - name: Fallback — Check via Management API
+        if: steps.ping.outcome == 'failure'
+        run: |
+          echo "REST API unreachable. Checking project status via Management API..."
+          RESPONSE=$(curl -s --max-time 30 \
+            "https://api.supabase.com/v1/projects/${{ secrets.SUPABASE_PROJECT_REF }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}")
+
+          STATUS=$(echo "$RESPONSE" | grep -o '"status":"[^"]*"' | head -1)
+          echo "Project status: $STATUS"
+
+          if echo "$STATUS" | grep -q "ACTIVE_HEALTHY"; then
+            echo "Project is healthy but REST API was unreachable — transient issue"
+            exit 0
+          elif echo "$STATUS" | grep -q "INACTIVE"; then
+            echo "::error::Project is PAUSED! Restore manually: https://supabase.com/dashboard/project/${{ secrets.SUPABASE_PROJECT_REF }}"
+            exit 1
+          else
+            echo "::warning::Unexpected status: $STATUS"
+            echo "Full response: $RESPONSE"
             exit 1
           fi
