@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { createColumn } from "@/lib/supabase/queries/columns";
 
 interface Props {
   boardId: string;
@@ -20,7 +18,6 @@ export const AddColumnButton = ({
   maxColumns = MAX_COLUMNS,
   onColumnAdded
 }: Props) => {
-  const supabase = createClient();
   const [isAdding, setIsAdding] = useState(false);
   const isLimitReached = currentColumnCount >= maxColumns;
 
@@ -33,11 +30,19 @@ export const AddColumnButton = ({
     setIsAdding(true);
     try {
       // logger.log("Creating column:", { boardId, position: currentColumnCount });
-      await createColumn(supabase, {
-        board_id: boardId,
-        title: "New column",
-        position: currentColumnCount,
+      const res = await fetch('/api/columns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          board_id: boardId,
+          title: 'New column',
+          position: currentColumnCount,
+        }),
       });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create column');
+      }
       // logger.log("Column created successfully");
       onColumnAdded?.();
     } catch (error) {

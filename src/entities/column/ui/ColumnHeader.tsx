@@ -2,8 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Trash2, Check, X } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { updateColumn } from "@/lib/supabase/queries/columns";
 
 interface Props {
   columnId: string;
@@ -18,7 +16,6 @@ export const ColumnHeader = ({ columnId, title, isFirst, onColumnUpdated, onColu
   const [editedTitle, setEditedTitle] = useState(title);
   const [isDeleting, setIsDeleting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const supabase = createClient();
 
   // Update local state when title prop changes
   useEffect(() => {
@@ -55,7 +52,12 @@ export const ColumnHeader = ({ columnId, title, isFirst, onColumnUpdated, onColu
     }
 
     try {
-      await updateColumn(supabase, columnId, { title: trimmedTitle });
+      const res = await fetch(`/api/columns/${columnId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: trimmedTitle }),
+      });
+      if (!res.ok) throw new Error('Failed to update column');
       onColumnUpdated?.(columnId, trimmedTitle);
       setIsEditing(false);
     } catch (error) {

@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 
-// Force dynamic rendering - don't prerender at build time
 export const dynamic = 'force-dynamic'
 
 export default function SignupPage() {
@@ -22,25 +20,18 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName }),
       })
+      const data = await res.json()
 
-      if (error) throw error
+      if (!res.ok) throw new Error(data.error || 'Не удалось зарегистрироваться')
 
-      // Check if user was created and if email confirmation is required
       if (data.user && !data.session) {
         setError('Регистрация успешна! Пожалуйста, проверьте вашу почту для подтверждения аккаунта.')
       } else if (data.session) {
-        // Auto-login if email confirmation is disabled
         router.push('/')
         router.refresh()
       }

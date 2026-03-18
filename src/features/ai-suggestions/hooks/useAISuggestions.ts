@@ -1,9 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 import type { AISuggestion } from '@/features/task-ai-suggestions/hooks/useTaskAI'
 
 interface UseAISuggestionsOptions {
@@ -29,25 +26,20 @@ export function useAISuggestions({ taskId, enabled = true }: UseAISuggestionsOpt
       setLoading(true)
       setError(null)
 
-      const { data, error } = await supabase
-        .from('ai_suggestions')
-        .select('*')
-        .eq('task_id', taskId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (error) {
-        setError(error)
-      } else if (data) {
-        // Convert DB format to AISuggestion format
-        const suggestion: AISuggestion = {
-          improvedTitle: data.improved_title || '',
-          description: data.description,
-          acceptanceCriteria: data.acceptance_criteria || [],
-          risks: data.risks || []
+      try {
+        const res = await fetch(`/api/ai-suggestions?taskId=${taskId}`)
+        if (!res.ok) throw new Error('Failed to load suggestions')
+        const result = await res.json()
+        if (result) {
+          setSuggestions({
+            improvedTitle: result.improved_title || '',
+            description: result.description,
+            acceptanceCriteria: result.acceptance_criteria || [],
+            risks: result.risks || [],
+          })
         }
-        setSuggestions(suggestion)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to load suggestions'))
       }
 
       setLoading(false)

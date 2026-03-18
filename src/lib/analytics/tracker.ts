@@ -1,5 +1,3 @@
-import { createClient } from '@/lib/supabase/client'
-
 /**
  * Analytics tracking utility
  */
@@ -24,15 +22,13 @@ export interface AIUsageEvent {
  */
 export async function trackEvent(eventType: string, properties: Record<string, any> = {}) {
   try {
-    const supabase = createClient()
-
-    await supabase.rpc('track_analytics_event', {
-      p_event_type: eventType,
-      p_properties: properties
+    await fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventType, properties }),
     })
   } catch (error) {
     console.error('Failed to track analytics event:', error)
-    // Don't throw - analytics failures shouldn't break the app
   }
 }
 
@@ -41,20 +37,21 @@ export async function trackEvent(eventType: string, properties: Record<string, a
  */
 export async function trackAIUsage(aiUsage: AIUsageEvent) {
   try {
-    const supabase = createClient()
-
-    await supabase.rpc('track_ai_usage', {
-      p_model: aiUsage.model,
-      p_operation: aiUsage.operation,
-      p_input_tokens: aiUsage.inputTokens || 0,
-      p_output_tokens: aiUsage.outputTokens || 0,
-      p_cost_usd: aiUsage.costUsd || 0,
-      p_board_id: aiUsage.boardId || null,
-      p_metadata: aiUsage.metadata || {}
+    await fetch('/api/analytics/ai-usage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: aiUsage.model,
+        operation: aiUsage.operation,
+        inputTokens: aiUsage.inputTokens || 0,
+        outputTokens: aiUsage.outputTokens || 0,
+        costUsd: aiUsage.costUsd || 0,
+        boardId: aiUsage.boardId || null,
+        metadata: aiUsage.metadata || {},
+      }),
     })
   } catch (error) {
     console.error('Failed to track AI usage:', error)
-    // Don't throw - analytics failures shouldn't break the app
   }
 }
 

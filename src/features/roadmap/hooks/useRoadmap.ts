@@ -1,9 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 
 interface UseRoadmapOptions {
   boardId: string | null
@@ -35,26 +32,18 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
     }
 
     const fetchRoadmap = async () => {
-      // logger.log('📋 Roadmap: loading for boardId:', boardId)
       setLoading(true)
       setError(null)
 
-      const { data, error } = await supabase
-        .from('roadmaps')
-        .select('content')
-        .eq('board_id', boardId)
-        .maybeSingle()
-
-      // logger.log('📋 Roadmap: load result:', { data, error })
-
-      if (error) {
-        // logger.error('❌ Roadmap: load error:', error)
-        setError(error)
-      } else {
+      try {
+        const res = await fetch(`/api/roadmaps/${boardId}`)
+        if (!res.ok) throw new Error('Failed to load roadmap')
+        const data = await res.json()
         const roadmapContent = data?.content || ''
         setContent(roadmapContent)
         setHasContent(!!roadmapContent)
-        // logger.log('✅ Roadmap: loaded, content length:', roadmapContent.length)
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to load roadmap'))
       }
 
       setLoading(false)
@@ -66,31 +55,22 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
   // Save roadmap with debounce
   const saveRoadmap = useCallback(async (newContent: string) => {
     if (!boardId) {
-      // logger.log('📋 Roadmap: skip save (no boardId)')
       return
     }
 
-    // logger.log('💾 Roadmap: saving for boardId:', boardId, 'content length:', newContent.length)
     setSaving(true)
     setError(null)
 
-    const { error, data } = await supabase
-      .from('roadmaps')
-      .upsert(
-        { board_id: boardId, content: newContent },
-        { onConflict: 'board_id' }
-      )
+    try {
+      const res = await fetch(`/api/roadmaps/${boardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newContent }),
+      })
+      if (!res.ok) throw new Error('Failed to save roadmap')
 
-    // logger.log('📋 Roadmap: save result:', { error, data })
-
-    if (error) {
-      // logger.error('❌ Roadmap: save error:', error)
-      setError(error)
-    } else {
-      // logger.log('✅ Roadmap: saved successfully')
       setHasContent(!!newContent)
 
-      // Show saved status for 2 seconds
       setShowSavedStatus(true)
       if (savedStatusTimeoutRef.current) {
         clearTimeout(savedStatusTimeoutRef.current)
@@ -98,6 +78,8 @@ export function useRoadmap({ boardId, enabled = true }: UseRoadmapOptions) {
       savedStatusTimeoutRef.current = setTimeout(() => {
         setShowSavedStatus(false)
       }, 2000)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to save roadmap'))
     }
 
     setSaving(false)

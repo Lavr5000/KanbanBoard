@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 
-// Force dynamic rendering - don't prerender at build time
 export const dynamic = 'force-dynamic'
 
 export default function ForgotPasswordPage() {
@@ -19,12 +17,17 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+        }),
       })
+      const data = await res.json()
 
-      if (error) throw error
+      if (!res.ok) throw new Error(data.error || 'Не удалось отправить письмо')
 
       setSuccess(true)
     } catch (err) {

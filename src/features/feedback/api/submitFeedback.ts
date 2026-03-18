@@ -1,55 +1,18 @@
-import { createClient } from "@/lib/supabase/client";
 import type { SubmitFeedbackData } from "../model/types";
-
-const UPLOAD_BUCKET = "suggestions-screenshots";
 
 export async function submitFeedback({
   category,
   content,
   screenshot,
 }: SubmitFeedbackData) {
-  const supabase = createClient();
+  const formData = new FormData();
+  formData.append("category", category);
+  formData.append("content", content);
+  if (screenshot) formData.append("screenshot", screenshot);
 
-  // Get current user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user?.email) {
-    throw new Error("Необходимо авторизоваться");
+  const res = await fetch("/api/feedback", { method: "POST", body: formData });
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error || "Failed to submit feedback");
   }
-
-  let screenshotUrl: string | null = null;
-
-  // Upload screenshot if provided
-  if (screenshot) {
-    const fileExt = screenshot.name.split(".").pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(UPLOAD_BUCKET)
-      .upload(fileName, screenshot);
-
-    if (uploadError) {
-      console.error("Screenshot upload failed:", uploadError);
-      // Continue without screenshot if upload fails
-    } else {
-      // Create signed URL valid for 7 days (private bucket)
-      const { data } = await supabase.storage
-        .from(UPLOAD_BUCKET)
-        .createSignedUrl(fileName, 60 * 60 * 24 * 7); // 7 days
-
-      if (data?.signedUrl) {
-        screenshotUrl = data.signedUrl;
-      }
-    }
-  }
-
-  // Save suggestion
-  const { error } = await supabase.from("suggestions").insert({
-    user_id: user.id,
-    user_email: user.email,
-    category,
-    content,
-    screenshot_url: screenshotUrl,
-  });
-
-  if (error) throw error;
 }

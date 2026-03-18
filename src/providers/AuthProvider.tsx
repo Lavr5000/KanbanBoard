@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { User } from '@supabase/supabase-js'
 
 type AuthContextType = {
@@ -14,55 +14,35 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const fetchSession = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/session')
+      const data = await res.json()
+      setUser(data.user ?? null)
+    } catch {
+      setUser(null)
+    }
+  }, [])
 
   useEffect(() => {
     console.log('[AuthProvider] Starting initialization...')
 
-    // Immediately set loading to false to prevent hanging
-    const timer = setTimeout(() => {
-      console.log('[AuthProvider] Loading complete (timeout fallback)')
-      setLoading(false)
-    }, 100)
-
-    // Try to load Supabase auth dynamically
-    import('@/lib/supabase/client').then(({ createClient }) => {
-      console.log('[AuthProvider] Supabase client loaded')
-
-      clearTimeout(timer)
-
-      const supabase = createClient()
-
-      // Get session with timeout
-      supabase.auth.getSession()
-        .then(({ data: { session } }) => {
-          console.log('[AuthProvider] Session loaded:', session?.user?.id || 'no user')
-          setUser(session?.user ?? null)
-          setLoading(false)
-        })
-        .catch((error) => {
-          console.error('[AuthProvider] Error getting session:', error)
-          setLoading(false)
-        })
-
-      // Listen for auth changes
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        console.log('[AuthProvider] Auth state changed:', _event, session?.user?.id)
-        setUser(session?.user ?? null)
-      })
-
-      return () => subscription.unsubscribe()
-    })
-    .catch((error) => {
-      console.error('[AuthProvider] Error loading Supabase:', error)
-      clearTimeout(timer)
+    fetchSession().then(() => {
+      console.log('[AuthProvider] Session loaded')
       setLoading(false)
     })
-  }, [])
+
+    intervalRef.current = setInterval(fetchSession, 30_000)
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [fetchSession])
 
   const signOut = async () => {
-    const { createClient } = await import('@/lib/supabase/client')
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await fetch('/api/auth/logout', { method: 'POST' })
     setUser(null)
   }
 

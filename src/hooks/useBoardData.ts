@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import type { Task, Column, Board } from '@/lib/supabase/types'
 import { useAuth } from '@/providers/AuthProvider'
 import { trackTaskCreated, trackTaskMoved, trackTaskDeleted, trackTaskUpdated } from '@/lib/analytics/tracker'
@@ -27,13 +26,23 @@ interface UseBoardDataReturn {
   refetchColumns: () => Promise<void>
 }
 
+const ACTIVE_BOARD_KEY = 'activeBoardId'
+
+async function fetchBoardData(boardId: string) {
+  const res = await fetch(`/api/boards/${boardId}/data`)
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(err.error || 'Failed to load board data')
+  }
+  return res.json() as Promise<{ board: Board; columns: Column[]; tasks: Task[] }>
+}
+
 /**
- * Custom hook for board data with Supabase integration
- * Handles data loading, real-time subscriptions, and mutations
+ * Custom hook for board data with API route integration
+ * Handles data loading, polling, and mutations
  */
 export function useBoardData(boardId?: string): UseBoardDataReturn {
   const { user, loading: authLoading } = useAuth()
-  const supabase = createClient()
 
   const [board, setBoard] = useState<Board | null>(null)
   const [columns, setColumns] = useState<Column[]>([])
@@ -41,143 +50,90 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  // Optimistic state (for instant UI updates before server confirms)
   const [optimisticTasks, setOptimisticTasks] = useState<Task[]>([])
   const [optimisticColumns, setOptimisticColumns] = useState<Column[]>([])
 
-  // Refetch function for columns
-  const refetchColumns = async () => {
-    if (!board) return
-    const { data, error } = await supabase
-      .from('columns')
-      .select('*')
-      .eq('board_id', board.id)
-      .order('position', { ascending: true })
+  const boardRef = useRef<Board | null>(null)
+  boardRef.current = board
 
-    if (!error && data) {
-      setColumns(data)
-      setOptimisticColumns(data)
+  const refetchColumns = useCallback(async () => {
+    const currentBoard = boardRef.current
+    if (!currentBoard) return
+    try {
+      const data = await fetchBoardData(currentBoard.id)
+      setColumns(data.columns)
+      setOptimisticColumns(data.columns)
+      setTasks(data.tasks)
+      setOptimisticTasks(data.tasks)
+    } catch {
+      // Silently ignore polling errors
     }
-  }
+  }, [])
 
   // Load initial data
   useEffect(() => {
-    // Wait for auth to complete before loading data
     if (authLoading || !user) return
 
     async function loadData() {
       try {
         setLoading(true)
 
-        // SECURITY NOTE: Active board ID is stored in localStorage for UX.
-        // This is low-risk (board IDs are validated via RLS), but be aware:
-        // - localStorage is accessible via XSS attacks
-        // - Board IDs alone don't expose user data (RLS protects access)
-        const ACTIVE_BOARD_KEY = 'activeBoardId'
-        let targetBoardId = boardId || (typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_BOARD_KEY) : null)
-
-        // Get the board to load
-        let boardToLoad: Board | null = null
+        const targetBoardId = boardId || (typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_BOARD_KEY) : null)
+        let loadedBoard: Board | null = null
 
         if (targetBoardId) {
-          // Load specific board
-          const { data: targetBoard, error: targetError } = await supabase
-            .from('boards')
-            .select('*')
-            .eq('id', targetBoardId)
-            .single()
-
-          if (!targetError && targetBoard) {
-            boardToLoad = targetBoard
-          }
-        }
-
-        // If no board found, get user's first board (or create one)
-        if (!boardToLoad) {
-          let { data: boards, error: boardsError } = await supabase
-            .from('boards')
-            .select('*')
-            .order('created_at', { ascending: true })
-            .limit(1)
-
-          if (boardsError) throw boardsError
-
-          // Create default board if none exists
-          if (!boards || boards.length === 0) {
-            if (!user) return // Extra safety check for TypeScript
-
-            const { data: newBoard, error: createError } = await supabase
-              .from('boards')
-              .insert({
-                user_id: user.id,
-                name: 'My Kanban Board',
-                description: 'Default board'
-              })
-              .select()
-              .single()
-
-            if (createError) throw createError
-            boardToLoad = newBoard
-
-            // Save to localStorage
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(ACTIVE_BOARD_KEY, newBoard.id)
-            }
-
-            // Create default columns for new board
-            const defaultColumns = [
-              { board_id: newBoard.id, title: 'Новая задача', position: 0 },
-              { board_id: newBoard.id, title: 'Выполняется', position: 1 },
-              { board_id: newBoard.id, title: 'На тестировании', position: 2 },
-              { board_id: newBoard.id, title: 'Выполнено', position: 3 },
-            ]
-
-            const { data: newColumns, error: columnsError } = await supabase
-              .from('columns')
-              .insert(defaultColumns)
-              .select()
-
-            if (columnsError) throw columnsError
-            setBoard(newBoard)
-            setColumns(newColumns || [])
-            setTasks([])
-            setOptimisticTasks([])
-            setOptimisticColumns(newColumns || [])
+          try {
+            const data = await fetchBoardData(targetBoardId)
+            loadedBoard = data.board
+            setBoard(data.board)
+            setColumns(data.columns)
+            setTasks(data.tasks)
+            setOptimisticTasks(data.tasks)
+            setOptimisticColumns(data.columns)
             setLoading(false)
             return
-          } else {
-            boardToLoad = boards[0]
-            // Save to localStorage
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(ACTIVE_BOARD_KEY, boards[0].id)
-            }
+          } catch {
+            // Board not found or error, fall through
           }
         }
 
-        setBoard(boardToLoad)
+        // Get user's first board or create one
+        const boardsRes = await fetch('/api/boards')
+        if (!boardsRes.ok) throw new Error('Failed to load boards')
+        const boards: Board[] = await boardsRes.json()
 
-        // Load columns
-        const { data: columnsData, error: columnsError } = await supabase
-          .from('columns')
-          .select('*')
-          .eq('board_id', boardToLoad!.id)
-          .order('position', { ascending: true })
+        if (boards.length === 0) {
+          const createRes = await fetch('/api/boards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'My Kanban Board' }),
+          })
+          if (!createRes.ok) throw new Error('Failed to create board')
+          const newBoard: Board = await createRes.json()
 
-        if (columnsError) throw columnsError
-        setColumns(columnsData || [])
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(ACTIVE_BOARD_KEY, newBoard.id)
+          }
 
-        // Load tasks
-        const { data: tasksData, error: tasksError } = await supabase
-          .from('tasks')
-          .select('*')
-          .eq('board_id', boardToLoad!.id)
-          .order('position', { ascending: true })
+          const data = await fetchBoardData(newBoard.id)
+          setBoard(data.board)
+          setColumns(data.columns)
+          setTasks(data.tasks)
+          setOptimisticTasks(data.tasks)
+          setOptimisticColumns(data.columns)
+        } else {
+          loadedBoard = boards[0]
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(ACTIVE_BOARD_KEY, boards[0].id)
+          }
 
-        if (tasksError) throw tasksError
-        setTasks(tasksData || [])
-
-        setOptimisticTasks(tasksData || [])
-        setOptimisticColumns(columnsData || [])
+          const data = await fetchBoardData(boards[0].id)
+          setBoard(data.board)
+          setColumns(data.columns)
+          setTasks(data.tasks)
+          setOptimisticTasks(data.tasks)
+          setOptimisticColumns(data.columns)
+        }
       } catch (err) {
         console.error('Error loading board data:', err)
         setError(err as Error)
@@ -189,64 +145,23 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     loadData()
   }, [user, authLoading, boardId])
 
-  // Real-time subscriptions
+  // Polling every 10 seconds
   useEffect(() => {
     if (!board) return
 
-    // Subscribe to tasks changes
-    const tasksSubscription = supabase
-      .channel(`board-${board.id}-tasks`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'tasks',
-          filter: `board_id=eq.${board.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setTasks((prev) => [...prev, payload.new as Task])
-          } else if (payload.eventType === 'UPDATE') {
-            setTasks((prev) =>
-              prev.map((t) => (t.id === payload.new.id ? (payload.new as Task) : t))
-            )
-          } else if (payload.eventType === 'DELETE') {
-            setTasks((prev) => prev.filter((t) => t.id !== payload.old.id))
-          }
-        }
-      )
-      .subscribe()
+    const interval = setInterval(async () => {
+      try {
+        const data = await fetchBoardData(board.id)
+        setColumns(data.columns)
+        setTasks(data.tasks)
+        setOptimisticTasks(data.tasks)
+        setOptimisticColumns(data.columns)
+      } catch {
+        // Silently ignore polling errors
+      }
+    }, 10000)
 
-    // Subscribe to columns changes
-    const columnsSubscription = supabase
-      .channel(`board-${board.id}-columns`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'columns',
-          filter: `board_id=eq.${board.id}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setColumns((prev) => [...prev, payload.new as Column])
-          } else if (payload.eventType === 'UPDATE') {
-            setColumns((prev) =>
-              prev.map((c) => (c.id === payload.new.id ? (payload.new as Column) : c))
-            )
-          } else if (payload.eventType === 'DELETE') {
-            setColumns((prev) => prev.filter((c) => c.id !== payload.old.id))
-          }
-        }
-      )
-      .subscribe()
-
-    return () => {
-      tasksSubscription.unsubscribe()
-      columnsSubscription.unsubscribe()
-    }
+    return () => clearInterval(interval)
   }, [board])
 
   // Mutations
@@ -256,27 +171,27 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert({
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           board_id: board.id,
           column_id: columnId,
           title: taskData.title || '',
           description: taskData.description || '',
-          priority: (taskData.priority as any) || 'medium',
-          position: tasks.filter((t) => t.column_id === columnId).length,
-        })
-        .select()
-        .single()
+          priority: (taskData.priority as string) || 'medium',
+        }),
+      })
 
-      if (error) {
-        throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to create task')
       }
 
-      // Track analytics event
+      const data: Task = await res.json()
+
       await trackTaskCreated(data.id, columnId, board.id)
 
-      // Optimistic update - update UI immediately
       setTasks((prev) => [...prev, data])
     } catch (err) {
       console.error('Error adding task:', err)
@@ -285,10 +200,8 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
   }
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
-    // Save current state for rollback
     const previousTasks = tasks
 
-    // Optimistic update - update UI immediately
     setTasks((prev) =>
       prev.map((t) =>
         t.id === taskId ? { ...t, ...updates } : t
@@ -296,49 +209,47 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     )
 
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .update(updates)
-        .eq('id', taskId)
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to update task')
+      }
 
-      // Track analytics event
       const updatedFields = Object.keys(updates)
       await trackTaskUpdated(taskId, updatedFields)
     } catch (err) {
       console.error('Error updating task:', err)
-      // Rollback optimistic update
       setTasks(previousTasks)
       throw err
     }
   }
 
   const deleteTask = async (taskId: string) => {
-    // Save current state for rollback
     const previousTasks = tasks
-
-    // Get task data before deleting for analytics
     const taskToDelete = tasks.find(t => t.id === taskId)
 
-    // Optimistic update - remove from UI immediately
     setTasks((prev) => prev.filter((t) => t.id !== taskId))
 
     try {
-      const { error } = await supabase
-        .from('tasks')
-        .delete()
-        .eq('id', taskId)
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to delete task')
+      }
 
-      // Track analytics event
       if (taskToDelete) {
         await trackTaskDeleted(taskId, taskToDelete.column_id)
       }
     } catch (err) {
       console.error('Error deleting task:', err)
-      // Rollback optimistic update
       setTasks(previousTasks)
       throw err
     }
@@ -349,14 +260,10 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     newColumnId: string,
     newPosition: number
   ) => {
-    // Save current state for rollback
     const previousTasks = tasks
-
-    // Get old column_id for analytics
     const taskToMove = tasks.find(t => t.id === taskId)
     const oldColumnId = taskToMove?.column_id
 
-    // Optimistic update - update UI immediately
     setTasks((prev) => {
       const updated = prev.map((t) =>
         t.id === taskId
@@ -367,35 +274,32 @@ export function useBoardData(boardId?: string): UseBoardDataReturn {
     })
 
     try {
-      const { error, data } = await supabase
-        .from('tasks')
-        .update({
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           column_id: newColumnId,
           position: newPosition,
-        })
-        .eq('id', taskId)
-        .select()
+        }),
+      })
 
-      if (error) {
-        throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to move task')
       }
 
-      // Track analytics event
+      const data: Task = await res.json()
+
       if (oldColumnId && oldColumnId !== newColumnId) {
         await trackTaskMoved(taskId, oldColumnId, newColumnId)
       }
 
-      // Manually update state with confirmed data from Supabase
-      // This ensures all useBoardData() calls see the update
-      if (data && data.length > 0) {
-        setTasks((prev) => {
-          const updated = prev.map((t) => (t.id === taskId ? data[0] : t))
-          return updated
-        })
-      }
+      setTasks((prev) => {
+        const updated = prev.map((t) => (t.id === taskId ? data : t))
+        return updated
+      })
     } catch (err) {
       console.error('Error moving task:', err)
-      // Rollback optimistic update
       setTasks(previousTasks)
       throw err
     }

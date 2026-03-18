@@ -1,9 +1,6 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 
 export interface AISuggestion {
   improvedTitle: string
@@ -80,20 +77,17 @@ export function useTaskAI(options: UseTaskAIOptions = {}) {
 
         // Auto-save to database if taskId is provided
         if (taskId) {
-          supabase
-            .from('ai_suggestions')
-            .insert({
-              task_id: taskId,
-              improved_title: data.improvedTitle,
+          fetch('/api/ai-suggestions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              taskId,
+              improvedTitle: data.improvedTitle,
               description: data.description,
-              acceptance_criteria: data.acceptanceCriteria,
+              acceptanceCriteria: data.acceptanceCriteria,
               risks: data.risks,
-            })
-            .then(({ error }) => {
-              if (error) {
-                console.error('Failed to save AI suggestions:', error)
-              }
-            })
+            }),
+          }).catch(err => console.error('Failed to save AI suggestions:', err))
         }
 
         startHideTimer()

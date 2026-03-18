@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { AuthDebug } from '@/app/admin/debug/AuthDebug'
 
 export default function AdminDebugPage() {
@@ -13,18 +12,12 @@ export default function AdminDebugPage() {
 
   useEffect(() => {
     async function debugAdminAccess() {
-      const supabase = createClient()
-
       try {
-        setStatus({ step: '1. Checking Supabase connection...' })
-        const { data: { session }, error: authError } = await supabase.auth.getSession()
+        setStatus({ step: '1. Checking auth session...' })
+        const res = await fetch('/api/auth/session')
+        const { user } = await res.json()
 
-        if (authError) {
-          setStatus({ step: 'Auth Error', error: authError.message })
-          return
-        }
-
-        if (!session) {
+        if (!user) {
           setStatus({ step: '2. No session found', error: 'Please login first' })
           return
         }
@@ -32,43 +25,19 @@ export default function AdminDebugPage() {
         setStatus({
           step: '2. Session found',
           data: {
-            userId: session.user.id,
-            email: session.user.email
+            userId: user.id,
+            email: user.email
           }
         })
 
-        setStatus({ step: '3. Checking user profile in public.users...' })
-        const { data: userProfile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        if (profileError) {
-          setStatus({
-            step: '3. Profile Error',
-            error: profileError.message,
-            data: { code: profileError.code, details: profileError.details, hint: profileError.hint }
-          })
-          return
-        }
-
         setStatus({
-          step: '4. User profile found',
-          data: userProfile
+          step: '3. User info from session',
+          data: user
         })
 
-        if (userProfile.role !== 'admin') {
-          setStatus({
-            step: '5. Access Denied',
-            error: `User role is '${userProfile.role}', expected 'admin'`
-          })
-          return
-        }
-
         setStatus({
-          step: '✅ SUCCESS - User has admin access',
-          data: userProfile
+          step: '4. Debug page loaded (admin check requires server API routes)',
+          data: { userId: user.id, email: user.email }
         })
 
       } catch (error: any) {
@@ -91,7 +60,7 @@ export default function AdminDebugPage() {
           <h2 className="text-xl font-semibold text-white mb-4">Diagnostic Steps</h2>
           <div className="space-y-2">
             <div className={`p-3 rounded-lg ${
-              status.step.includes('✅') ? 'bg-green-500/20 text-green-400' :
+              status.step.includes('4.') ? 'bg-green-500/20 text-green-400' :
               status.error ? 'bg-red-500/20 text-red-400' :
               'bg-blue-500/20 text-blue-400'
             }`}>

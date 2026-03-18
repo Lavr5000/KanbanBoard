@@ -50,23 +50,13 @@ vi.mock('@dnd-kit/utilities', () => ({
   },
 }))
 
-// Mock Supabase client
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: vi.fn(() => ({ data: null, error: null })),
-          order: vi.fn(() => ({ data: [], error: null })),
-        })),
-        order: vi.fn(() => ({
-          data: [],
-          error: null,
-        })),
-      })),
-    })),
-  })),
-}))
+// Mock global fetch for API routes
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+  } as Response)
+)
 
 // Mock useAISuggestions hook
 vi.mock('@/features/ai-suggestions/hooks/useAISuggestions', () => ({

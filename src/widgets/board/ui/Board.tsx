@@ -30,8 +30,6 @@ import { OnboardingTour, useOnboarding } from "@/features/onboarding";
 import { MobileBoard } from "@/widgets/mobile-board";
 import { Bell, Search, LogOut, Filter, Calendar } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
-import { deleteColumn } from "@/lib/supabase/queries/columns";
 import { useIsMobile } from "@/shared/lib/useMediaQuery";
 import { BoardBackground } from "./BoardBackground";
 
@@ -72,8 +70,6 @@ export const Board = () => {
   const { user, signOut } = useAuth();
   const { activeBoard } = useBoards();
   const boardName = activeBoard?.name || 'Проект';
-  const supabase = createClient();
-
   // Mobile detection
   const isMobile = useIsMobile();
 
@@ -371,7 +367,7 @@ export const Board = () => {
       }
 
       // Delete the column
-      await deleteColumn(supabase, columnId);
+      await fetch(`/api/columns/${columnId}`, { method: 'DELETE' });
       // logger.log('Column deleted:', columnId);
 
       // Refetch columns to update UI

@@ -3,9 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 
-// Force dynamic rendering - don't prerender at build time
 export const dynamic = 'force-dynamic'
 
 export default function ResetPasswordPage() {
@@ -27,10 +25,14 @@ export default function ResetPasswordPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      const { error } = await supabase.auth.updateUser({ password })
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      const data = await res.json()
 
-      if (error) throw error
+      if (!res.ok) throw new Error(data.error || 'Не удалось обновить пароль')
 
       router.push('/')
       router.refresh()

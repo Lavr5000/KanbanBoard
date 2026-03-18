@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import type { Board } from '@/lib/supabase/types'
 import { useAuth } from '@/providers/AuthProvider'
 
@@ -25,16 +24,14 @@ interface UseBoardsReturn {
  */
 export function useBoards(): UseBoardsReturn {
   const { user, loading: authLoading } = useAuth()
-  const supabase = createClient()
 
   const [boards, setBoards] = useState<Board[]>([])
   const [activeBoardId, setActiveBoardId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  // Load boards and active board from localStorage
+  // Load boards
   useEffect(() => {
-    // Wait for auth to complete before loading boards
     if (authLoading || !user) return
 
     async function loadBoards() {
@@ -42,23 +39,20 @@ export function useBoards(): UseBoardsReturn {
         setLoading(true)
         setError(null)
 
-        // Load all user's boards
-        const { data: boardsData, error: boardsError } = await supabase
-          .from('boards')
-          .select('*')
-          .order('created_at', { ascending: true })
+        const res = await fetch('/api/boards')
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || 'Failed to load boards')
+        }
 
-        if (boardsError) throw boardsError
+        const boardsData: Board[] = await res.json()
+        setBoards(boardsData)
 
-        setBoards(boardsData || [])
-
-        // Get active board from localStorage (client-side only)
         const savedBoardId = typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_BOARD_KEY) : null
 
-        if (savedBoardId && boardsData?.some(b => b.id === savedBoardId)) {
+        if (savedBoardId && boardsData.some(b => b.id === savedBoardId)) {
           setActiveBoardId(savedBoardId)
-        } else if (boardsData && boardsData.length > 0) {
-          // Fallback to first board
+        } else if (boardsData.length > 0) {
           setActiveBoardId(boardsData[0].id)
           if (typeof window !== 'undefined') {
             localStorage.setItem(ACTIVE_BOARD_KEY, boardsData[0].id)
@@ -75,41 +69,24 @@ export function useBoards(): UseBoardsReturn {
     loadBoards()
   }, [user, authLoading])
 
-  // Real-time subscription for boards changes
+  // Polling every 30 seconds
   useEffect(() => {
-    // Wait for auth to complete before subscribing
     if (authLoading || !user) return
 
-    const subscription = supabase
-      .channel('boards-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'boards',
-          filter: `user_id=eq.${user.id}`,
-        },
-        (payload) => {
-          // logger.log('Board change:', payload)
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/boards')
+        if (!res.ok) return
+        const boardsData: Board[] = await res.json()
+        setBoards(boardsData)
+      } catch {
+        // Silently ignore polling errors
+      }
+    }, 30000)
 
-          if (payload.eventType === 'INSERT') {
-            setBoards((prev) => [...prev, payload.new as Board])
-          } else if (payload.eventType === 'UPDATE') {
-            setBoards((prev) =>
-              prev.map((b) => (b.id === payload.new.id ? (payload.new as Board) : b))
-            )
-          }
-        }
-      )
-      .subscribe()
+    return () => clearInterval(interval)
+  }, [user, authLoading])
 
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [user, supabase, authLoading])
-
-  // Switch active board
   const switchBoard = useCallback((boardId: string) => {
     setActiveBoardId(boardId)
     if (typeof window !== 'undefined') {
@@ -117,71 +94,64 @@ export function useBoards(): UseBoardsReturn {
     }
   }, [])
 
-  // Create new board with default columns
   const createBoard = useCallback(async (name: string): Promise<Board> => {
     if (!user) throw new Error('User not authenticated')
 
     try {
-      // Create board
-      const { data: newBoard, error: boardError } = await supabase
-        .from('boards')
-        .insert({
-          user_id: user.id,
-          name: name.trim(),
-        })
-        .select()
-        .single()
+      const res = await fetch('/api/boards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() }),
+      })
 
-      if (boardError) throw boardError
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to create board')
+      }
 
-      // Create default columns
-      const defaultColumns = [
-        { board_id: newBoard.id, title: 'Новая задача', position: 0 },
-        { board_id: newBoard.id, title: 'Выполняется', position: 1 },
-        { board_id: newBoard.id, title: 'На тестировании', position: 2 },
-        { board_id: newBoard.id, title: 'Выполнено', position: 3 },
-      ]
-
-      const { error: columnsError } = await supabase
-        .from('columns')
-        .insert(defaultColumns)
-
-      if (columnsError) throw columnsError
-
+      const newBoard: Board = await res.json()
+      setBoards((prev) => [...prev, newBoard])
       return newBoard
     } catch (err) {
       console.error('Error creating board:', err)
       throw err
     }
-  }, [user, supabase])
+  }, [user])
 
-  // Update board name
   const updateBoard = useCallback(async (boardId: string, name: string) => {
     try {
-      const { error } = await supabase
-        .from('boards')
-        .update({ name: name.trim() })
-        .eq('id', boardId)
+      const res = await fetch(`/api/boards/${boardId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim() }),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to update board')
+      }
+
+      const updated: Board = await res.json()
+      setBoards((prev) => prev.map((b) => (b.id === boardId ? updated : b)))
     } catch (err) {
       console.error('Error updating board:', err)
       throw err
     }
-  }, [supabase])
+  }, [])
 
-  // Delete board
   const deleteBoard = useCallback(async (boardId: string) => {
     try {
-      // Delete board (cascade will delete columns and tasks)
-      const { error } = await supabase
-        .from('boards')
-        .delete()
-        .eq('id', boardId)
+      const res = await fetch(`/api/boards/${boardId}`, {
+        method: 'DELETE',
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to delete board')
+      }
 
-      // If deleted board was active, switch to another board
+      setBoards((prev) => prev.filter((b) => b.id !== boardId))
+
       if (boardId === activeBoardId) {
         const remainingBoards = boards.filter(b => b.id !== boardId)
         if (remainingBoards.length > 0) {
@@ -197,9 +167,8 @@ export function useBoards(): UseBoardsReturn {
       console.error('Error deleting board:', err)
       throw err
     }
-  }, [supabase, activeBoardId, boards, switchBoard])
+  }, [activeBoardId, boards, switchBoard])
 
-  // Find active board
   const activeBoard = boards.find(b => b.id === activeBoardId) || null
 
   return {
