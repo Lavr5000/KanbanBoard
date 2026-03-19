@@ -159,10 +159,10 @@ export const TaskCard = ({
                     }
                   }}
                   disabled={loading}
-                  className="text-gray-500 hover:text-purple-400 transition-colors p-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-gray-500 hover:text-purple-400 transition-colors p-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Get AI suggestions"
                 >
-                  <Sparkles size={14} />
+                  <Sparkles size={16} />
                 </button>
               )
             )}
@@ -172,15 +172,15 @@ export const TaskCard = ({
                 e.stopPropagation();
                 onDeleteTrigger?.(task.id);
               }}
-              className="text-gray-500 hover:text-red-500 transition-colors p-1"
+              className="text-gray-500 hover:text-red-500 transition-colors p-2"
             >
-              <Trash2 size={14} />
+              <Trash2 size={16} />
             </button>
             <button
               className="text-gray-500 hover:text-white pointer-events-none"
               onPointerDownCapture={(e) => e.stopPropagation()}
             >
-              <MoreVertical size={16} />
+              <MoreVertical size={18} />
             </button>
           </div>
         </div>

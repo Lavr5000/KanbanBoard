@@ -108,7 +108,7 @@ export function MobileBoard({
       {/* Mobile Onboarding */}
       <MobileOnboarding />
 
-      <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-16">
+      <div className="flex flex-col w-full min-h-screen bg-[#121218] pb-20">
       {/* Header */}
       <header className="sticky top-0 bg-[#121218]/90 backdrop-blur-sm z-20 border-b border-gray-800">
         <div className="px-4 py-3 flex items-center justify-between">

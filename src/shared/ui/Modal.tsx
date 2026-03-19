@@ -35,7 +35,7 @@ export const Modal = ({
       style={{ zIndex: 99999 }}
       onClick={handleOverlayClick}
     >
-      <div className="bg-[#1c1c24] border border-gray-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-[#1c1c24] border border-gray-800 w-full sm:max-w-md rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-800 flex-shrink-0">
           <h3 className="text-white font-semibold text-lg">{title}</h3>
           <button

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   boardId: string;
@@ -47,7 +48,7 @@ export const AddColumnButton = ({
       onColumnAdded?.();
     } catch (error) {
       // logger.error("Failed to create column:", error);
-      alert("Failed to create column: " + (error as Error).message);
+      toast.error("Не удалось создать колонку: " + (error as Error).message);
     } finally {
       setIsAdding(false);
     }

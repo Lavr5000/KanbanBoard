@@ -1,292 +1,66 @@
-# План реализации: AI Roadmap Generation
+# Kanban Board: Responsive Audit + UX/UI Improvements
 
-**Дата:** 2025-01-01
+**Дата:** 2026-03-19
 **Статус:** ✅ Завершено
 
-## Описание
+---
 
-Добавить возможность генерации дорожной карты через диалог с AI. Пользователь озвучивает идею, AI задаёт уточняющие вопросы с вариантами ответов, в итоге создаётся структурированная roadmap с нумерованным списком задач. Затем можно создать первые 5 задач одной кнопкой.
+## Часть 1: Responsive Fixes
 
-**Дизайн документ:** [docs/plans/2025-01-01-ai-roadmap-generation-design.md](../docs/plans/2025-01-01-ai-roadmap-generation-design.md)
+- [x] **1.1** Auth pages — mobile padding (`p-4 sm:p-8`, `px-4` на контейнер)
+- [x] **1.2** BottomNavigation — safe area (`pb-[env(safe-area-inset-bottom,0px)]`)
+- [x] **1.3** MobileBoard — dynamic bottom padding (`pb-16` → `pb-20`)
+- [x] **1.4** TaskCard — touch targets (`p-1` → `p-2`, icons 14→16/18px)
+- [x] **1.5** Board header — responsive padding (`px-10` → `px-4 lg:px-10`)
+- [x] **1.6** Board search + progress bar (`w-64` → `w-48 lg:w-64`, `w-32` → `w-24 lg:w-32`)
+- [x] **1.7** Column width (`w-[300px]` → `w-[280px] lg:w-[300px]`)
+- [x] **1.8** Modal — mobile fullscreen (`max-w-md` → `sm:max-w-md`)
+
+## Часть 2: UX/UI Improvements
+
+- [x] **2.1** Empty states для колонок — `EmptyColumnState.tsx`
+- [x] **2.2** Loading skeleton → spinner + русский текст "Загрузка данных доски..."
+- [x] **2.3** Toast notification system — `sonner` установлен, все `alert()` заменены
+- [x] **2.4** prefers-reduced-motion — отключает animations
+- [x] **2.5** Локализация loading/error текстов → русский
+- [x] **2.6** Focus ring visibility — `focus-visible` стили в globals.css
 
 ---
 
-## Todo Items
+## Review
 
-### Фаза 1: Базовая инфраструктура
+### Изменённые файлы (13):
 
-- [x] Создать API endpoint `/api/ai/roadmap`
-  - Файл: `src/app/api/ai/roadmap/route.ts`
-  - Принимает `{ messages: Array<{role, content}> }`
-  - Возвращает `{ content: string }`
+| Файл | Изменение |
+|------|-----------|
+| `src/app/(auth)/login/page.tsx` | responsive padding |
+| `src/app/(auth)/signup/page.tsx` | responsive padding |
+| `src/app/(auth)/forgot-password/page.tsx` | responsive padding |
+| `src/app/(auth)/reset-password/page.tsx` | responsive padding |
+| `src/widgets/bottom-navigation/ui/BottomNavigation.tsx` | safe-area-inset-bottom |
+| `src/widgets/mobile-board/ui/MobileBoard.tsx` | pb-16→pb-20 |
+| `src/entities/task/ui/TaskCard.tsx` | touch targets p-2, icons 16-18px |
+| `src/widgets/board/ui/Board.tsx` | responsive px, search/progress width, RU texts |
+| `src/entities/column/ui/Column.tsx` | responsive width, EmptyColumnState |
+| `src/shared/ui/Modal.tsx` | sm:max-w-md mobile fullscreen |
+| `src/app/layout.tsx` | Toaster from sonner |
+| `src/features/feedback/ui/FeedbackModal.tsx` | alert→toast |
+| `src/features/add-column/ui/AddColumnButton.tsx` | alert→toast |
+| `src/features/export-data/ui/ExportButtonsGroup.tsx` | alert→toast (4 places) |
+| `src/app/globals.css` | prefers-reduced-motion, focus-visible |
 
-- [x] Добавить функцию `generateRoadmapChat()` в `src/lib/deepseek.ts`
-  - System prompt для roadmap generation
-  - Поддержка диалоговой истории
-  - Температура 0.8 для креативности
+### Новые файлы (2):
 
-- [x] Создать хук `useRoadmapAI` в `src/features/roadmap/hooks/useRoadmapAI.ts`
-  - Управление состоянием диалога
-  - Отправка сообщений в API
-  - Парсинг вариантов ответов (формат `ВАРИАНТЫ: [опция1, опция2]`)
-  - Метод `getFinalRoadmap()` для получения результата
+| Файл | Назначение |
+|------|-----------|
+| `src/shared/ui/EmptyColumnState.tsx` | Empty state для пустых колонок |
+| `src/shared/ui/TaskCardSkeleton.tsx` | Skeleton для loading state (готов к использованию) |
 
-### Фаза 2: UI компоненты
+### Зависимости:
 
-- [x] Создать компонент `RoadmapAIChat` в `src/features/roadmap/ui/RoadmapAIChat.tsx`
-  - Модальное окно с чатом
-  - Список сообщений (AI + пользователь)
-  - Кнопки с вариантами ответов
-  - Поле ввода для своего ответа
-  - Кнопки "Применить" и "Отмена"
-  - Toast уведомления
-  - Обработка ошибок
+- `sonner` v2.0.7 — toast notifications (2KB, zero-config)
 
-- [x] Создать стили для чата в `src/features/roadmap/ui/RoadmapAIChat.module.css`
-  - Анимации появления
-  - Сообщения AI (слева) и пользователя (справа)
-  - Кнопки с вариантами
-  - Toast уведомления
+### Верификация:
 
-- [x] Интегрировать AI чат в `RoadmapPanel.tsx`
-  - Добавить кнопку "AI" с иконкой Sparkles в header
-  - Добавить состояние `isAIChatOpen`
-  - Рендерить `RoadmapAIChat` при открытии
-  - Передать `onApply` callback для обновления content
-
-### Фаза 3: Парсинг и создание задач
-
-- [x] Создать `src/features/roadmap/lib/parser.ts`
-  - Функция `isAIGenerated(content)` — проверка маркера
-  - Функция `parseRoadmapTasks(content)` — парсинг нумерованного списка
-  - Формат: "1. Текст", "2. Текст" и т.д.
-  - Возвращает `Array<{ number, title, lineNumber }>`
-
-- [x] Создать `src/features/roadmap/lib/task-creator.ts`
-  - Функция `createTasksFromRoadmap(boardId, tasks, maxTasks)`
-  - Поиск колонки "Новые задачи" (или первой колонки)
-  - Создание задач в Supabase
-  - Возвращает `{ success, created, errors }`
-
-- [x] Добавить кнопку "Создать задачи" в `RoadmapPanel.tsx`
-  - Показывать только если `isAIGenerated` и есть задачи
-  - Текст: "Создать N задач" (максимум 5)
-  - При клике — вызов `createTasksFromRoadmap`
-  - Показать результат через toast
-
-### Фаза 4: Тестирование и полировка
-
-- [x] Протестировать полный flow
-  1. Открыть RoadmapPanel
-  2. Нажать кнопку "AI"
-  3. Ввести идею проекта
-  4. Ответить на 3-5 вопросов AI
-  5. Получить финальную roadmap
-  6. Нажать "Применить"
-  7. Проверить что roadmap появилась в textarea
-  8. Нажать "Создать задачи"
-  9. Проверить что задачи создались в колонке
-
-- [x] Проверить edge cases
-  - Пустой ответ от AI
-  - Нет колонки "Новые задачи"
-  - Невалидный формат задач
-  - API rate limits
-  - Ручное редактирование AI-roadmap
-
-- [x] Проверить TypeScript компиляцию
-  - Убедиться что нет ошибок типов
-  - Все импорты корректны
-
-- [x] Написать review section в этом файле
-
----
-
-## Структура файлов
-
-### Новые файлы:
-
-```
-src/
-├── app/api/ai/roadmap/
-│   └── route.ts                          # API endpoint
-├── features/roadmap/
-│   ├── hooks/
-│   │   └── useRoadmapAI.ts               # AI chat hook
-│   ├── lib/
-│   │   ├── parser.ts                     # Parse tasks from roadmap
-│   │   └── task-creator.ts               # Create tasks in DB
-│   └── ui/
-│       ├── RoadmapAIChat.tsx             # Chat modal component
-│       └── RoadmapAIChat.module.css      # Chat styles
-└── lib/
-    └── deepseek.ts                       # Add generateRoadmapChat()
-```
-
-### Изменяемые файлы:
-
-```
-src/features/roadmap/ui/RoadmapPanel.tsx  # Add AI button & integration
-```
-
----
-
-## Критерии завершения
-
-1. ✅ AI чат открывается по кнопке в RoadmapPanel
-2. ✅ AI задаёт вопросы с вариантами ответов
-3. ✅ Пользователь может выбрать вариант или ввести свой ответ
-4. ✅ После 3-5 итераций AI генерирует финальную roadmap
-5. ✅ Roadmap содержит маркер `<!-- AI_GENERATED -->`
-6. ✅ Roadmap содержит нумерованный список задач
-7. ✅ Кнопка "Создать задачи" появляется для AI-roadmap
-8. ✅ При клике создаются первые 5 задач в колонке
-9. ✅ TypeScript компилируется без ошибок
-10. ✅ Все edge cases обработаны
-
----
-
-## Review Section
-
-### ✅ Реализация завершена!
-
-**Что было создано:**
-
-#### Новые файлы (6 файлов):
-
-1. **`src/app/api/ai/roadmap/route.ts`** - API endpoint для AI roadmap
-   - POST `/api/ai/roadmap`
-   - Принимает массив сообщений для диалога
-   - Возвращает ответ от DeepSeek API
-
-2. **`src/lib/deepseek.ts`** (дополнен)
-   - Добавлен интерфейс `RoadmapChatMessage`
-   - Добавлена функция `generateRoadmapChat()`
-   - System prompt для roadmap generation с правилами форматирования
-
-3. **`src/features/roadmap/hooks/useRoadmapAI.ts`** - Хук для AI чата
-   - Управление состоянием диалога
-   - Парсинг вариантов ответов из формата `ВАРИАНТЫ: [опция1, опция2]`
-   - Методы: `sendMessage`, `startSession`, `reset`, `getFinalRoadmap`
-
-4. **`src/features/roadmap/ui/RoadmapAIChat.tsx`** - Компонент модального чата
-   - Модальное окно с чатом как в Claude Code
-   - Сообщения AI слева, пользователя справа
-   - Кнопки с вариантами ответов
-   - Toast уведомления
-   - Обработка ошибок API
-
-5. **`src/features/roadmap/ui/RoadmapAIChat.module.css`** - Стили чата
-   - Анимации появления (fadeIn, slideUp)
-   - Разные стили для AI и пользовательских сообщений
-   - Hover эффекты для кнопок
-   - Toast уведомления
-
-6. **`src/features/roadmap/lib/parser.ts`** - Парсер roadmap
-   - `isAIGenerated()` — проверка маркера `<!-- AI_GENERATED -->`
-   - `parseRoadmapTasks()` — парсинг нумерованного списка задач
-   - Возвращает `Array<{ number, title, lineNumber }>`
-
-7. **`src/features/roadmap/lib/task-creator.ts`** - Создатель задач
-   - `createTasksFromRoadmap()` — создание задач в Supabase
-   - Поиск колонки "Новые задачи" или использование первой
-   - Возвращает `{ success, created, errors }`
-
-#### Изменённые файлы (1 файл):
-
-8. **`src/features/roadmap/ui/RoadmapPanel.tsx`**
-   - Добавлена кнопка AI с градиентом и иконкой Sparkles
-   - Добавлено состояние `isAIChatOpen`
-   - Интегрирован компонент `RoadmapAIChat`
-   - Добавлена кнопка "Создать N задач" для AI-roadmap
-   - Добавлены toast уведомления о создании задач
-
-### 📁 Структура FSD:
-
-```
-src/
-├── app/
-│   └── api/
-│       └── ai/
-│           └── roadmap/
-│               └── route.ts              # API layer
-├── features/
-│   └── roadmap/
-│       ├── hooks/
-│       │   └── useRoadmapAI.ts           # State management
-│       ├── lib/
-│       │   ├── parser.ts                 # Business logic
-│       │   └── task-creator.ts           # Business logic
-│       └── ui/
-│           ├── RoadmapPanel.tsx          # UI component (modified)
-│           ├── RoadmapAIChat.tsx         # UI component (new)
-│           └── RoadmapAIChat.module.css  # Styles (new)
-└── lib/
-    └── deepseek.ts                       # Shared library (extended)
-```
-
-### 🎯 Как это работает:
-
-**Flow генерации roadmap:**
-```
-1. Пользователь нажимает кнопку ✨ AI в RoadmapPanel
-2. Открывается модальное окно RoadmapAIChat
-3. Пользователь вводит идею проекта
-4. AI отвечает вопросом + варианты (ВАРИАНТЫ: [опция1, опция2])
-5. Пользователь выбирает вариант или вводит свой ответ
-6. Повторяется 3-5 раз
-7. AI генерирует финальную roadmap с маркером <!-- AI_GENERATED -->
-8. Пользователь нажимает "✓ Применить"
-9. Roadmap сохраняется в textarea и в Supabase
-10. Появляется кнопка "Создать N задач"
-```
-
-**Flow создания задач:**
-```
-1. Пользователь нажимает "Создать N задач"
-2. parser.ts проверяет маркер и парсит нумерованный список
-3. task-creator.ts находит колонку "Новые задачи" (или первую)
-4. Создаёт первые 5 задач в Supabase
-5. Показывается toast "✓ Создано N задач"
-```
-
-### 🔧 Технические детали:
-
-- **Stateless chat:** Вся история на клиенте, каждый запрос отправляет полный контекст
-- **Marker-based:** Маркер `<!-- AI_GENERATED -->` для идентификации AI-roadmap
-- **Numbered list format:** "1. Задача", "2. Задача" — простой и парсимый формат
-- **DeepSeek reuse:** Используется существующий API ключ
-- **Toast notifications:** Уведомления в правом нижнем углу
-- **Error handling:** API ошибки, пустые ответы, невалидный формат
-
-### 📝 Следующие шаги для пользователя:
-
-1. **Запустить dev сервер:**
-   ```bash
-   npm run dev
-   ```
-
-2. **Протестировать функционал:**
-   - Открыть Kanban доску
-   - Нажать на RoadmapPanel внизу экрана
-   - Нажать кнопку ✨ AI
-   - Ввести идею проекта
-   - Ответить на вопросы AI
-   - Получить roadmap
-   - Нажать "Создать N задач"
-   - Проверить что задачи создались
-
-3. **Развернуть на продакшн:**
-   ```bash
-   npm run build:cloudflare
-   npm run deploy:cloudflare
-   ```
-
-### 🚀 Возможные улучшения в будущем:
-
-- Сохранять историю AI-диалогов в БД
-- Редактирование AI-roadmap с регенерацией
-- Экспорт roadmap в markdown/PDF
-- Шаблоны roadmap для разных типов проектов
-- Приоритеты и теги для задач
-- Настройка количества создаваемых задач
+- ✅ `npm run build` — без ошибок
+- ✅ `npm run test` — 83/83 тестов пройдено (10 файлов)

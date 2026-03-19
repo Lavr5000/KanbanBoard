@@ -9,6 +9,7 @@ import { Plus } from "lucide-react";
 import { Modal } from "@/shared/ui/Modal";
 import { AddTaskModal } from "@/features/task-operations/ui/AddTaskModal";
 import { ColumnHeader } from "./ColumnHeader";
+import { EmptyColumnState } from "@/shared/ui/EmptyColumnState";
 import { clsx } from "clsx";
 
 interface Props {
@@ -34,7 +35,7 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
   });
 
   return (
-    <div className="flex flex-col w-[300px] min-h-[500px]" data-testid="column" data-column-id={column.id}>
+    <div className="flex flex-col w-[280px] lg:w-[300px] min-h-[500px]" data-testid="column" data-column-id={column.id}>
       <div className="flex items-center gap-2 mb-4">
         <Plus
           data-tour="add-task-btn"
@@ -64,6 +65,7 @@ export const Column = ({ column, tasks, onDeleteTrigger, boardName, isFirst = fa
         {/* Rim light effect */}
         <div className="absolute bottom-0 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-purple-400/30 to-transparent"></div>
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+          {tasks.length === 0 && <EmptyColumnState />}
           {tasks.map((task) => (
             <TaskCard
               key={task.id}

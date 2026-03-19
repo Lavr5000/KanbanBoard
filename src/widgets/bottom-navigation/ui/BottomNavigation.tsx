@@ -8,7 +8,7 @@ export function BottomNavigation() {
   const [activeTab, setActiveTab] = useState('board');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[#121218]/90 backdrop-blur-md border-t border-gray-800 flex items-center justify-around z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[#121218]/90 backdrop-blur-md border-t border-gray-800 flex items-center justify-around z-50 md:hidden pb-[env(safe-area-inset-bottom,0px)]">
       {navigationItems.map((item) => (
         <NavigationItemComponent
           key={item.id}

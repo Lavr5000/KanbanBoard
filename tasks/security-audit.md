@@ -146,3 +146,53 @@
    npm run deploy
    ```
 
+---
+
+## ИНЦИДЕНТ: Утечка API ключей из wrangler.toml (28.02.2026)
+
+### Хронология
+
+| Дата | Событие |
+|------|---------|
+| 30.12.2025 | Коммит `0db2e86` — ключ DEEPSEEK_API_KEY добавлен в `wrangler.toml` |
+| 04.01.2026 10:16 | Коммит `e7eacf8` — security fix, ключ убран |
+| 04.01.2026 14:46 | Коммит `7005be4` — РЕВЕРТ, ключ снова на main |
+| Февраль 2026 | 8,090 несанкционированных запросов deepseek-reasoner, ~$17.50 ущерба |
+| 28.02.2026 | Ключ удалён на платформе DeepSeek |
+| 28.02.2026 | Git-история полностью очищена от wrangler.toml и SECURITY_AUDIT_REPORT.md |
+
+### Утекшие секреты
+
+| Секрет | Статус |
+|--------|--------|
+| `DEEPSEEK_API_KEY` (`sk-5b24ee...f625`) | УДАЛЁН на платформе DeepSeek |
+| `SUPABASE_SERVICE_ROLE_KEY` | Был в wrangler.toml, удалён из истории. Рекомендуется ротация |
+| `SUPABASE_ANON_KEY` | Публичный ключ, менее критичен |
+
+### Выполненные действия
+
+- [x] Установлен `git-filter-repo`
+- [x] Удалён `wrangler.toml` из ВСЕЙ git-истории (257 коммитов переписаны)
+- [x] Удалён `SECURITY_AUDIT_REPORT.md` из истории (содержал ключ в открытом виде)
+- [x] Force push на GitHub (24 ветки обновлены)
+- [x] Верификация: `git log --all -S "sk-5b24ee"` = 0 результатов
+- [x] Верификация: GitHub API `/contents/wrangler.toml` = 404
+- [x] `.gitignore` уже содержит `wrangler.toml`
+- [x] Проверить Supabase Dashboard — ПРОВЕРЕНО (см. ниже)
+- [ ] Проверить DeepSeek usage за январь — ТРЕБУЕТ РУЧНОГО ВХОДА
+- [ ] Ротация Supabase Service Role Key — НЕ ТРЕБУЕТСЯ (проект удалён)
+
+### Результаты проверки Supabase (28.02.2026)
+
+- Проект `ygxnblhpjdhqjgcmcxgu` (из wrangler.toml) → **404 Not Found** (удалён/пересоздан)
+- Утекший Service Role Key привязан к несуществующему проекту → **недействителен**
+- Текущий проект `sqhtukwjmlaxuvemkydn` — 4 пользователя, все легитимные
+- Auth логи: только штатные `token_refreshed` / `token_revoked` от Лавров Д.В.
+- Посторонних аккаунтов и подозрительной активности **НЕ ОБНАРУЖЕНО**
+
+### Рекомендации
+
+1. ~~Ротировать Supabase Service Role Key~~ — НЕ ТРЕБУЕТСЯ (проект удалён, ключ недействителен)
+2. **Проверить DeepSeek usage за январь** — зайти вручную на platform.deepseek.com
+3. **Для нового деплоя** — хранить ключи через Cloudflare Secrets (`wrangler secret put`), а не в wrangler.toml
+4. **Никогда не коммитить wrangler.toml** — уже в .gitignore

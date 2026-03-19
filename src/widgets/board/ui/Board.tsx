@@ -287,11 +287,14 @@ export const Board = () => {
     }
   };
 
-  // Loading state
-  if (loading) {
+  // Loading state — only show full spinner on initial load (no data yet)
+  if (loading && columns.length === 0) {
     return (
       <div className="flex w-full items-center justify-center min-h-screen bg-[#121218]">
-        <div className="text-white text-lg">Loading board data...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="text-gray-400 text-lg">Загрузка данных доски...</div>
+        </div>
       </div>
     );
   }
@@ -300,7 +303,7 @@ export const Board = () => {
   if (error) {
     return (
       <div className="flex w-full items-center justify-center min-h-screen bg-[#121218]">
-        <div className="text-red-500 text-lg">Error loading board: {error.message}</div>
+        <div className="text-red-500 text-lg">Ошибка загрузки: {error.message}</div>
       </div>
     );
   }
@@ -409,7 +412,7 @@ export const Board = () => {
           <BoardBackground />
       <div className="flex-grow flex flex-col relative z-10">
         {/* Top Header */}
-        <header className="h-20 border-b border-gray-800 flex items-center justify-between px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
+        <header className="h-20 border-b border-gray-800 flex items-center justify-between px-4 lg:px-10 bg-[#121218]/80 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-white">Канбан доска</h1>
@@ -418,7 +421,7 @@ export const Board = () => {
                   Прогресс
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-32 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                  <div className="w-24 lg:w-32 h-1.5 bg-gray-800 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 transition-all duration-500"
                       style={{ width: `${progressStats.percentage}%` }}
@@ -438,7 +441,7 @@ export const Board = () => {
                 placeholder="Поиск задач..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-[#1c1c24] border border-gray-800 rounded-lg py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500 w-64 transition-all"
+                className="bg-[#1c1c24] border border-gray-800 rounded-lg py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-blue-500 w-48 lg:w-64 transition-all"
               />
             </div>
 
@@ -495,7 +498,7 @@ export const Board = () => {
         </header>
 
         {/* Board Content */}
-        <div className="flex w-full overflow-x-auto overflow-y-hidden px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide" data-testid="board-container">
+        <div className="flex w-full overflow-x-auto overflow-y-hidden px-4 lg:px-10 pt-10 gap-8 bg-[#121218] min-h-screen scrollbar-hide" data-testid="board-container">
         <DndContext
           sensors={sensors}
           onDragStart={onDragStart}

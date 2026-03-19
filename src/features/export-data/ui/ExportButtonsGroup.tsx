@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { ExportButtonsGroupProps, ExportFormat } from '../model/types';
 import { exportToExcel } from '../lib/exporters/excelExporter';
 import { exportToPDF } from '../lib/exporters/pdfExporter';
@@ -53,19 +54,19 @@ export function ExportButtonsGroup({
 
     if (!board || !boardId) {
       console.error('No board selected:', { board, boardId });
-      alert('Сначала выберите проект');
+      toast.error('Сначала выберите проект');
       return;
     }
 
     if (!tasks || tasks.length === 0) {
       console.error('No tasks to export');
-      alert('Нет задач для экспорта');
+      toast.error('Нет задач для экспорта');
       return;
     }
 
     if (!columns || columns.length === 0) {
       console.error('No columns');
-      alert('Нет колонок');
+      toast.error('Нет колонок');
       return;
     }
 
@@ -87,7 +88,7 @@ export function ExportButtonsGroup({
       setShowExportModal(false);
     } catch (error) {
       console.error('Export error:', error);
-      alert('Ошибка экспорта: ' + (error as Error).message);
+      toast.error('Ошибка экспорта: ' + (error as Error).message);
     }
   };
 

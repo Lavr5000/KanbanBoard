@@ -5,6 +5,7 @@ import { Modal } from "@/shared/ui/Modal";
 import { useFeedbackModal } from "../model/useFeedbackModal";
 import { submitFeedback } from "../api/submitFeedback";
 import { CATEGORY_LABELS, type Category } from "../model/types";
+import { toast } from "sonner";
 
 const CATEGORIES: Array<{ value: Category; label: string }> = [
   { value: "bug", label: "Баг" },
@@ -39,7 +40,7 @@ export const FeedbackModal = () => {
     } catch (error) {
       setIsSubmitting(false);
       console.error("Failed to submit feedback:", error);
-      alert("Ошибка при отправке. Попробуйте еще раз.");
+      toast.error("Ошибка при отправке. Попробуйте еще раз.");
     }
   };
 

@@ -14,6 +14,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // If code is missing or exchange failed, redirect to login
-  return NextResponse.redirect(`${origin}/login`)
+  // If code is missing or exchange failed, redirect to login with error
+  return NextResponse.redirect(`${origin}/login?error=callback_failed`)
 }

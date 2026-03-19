@@ -52,7 +52,7 @@ npx wrangler login
 ```
 
 2. **Set environment variables** in Cloudflare Dashboard:
-   - Go to: Cloudflare Workers & Pages → lavr-ai-kanban-doska → Settings → **Variables**
+   - Go to: Cloudflare Workers & Pages → kanban-board-peach-three → Settings → **Variables**
    - Add: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DEEPSEEK_API_KEY`
 
    **Note:** These variables are already configured. No need to re-add them unless adding new secrets.
@@ -77,7 +77,7 @@ npx wrangler login
 
 ## Environment Variables (Cloudflare Dashboard)
 
-Set these in Cloudflare Dashboard → Workers & Pages → lavr-ai-kanban-doska → Settings → **Variables**:
+Set these in Cloudflare Dashboard → Workers & Pages → kanban-board-peach-three → Settings → **Variables**:
 
 - [x] `NEXT_PUBLIC_SUPABASE_URL` ✅ (already configured)
 - [x] `NEXT_PUBLIC_SUPABASE_ANON_KEY` ✅ (already configured)

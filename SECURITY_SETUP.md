@@ -35,7 +35,7 @@ You need to set these secrets in Cloudflare Dashboard:
 ### Option 1: Cloudflare Dashboard (Recommended for Production)
 
 1. Go to: https://dash.cloudflare.com/
-2. Navigate to: **Workers & Pages** → **lavr-ai-kanban-doska** → **Settings** → **Variables and Secrets**
+2. Navigate to: **Workers & Pages** → **kanban-board-peach-three** → **Settings** → **Variables and Secrets**
 3. Click **"Add variable"** for each secret:
    - Name: `DEEPSEEK_API_KEY` → Value: `your-actual-key`
    - Name: `SUPABASE_SERVICE_ROLE_KEY` → Value: `your-actual-key`
