@@ -59,11 +59,7 @@ jobs:
         run: |
           echo "Checking for known React 19 incompatible packages..."
 
-          # Check for framer-motion 12.x (incompatible with React 19)
-          if npm list framer-motion 2>/dev/null | grep -q "framer-motion@12"; then
-            echo "ERROR: framer-motion 12.x is incompatible with React 19"
-            exit 1
-          fi
+          # framer-motion 12.x is React 19 compatible (removed false positive check)
 
           # Check @testing-library/react version
           TL_VERSION=$(npm list @testing-library/react --depth=0 2>/dev/null | grep @testing-library/react | awk '{print $2}')
