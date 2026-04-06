@@ -9,24 +9,29 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Query Supabase (real SELECT counts as activity)
         id: ping
         continue-on-error: true
         run: |
+          # Real SELECT against 'boards' table — Supabase only counts
+          # actual data queries as "activity", not /rest/v1/ pings.
+          URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/boards?select=id&limit=1"
+          KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}"
+
           echo "=== Attempt 1 ==="
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
-            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/" \
-            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+          STATUS=$(curl -s -o /tmp/body.txt -w "%{http_code}" --max-time 30 \
+            "$URL" -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
           EXIT_CODE=$?
 
           if [ "$EXIT_CODE" -eq 0 ] && [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "Supabase is alive (HTTP $STATUS)"
+            echo "Supabase SELECT ok (HTTP $STATUS)"
+            cat /tmp/body.txt
             exit 0
           fi
 
           echo "Attempt 1 failed (exit=$EXIT_CODE, http=$STATUS)"
+          cat /tmp/body.txt || true
 
-          # Diagnose failure
           if [ "$EXIT_CODE" -eq 6 ]; then
             echo "::warning::DNS resolution failed — project may be paused"
           elif [ "$EXIT_CODE" -eq 28 ]; then
@@ -38,17 +43,17 @@ jobs:
           echo "=== Retry in 30s ==="
           sleep 30
 
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
-            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/" \
-            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+          STATUS=$(curl -s -o /tmp/body.txt -w "%{http_code}" --max-time 30 \
+            "$URL" -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
           EXIT_CODE=$?
 
           if [ "$EXIT_CODE" -eq 0 ] && [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "Supabase is alive after retry (HTTP $STATUS)"
+            echo "Supabase SELECT ok after retry (HTTP $STATUS)"
+            cat /tmp/body.txt
             exit 0
           fi
 
-          echo "::error::REST API ping failed after retry (exit=$EXIT_CODE, http=$STATUS)"
+          echo "::error::SELECT failed after retry (exit=$EXIT_CODE, http=$STATUS)"
           exit 1
 
       - name: Fallback — Check via Management API
