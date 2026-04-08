@@ -55,6 +55,10 @@
   ],
   "exclude": [
     "node_modules",
-    "e2e"
+    "e2e",
+    "src/__tests__",
+    "console-test.js",
+    "modal-test.js",
+    "vitest.config.ts"
   ]
 }

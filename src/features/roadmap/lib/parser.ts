@@ -54,17 +54,17 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
   // Try multiple regex patterns to match different formats
   const patterns = [
     // Format: "1. **Title:** Description" (with bold markdown + colon - AI format)
-    /^\d+[\.)]\s+\*\*(.+?)\*\*:\s*(.+)$/,
+    /^\d+[.)]\s+\*\*(.+?)\*\*:\s*(.+)$/,
     // Format: "1. **Title** - Description" (with bold markdown + dash)
-    /^\d+[\.)]\s+\*\*(.+?)\*\*\s+-\s+(.+)$/,
+    /^\d+[.)]\s+\*\*(.+?)\*\*\s+-\s+(.+)$/,
     // Format: "1. Title: Description" (without bold + colon - AI format)
-    /^\d+[\.)]\s+(.+?):\s*(.+)$/,
+    /^\d+[.)]\s+(.+?):\s*(.+)$/,
     // Format: "1. Title - Description" (without bold + dash)
-    /^\d+[\.)]\s+(.+?)\s+-\s+(.+)$/,
+    /^\d+[.)]\s+(.+?)\s+-\s+(.+)$/,
     // Format: "1. **Title**" (just bold title, no description yet)
-    /^\d+[\.)]\s+\*\*(.+?)\*\*$/,
+    /^\d+[.)]\s+\*\*(.+?)\*\*$/,
     // Format: "1. Title" (just title, no description)
-    /^\d+[\.)]\s+(.+)$/,
+    /^\d+[.)]\s+(.+)$/,
   ]
 
   for (let i = 0; i < lines.length; i++) {
@@ -96,7 +96,7 @@ export function parseRoadmapTasks(content: string): ParsedTask[] {
           for (let j = i + 1; j < lines.length && j < i + 5; j++) {
             const nextLine = lines[j].trim()
             // Stop if empty, new task, or section
-            if (!nextLine || nextLine.match(/^\d+[\.)]/) || nextLine.startsWith('#') || nextLine.startsWith('**')) {
+            if (!nextLine || nextLine.match(/^\d+[.)]/) || nextLine.startsWith('#') || nextLine.startsWith('**')) {
               break
             }
             descLines.push(nextLine)

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
     // Calculate start date
     const now = new Date()
-    let startDate = new Date()
+    const startDate = new Date()
 
     switch (timeRange) {
       case '24h':
